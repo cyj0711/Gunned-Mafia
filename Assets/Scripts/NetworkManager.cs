@@ -5,13 +5,14 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 
-public class NetworkManager : MonoBehaviourPunCallbacks
+//public class NetworkManager : MonoBehaviourPunCallbacks
+public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 {
     public InputField NickNameInput;
     public GameObject DisconnectPanel;
     public GameObject RespawnPanel;
 
-    private void Awake()
+    private void Start()    // singleton 적용하기전엔 Awake 함수였슴
     {
         Screen.SetResolution(960, 540, false);
 
@@ -32,12 +33,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         DisconnectPanel.SetActive(false);
+        StartCoroutine("DestroyBullet");
         Spawn();
+    }
+
+    IEnumerator DestroyBullet()
+    {
+        yield return new WaitForSeconds(0.2f);
+        foreach (GameObject GO in GameObject.FindGameObjectsWithTag("Bullet"))
+            GO.GetComponent<PhotonView>().RPC("DestroyRPC", RpcTarget.All);
     }
 
     public void Spawn()
     {
-        PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player", new Vector3 (Random.Range(-0.5f,1f),Random.Range(-1f,0f),0), Quaternion.identity);
         RespawnPanel.SetActive(false);
     }
 
@@ -47,6 +56,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected)
             PhotonNetwork.Disconnect();
     }
+
 
     public override void OnDisconnected(DisconnectCause cause)
     {

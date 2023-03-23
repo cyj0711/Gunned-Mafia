@@ -24,9 +24,9 @@ public class BulletScript : MonoBehaviourPunCallbacks
 
         if (!PV.IsMine && col.tag == "Player" && col.GetComponent<PhotonView>().IsMine)    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
         {
-            PlayerScript ps = col.GetComponent<PlayerScript>();
+            PlayerScript ps = col.GetComponentInParent<PlayerScript>();
             ps.Hit(30);
-            PV.RPC("Destroy", RpcTarget.AllBuffered);
+            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
         }
     }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+using Cinemachine;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -36,6 +37,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
         characterAnimationController = character.GetComponent<CharacterAnimationController>();
         weaponManager = weapons.GetComponent<WeaponManager>();
+
+        if(PV.IsMine)
+        {
+            // 2D 카메라
+            var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
+            CM.Follow = transform;
+            CM.LookAt = transform;
+        }
     }
 
     private void Start()
