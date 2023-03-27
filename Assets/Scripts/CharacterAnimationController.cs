@@ -5,7 +5,7 @@ using UnityEngine;
 public class CharacterAnimationController : MonoBehaviour
 {
     public Animator animator;
-    void Start()
+    void Awake()
     {
         animator = GetComponent<Animator>();
     }

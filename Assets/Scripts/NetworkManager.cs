@@ -19,23 +19,32 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         // 이거 쓰면 더 빨라진다는데 정확힌 모름
         PhotonNetwork.SendRate = 60;
         PhotonNetwork.SerializationRate = 30;
+
+        StartSetting();
     }
 
-    // 인게임에서 접속 버튼 누르면 Connect 함수 작동
-    public void Connect() => PhotonNetwork.ConnectUsingSettings();
-
-    public override void OnConnectedToMaster()
-    {
-        PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
-        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 8 }, null);
-    }
-
-    public override void OnJoinedRoom()
+    private void StartSetting()
     {
         DisconnectPanel.SetActive(false);
         StartCoroutine("DestroyBullet");
         Spawn();
     }
+
+    //// 인게임에서 접속 버튼 누르면 Connect 함수 작동
+    //public void Connect() => PhotonNetwork.ConnectUsingSettings();
+
+    //public override void OnConnectedToMaster()
+    //{
+    //    PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
+    //    PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 8 }, null);
+    //}
+
+    //public override void OnJoinedRoom()
+    //{
+    //    DisconnectPanel.SetActive(false);
+    //    StartCoroutine("DestroyBullet");
+    //    Spawn();
+    //}
 
     IEnumerator DestroyBullet()
     {

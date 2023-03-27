@@ -169,8 +169,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
         if (stream.IsWriting)    // PV가 IsMine 일 때 작동돼서 넘겨줌
         {
-            stream.SendNext(transform.position);
-            stream.SendNext(HealthImage.fillAmount);
+            stream.SendNext(transform.position);        // 캐릭터 위치
+            stream.SendNext(HealthImage.fillAmount);    // 캐릭터 체력
         }
         else                    // IsMine 아닐 때 작동돼서 받음
         {
