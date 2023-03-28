@@ -23,12 +23,12 @@ public class CrewFloater : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer <= 0f)
         {
-            SPawnFloatingCrew((EPlayerColor)Random.Range(0, 12), distance);
+            SPawnFloatingCrew((E_PlayerColor)Random.Range(0, 12), distance);
             timer = 1f;
         }
     }
 
-    public void SPawnFloatingCrew(EPlayerColor playerColor, float dist)
+    public void SPawnFloatingCrew(E_PlayerColor playerColor, float dist)
     {
         if (!crewStates[(int)playerColor])
         {

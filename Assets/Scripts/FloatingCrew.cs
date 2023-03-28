@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FloatingCrew : MonoBehaviour
 {
-    public EPlayerColor playerColor;
+    public E_PlayerColor playerColor;
 
     private SpriteRenderer spriteRenderer;
     private Vector3 direction;
@@ -16,7 +16,7 @@ public class FloatingCrew : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void SetFloatingCrew(Sprite sprite, EPlayerColor playerColor, Vector3 direction, float floatingSpeed, float rotateSpeed, float size)
+    public void SetFloatingCrew(Sprite sprite, E_PlayerColor playerColor, Vector3 direction, float floatingSpeed, float rotateSpeed, float size)
     {
         this.playerColor = playerColor;
         this.direction = direction;

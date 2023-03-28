@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EPlayerColor
+public enum E_PlayerColor
 {
     Red, Blue, Green,
     Pink, Orange, Yellow,
@@ -28,18 +28,18 @@ public class PlayerColor
         new Color(0.1f, 1f, 0.1f)
     };
 
-    public static Color GetColor(EPlayerColor playerColor) { return colors[(int)playerColor]; }
-    public static Color Red { get { return colors[(int)EPlayerColor.Red]; } }
-    public static Color Blue { get { return colors[(int)EPlayerColor.Blue]; } }
-    public static Color Green { get { return colors[(int)EPlayerColor.Green]; } }
-    public static Color Pink { get { return colors[(int)EPlayerColor.Pink]; } }
-    public static Color Orange { get { return colors[(int)EPlayerColor.Orange]; } }
-    public static Color Yellow { get { return colors[(int)EPlayerColor.Yellow]; } }
-    public static Color Black { get { return colors[(int)EPlayerColor.Black]; } }
-    public static Color White { get { return colors[(int)EPlayerColor.White]; } }
-    public static Color Purple { get { return colors[(int)EPlayerColor.Purple]; } }
-    public static Color Brown { get { return colors[(int)EPlayerColor.Brown]; } }
-    public static Color Cyan { get { return colors[(int)EPlayerColor.Cyan]; } }
-    public static Color Lime { get { return colors[(int)EPlayerColor.Lime]; } }
+    public static Color GetColor(E_PlayerColor playerColor) { return colors[(int)playerColor]; }
+    public static Color Red { get { return colors[(int)E_PlayerColor.Red]; } }
+    public static Color Blue { get { return colors[(int)E_PlayerColor.Blue]; } }
+    public static Color Green { get { return colors[(int)E_PlayerColor.Green]; } }
+    public static Color Pink { get { return colors[(int)E_PlayerColor.Pink]; } }
+    public static Color Orange { get { return colors[(int)E_PlayerColor.Orange]; } }
+    public static Color Yellow { get { return colors[(int)E_PlayerColor.Yellow]; } }
+    public static Color Black { get { return colors[(int)E_PlayerColor.Black]; } }
+    public static Color White { get { return colors[(int)E_PlayerColor.White]; } }
+    public static Color Purple { get { return colors[(int)E_PlayerColor.Purple]; } }
+    public static Color Brown { get { return colors[(int)E_PlayerColor.Brown]; } }
+    public static Color Cyan { get { return colors[(int)E_PlayerColor.Cyan]; } }
+    public static Color Lime { get { return colors[(int)E_PlayerColor.Lime]; } }
 
 }
