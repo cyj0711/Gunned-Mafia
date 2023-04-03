@@ -19,7 +19,6 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         // 이거 쓰면 더 빨라진다는데 정확힌 모름
         PhotonNetwork.SendRate = 60;
         PhotonNetwork.SerializationRate = 30;
-
         StartSetting();
     }
 
@@ -66,6 +65,11 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
             PhotonNetwork.Disconnect();
     }
 
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        //base.OnPlayerEnteredRoom(newPlayer);
+        Debug.Log(newPlayer.NickName + ": " + newPlayer.ActorNumber.ToString());
+    }
 
     public override void OnDisconnected(DisconnectCause cause)
     {

@@ -6,6 +6,16 @@ using Photon.Realtime;
 using UnityEngine.UI;
 using Cinemachine;
 
+public enum E_PlayerRole
+{
+    None, Civil, Mafia, Detective   // 미참여(관전), 시민, 마피아, 탐정
+}
+
+public enum E_PlayerState
+{
+    Alive, Missing, Dead, Spectator // 생존, 실종, 사망, 관전
+}
+
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 {
     public Rigidbody2D RB;
@@ -13,14 +23,19 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     public Text NickNameText;
     public Image HealthImage;
 
-    int hp = 100;
-    int currentHp;
-
     public GameObject weapons;
     public GameObject character;
 
     CharacterAnimationController characterAnimationController;
     WeaponManager weaponManager;
+
+    public E_PlayerRole PlayerRole { get { return playerRole; } set { playerRole = value; } }
+    public E_PlayerState PlayerState { get { return playerState; } set { playerState = value; } }
+    private E_PlayerRole playerRole;
+    private E_PlayerState playerState;
+
+    int hp = 100;
+    int currentHp;
 
     Vector3 curPos;
 
@@ -45,6 +60,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             CM.Follow = transform;
             CM.LookAt = transform;
         }
+
     }
 
     private void Start()
@@ -54,6 +70,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         lastSeeingRight = isSeeingRight;
 
         currentHp = 100;
+
+        PlayerRole = E_PlayerRole.None;
+        if (GameManager.I.GameState == E_GAMESTATE.Play || GameManager.I.GameState == E_GAMESTATE.Cooling) PlayerState = E_PlayerState.Spectator;
+        else PlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
     }
 
     void Update()
@@ -79,6 +99,25 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         else
             transform.position = Vector3.Lerp(transform.position, curPos, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
     }
+
+    //private static int PlayerID = -1;
+
+    //public void SetPlayerID()
+    //{
+    //    int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+    //    Player[] sortedPlayers = PhotonNetwork.PlayerList;
+
+    //    for (int i = 0; i < sortedPlayers.Length; i += 1)
+    //    {
+    //        if (sortedPlayers[i].ActorNumber == actorNumber)
+    //        {
+    //            PlayerID = i;
+    //            break;
+    //        }
+    //    }
+
+    //    Debug.Log(NickNameText.text + " - PlayerID: " + PlayerID.ToString()+" / ActorNumber: "+actorNumber.ToString());
+    //}
 
     public void Hit(int damage)
     {
