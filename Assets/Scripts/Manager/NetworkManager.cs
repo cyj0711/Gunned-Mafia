@@ -68,7 +68,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         //base.OnPlayerEnteredRoom(newPlayer);
-        Debug.Log(newPlayer.NickName + ": " + newPlayer.ActorNumber.ToString());
+        //Debug.Log(newPlayer.NickName + ": " + newPlayer.ActorNumber.ToString());
     }
 
     public override void OnDisconnected(DisconnectCause cause)

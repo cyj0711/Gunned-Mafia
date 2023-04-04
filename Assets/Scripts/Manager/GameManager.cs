@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
+using System;
 
 public enum E_GAMESTATE  // 현재 게임 방의 진행 상태
 {
@@ -40,10 +41,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     void Start()
     {
         gameState = E_GAMESTATE.Wait;
-        timeForPrepare = 20f;
-        timeForPlay = 300f;
+        timeForPrepare = 5f;
+        timeForPlay = 20f;
         bonusTimeForKill = 30f;
-        timeForCooling = 20f;
+        timeForCooling = 5f;
         numberOfMafia = 1;
         numberOfDetective = 0;
 
@@ -87,7 +88,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
     void UpdateWaitProcess()
     {
-        if(PhotonNetwork.CurrentRoom.PlayerCount >= 2)
+        if(PhotonNetwork.CurrentRoom.PlayerCount >= 1)
         {
             //startTime = PhotonNetwork.Time;
             //endTime = timeForPrepare;
@@ -103,10 +104,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         if (timer >= timeForPrepare)
         {
-            foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-            {
-                Debug.Log(player.NickName);
-            }
+            //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+            //{
+            //    Debug.Log(player.NickName);
+            //}
             //startTime = PhotonNetwork.Time;
             //endTime = timeForPlay;
             //gameState = E_GAMESTATE.Play;
@@ -128,6 +129,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         }
     }
 
+    // 마스터 클라이언트가 모든 플레이어의 역할을 정해주고 나머지 클라이언트에게 알려준다
     void SetPlayerRole()
     {
         playerRoles.Clear();
@@ -140,7 +142,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         for (int i = 0; i < numberOfMafia; i++)   // 마피아 뽑기
         {
-            int index = Random.Range(0, sortedPlayers.Length);
+            int index = UnityEngine.Random.Range(0, sortedPlayers.Length);
             if (GetPlayerRole(sortedPlayers[index].ActorNumber) != E_PlayerRole.Civil)  // 랜덤으로 뽑은 플레이어가 이미 마피아나 경찰이면 다시뽑음
             {
                 i--;
@@ -152,7 +154,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         for (int i = 0; i < numberOfDetective; i++)   // 탐정 뽑기
         {
-            int index = Random.Range(0, sortedPlayers.Length);
+            int index = UnityEngine.Random.Range(0, sortedPlayers.Length);
             if (GetPlayerRole(sortedPlayers[index].ActorNumber) != E_PlayerRole.Civil)  // 랜덤으로 뽑은 플레이어가 이미 마피아나 경찰이면 다시뽑음
             {
                 i--;
@@ -162,22 +164,30 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         }
 
-        PV.RPC("SetPlayerRoleRPC", RpcTarget.OthersBuffered, playerRoles);
-        //PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable() { { "PlayerRoles", playerRoles } });
-        //ht_CustomValue.Add("PlayerRoles", playerRoles);
-        //PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable() { { "PlayerRoles", 1} });
+        // RPC는 dictionary를 받지 못하므로, playerRoles dictionary를 string으로 변환하여 파라미터로 준다.
+        string playerRolesString = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(playerRoles);
+        PV.RPC("SetPlayerRoleRPC", RpcTarget.AllBuffered, playerRolesString);
 
-        for (int i = 0; i < sortedPlayers.Length; i ++)   // 전부 시민으로 초기화
+        for (int i = 0; i < sortedPlayers.Length; i ++)
         {
             Debug.Log(sortedPlayers[i].NickName + " : " + playerRoles[sortedPlayers[i].ActorNumber].ToString());
         }
 
     }
 
+    // playerRoles를 string으로 받아 int, E_PlayerRole형 dictionary로 변환하여 모든 클라이언트에게 전해준다.
     [PunRPC]
-    void SetPlayerRoleRPC(Dictionary<int, E_PlayerRole> roles)
+    void SetPlayerRoleRPC(string playerRolesString)
     {
-        playerRoles = roles;
+        Dictionary<string, string> playerRolesStringDic = StringConverter.I.ConvertStringToDictionary(playerRolesString);
+
+        playerRoles.Clear();
+        foreach (KeyValuePair<string, string> kvPair in playerRolesStringDic)
+        {
+            playerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
+        }
+
+
     }
 
     public E_PlayerRole GetPlayerRole(int actorNumber)  // 특정 유저의 역할 받기
