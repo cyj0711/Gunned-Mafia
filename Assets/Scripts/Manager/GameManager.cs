@@ -42,7 +42,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     {
         gameState = E_GAMESTATE.Wait;
         timeForPrepare = 5f;
-        timeForPlay = 20f;
+        timeForPlay = 300f;
         bonusTimeForKill = 30f;
         timeForCooling = 5f;
         numberOfMafia = 1;
@@ -94,7 +94,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             //endTime = timeForPrepare;
             //gameState = E_GAMESTATE.Prepare;
             if (PhotonNetwork.IsMasterClient)
+            {
                 PV.RPC("SetGameStateRPC", RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPrepare, E_GAMESTATE.Prepare);
+                MapManager.I.SpawnWeapons();
+            }
         }
     }
 

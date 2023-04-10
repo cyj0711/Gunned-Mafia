@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: Shotgun
   m_EditorClassIdentifier: 
-  weaponName: 
+  weaponName: Shotgun
   damage: 0
   criticalDamage: 0
   criticalChance: 0
@@ -20,6 +20,7 @@ MonoBehaviour:
   ammoInMagazine: 8
   reloadTime: 0
   isAutoFire: 0
+  weaponType: 0
   bulleyType: 4
   weaponPrefab: {fileID: 4988549205327503408, guid: f638036167bbfa047984df4e202fe41b,
     type: 3}

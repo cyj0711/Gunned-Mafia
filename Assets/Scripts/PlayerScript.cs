@@ -217,4 +217,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             HealthImage.fillAmount = (float)stream.ReceiveNext();
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // 땅에 떨어진 무기에 닿으면 해당 무기 획득
+        if(collision.tag=="Weapon")
+        {
+            Debug.Log(collision.gameObject.GetComponent<WeaponBase>().GetWeaponData.WeaponName);
+        }
+    }
 }

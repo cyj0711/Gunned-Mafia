@@ -525,6 +525,7 @@ GameObject:
   m_Component:
   - component: {fileID: 69867525}
   - component: {fileID: 69867526}
+  - component: {fileID: 69867527}
   m_Layer: 0
   m_Name: SpawnPoint (6)
   m_TagString: Untagged
@@ -540,7 +541,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 69867524}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.79, y: 1.44, z: -0.55293447}
+  m_LocalPosition: {x: 9.79, y: 1.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -596,6 +597,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &69867527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69867524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &89159464
 GameObject:
   m_ObjectHideFlags: 0
@@ -762,6 +776,7 @@ GameObject:
   m_Component:
   - component: {fileID: 121175382}
   - component: {fileID: 121175383}
+  - component: {fileID: 121175384}
   m_Layer: 0
   m_Name: SpawnPoint (17)
   m_TagString: Untagged
@@ -777,7 +792,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121175381}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.69, y: -4.22, z: -0.55293447}
+  m_LocalPosition: {x: 4.69, y: -4.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -833,6 +848,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &121175384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121175381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &154119599
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,6 +870,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 154119600}
+  - component: {fileID: 154119601}
   m_Layer: 0
   m_Name: map
   m_TagString: Untagged
@@ -867,6 +896,55 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &154119601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154119599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9d063e62d1864f43a5e54138c514ed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 0
+  weaponSpawnPoints:
+  - {fileID: 417560704}
+  - {fileID: 1959165339}
+  - {fileID: 1934130624}
+  - {fileID: 1367292094}
+  - {fileID: 1849995119}
+  - {fileID: 170813210}
+  - {fileID: 69867527}
+  - {fileID: 760934162}
+  - {fileID: 711329398}
+  - {fileID: 228922027}
+  - {fileID: 1937821145}
+  - {fileID: 1487099202}
+  - {fileID: 1132145369}
+  - {fileID: 1133752632}
+  - {fileID: 393866233}
+  - {fileID: 1416180357}
+  - {fileID: 1377198955}
+  - {fileID: 121175384}
+  - {fileID: 1952501408}
+  - {fileID: 1143065160}
+  - {fileID: 1474429688}
+  - {fileID: 1174830188}
+  - {fileID: 922700690}
+  - {fileID: 2110699193}
+  - {fileID: 938524381}
+  - {fileID: 936080534}
+  - {fileID: 759612663}
+  - {fileID: 314172121}
+  - {fileID: 1291899973}
+  - {fileID: 1606591564}
+  - {fileID: 1732881447}
+  - {fileID: 1192682083}
+  - {fileID: 728640422}
+  - {fileID: 376465441}
+  - {fileID: 1576362284}
 --- !u!1 &154740808
 GameObject:
   m_ObjectHideFlags: 0
@@ -1073,6 +1151,7 @@ GameObject:
   m_Component:
   - component: {fileID: 170813208}
   - component: {fileID: 170813209}
+  - component: {fileID: 170813210}
   m_Layer: 0
   m_Name: SpawnPoint (5)
   m_TagString: Untagged
@@ -1088,7 +1167,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 170813207}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.05, y: 1.34, z: -0.55293447}
+  m_LocalPosition: {x: 5.05, y: 1.34, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -1144,6 +1223,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &170813210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 170813207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &171784899
 GameObject:
   m_ObjectHideFlags: 0
@@ -1704,6 +1796,7 @@ GameObject:
   m_Component:
   - component: {fileID: 228922025}
   - component: {fileID: 228922026}
+  - component: {fileID: 228922027}
   m_Layer: 0
   m_Name: SpawnPoint (9)
   m_TagString: Untagged
@@ -1719,7 +1812,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 228922024}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.04, y: 5.68, z: -0.55293447}
+  m_LocalPosition: {x: -0.04, y: 5.68, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -1775,6 +1868,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &228922027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228922024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &231818398
 GameObject:
   m_ObjectHideFlags: 0
@@ -2106,6 +2212,7 @@ GameObject:
   m_Component:
   - component: {fileID: 314172119}
   - component: {fileID: 314172120}
+  - component: {fileID: 314172121}
   m_Layer: 0
   m_Name: SpawnPoint (27)
   m_TagString: Untagged
@@ -2121,7 +2228,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 314172118}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.48, y: 1.19, z: -0.55293447}
+  m_LocalPosition: {x: -4.48, y: 1.19, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -2177,6 +2284,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &314172121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314172118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &320155685
 GameObject:
   m_ObjectHideFlags: 0
@@ -2497,6 +2617,7 @@ GameObject:
   m_Component:
   - component: {fileID: 376465439}
   - component: {fileID: 376465440}
+  - component: {fileID: 376465441}
   m_Layer: 0
   m_Name: SpawnPoint (33)
   m_TagString: Untagged
@@ -2512,7 +2633,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 376465438}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.2, y: 1.12, z: -0.55293447}
+  m_LocalPosition: {x: -3.2, y: 1.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -2568,6 +2689,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &376465441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376465438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &393866230
 GameObject:
   m_ObjectHideFlags: 0
@@ -2578,6 +2712,7 @@ GameObject:
   m_Component:
   - component: {fileID: 393866231}
   - component: {fileID: 393866232}
+  - component: {fileID: 393866233}
   m_Layer: 0
   m_Name: SpawnPoint (14)
   m_TagString: Untagged
@@ -2593,7 +2728,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 393866230}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.12, y: -3.13, z: -0.55293447}
+  m_LocalPosition: {x: 6.12, y: -3.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -2649,6 +2784,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &393866233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 393866230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &417560701
 GameObject:
   m_ObjectHideFlags: 0
@@ -2659,6 +2807,7 @@ GameObject:
   m_Component:
   - component: {fileID: 417560702}
   - component: {fileID: 417560703}
+  - component: {fileID: 417560704}
   m_Layer: 0
   m_Name: SpawnPoint
   m_TagString: Untagged
@@ -2674,7 +2823,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 417560701}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.416, y: 5.587, z: -0.55293447}
+  m_LocalPosition: {x: 1.416, y: 5.587, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -2730,6 +2879,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &417560704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 417560701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &417672165
 GameObject:
   m_ObjectHideFlags: 0
@@ -4830,6 +4992,7 @@ GameObject:
   m_Component:
   - component: {fileID: 711329396}
   - component: {fileID: 711329397}
+  - component: {fileID: 711329398}
   m_Layer: 0
   m_Name: SpawnPoint (8)
   m_TagString: Untagged
@@ -4845,7 +5008,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 711329395}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.33, y: 5.73, z: -0.55293447}
+  m_LocalPosition: {x: 2.33, y: 5.73, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -4901,6 +5064,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &711329398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711329395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1001 &716375579
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4977,6 +5153,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1359341775859407726, guid: 5d7847f3c86681e429f1b257d6484dd7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3084041771936008640, guid: 5d7847f3c86681e429f1b257d6484dd7,
         type: 3}
@@ -5081,6 +5262,7 @@ GameObject:
   m_Component:
   - component: {fileID: 728640420}
   - component: {fileID: 728640421}
+  - component: {fileID: 728640422}
   m_Layer: 0
   m_Name: SpawnPoint (32)
   m_TagString: Untagged
@@ -5096,7 +5278,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 728640419}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.88, y: 4.26, z: -0.55293447}
+  m_LocalPosition: {x: -5.88, y: 4.26, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -5152,6 +5334,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &728640422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728640419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &751594155
 GameObject:
   m_ObjectHideFlags: 0
@@ -5195,6 +5390,7 @@ GameObject:
   m_Component:
   - component: {fileID: 759612661}
   - component: {fileID: 759612662}
+  - component: {fileID: 759612663}
   m_Layer: 0
   m_Name: SpawnPoint (26)
   m_TagString: Untagged
@@ -5210,7 +5406,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 759612660}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.69, y: -0.19, z: -0.55293447}
+  m_LocalPosition: {x: -4.69, y: -0.19, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -5266,6 +5462,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &759612663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759612660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &760934159
 GameObject:
   m_ObjectHideFlags: 0
@@ -5276,6 +5485,7 @@ GameObject:
   m_Component:
   - component: {fileID: 760934160}
   - component: {fileID: 760934161}
+  - component: {fileID: 760934162}
   m_Layer: 0
   m_Name: SpawnPoint (7)
   m_TagString: Untagged
@@ -5291,7 +5501,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 760934159}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.04, y: 0.06, z: -0.55293447}
+  m_LocalPosition: {x: 10.04, y: 0.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -5347,6 +5557,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &760934162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760934159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &772167692
 GameObject:
   m_ObjectHideFlags: 0
@@ -6680,6 +6903,7 @@ GameObject:
   m_Component:
   - component: {fileID: 922700688}
   - component: {fileID: 922700689}
+  - component: {fileID: 922700690}
   m_Layer: 0
   m_Name: SpawnPoint (22)
   m_TagString: Untagged
@@ -6695,7 +6919,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 922700687}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.78, y: -2.557, z: -0.55293447}
+  m_LocalPosition: {x: -2.78, y: -2.557, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -6751,6 +6975,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &922700690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922700687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &924807267
 GameObject:
   m_ObjectHideFlags: 0
@@ -6943,6 +7180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 936080532}
   - component: {fileID: 936080533}
+  - component: {fileID: 936080534}
   m_Layer: 0
   m_Name: SpawnPoint (25)
   m_TagString: Untagged
@@ -6958,7 +7196,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 936080531}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.675, y: -3.413, z: -0.55293447}
+  m_LocalPosition: {x: -6.675, y: -3.413, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -7014,6 +7252,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &936080534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936080531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &938524378
 GameObject:
   m_ObjectHideFlags: 0
@@ -7024,6 +7275,7 @@ GameObject:
   m_Component:
   - component: {fileID: 938524379}
   - component: {fileID: 938524380}
+  - component: {fileID: 938524381}
   m_Layer: 0
   m_Name: SpawnPoint (24)
   m_TagString: Untagged
@@ -7039,7 +7291,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 938524378}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.73, y: -1.077, z: -0.55293447}
+  m_LocalPosition: {x: -2.73, y: -1.077, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -7095,6 +7347,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &938524381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 938524378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &948093393
 GameObject:
   m_ObjectHideFlags: 0
@@ -8240,6 +8505,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1132145367}
   - component: {fileID: 1132145368}
+  - component: {fileID: 1132145369}
   m_Layer: 0
   m_Name: SpawnPoint (12)
   m_TagString: Untagged
@@ -8255,7 +8521,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1132145366}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.21, y: -1.63, z: -0.55293447}
+  m_LocalPosition: {x: 3.21, y: -1.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -8311,6 +8577,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1132145369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1132145366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1133752629
 GameObject:
   m_ObjectHideFlags: 0
@@ -8321,6 +8600,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1133752630}
   - component: {fileID: 1133752631}
+  - component: {fileID: 1133752632}
   m_Layer: 0
   m_Name: SpawnPoint (13)
   m_TagString: Untagged
@@ -8336,7 +8616,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1133752629}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.61, y: -2.58, z: -0.55293447}
+  m_LocalPosition: {x: 6.61, y: -2.58, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -8392,6 +8672,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1133752632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133752629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1143065157
 GameObject:
   m_ObjectHideFlags: 0
@@ -8402,6 +8695,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1143065158}
   - component: {fileID: 1143065159}
+  - component: {fileID: 1143065160}
   m_Layer: 0
   m_Name: SpawnPoint (19)
   m_TagString: Untagged
@@ -8417,7 +8711,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1143065157}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.56, y: -4.71, z: -0.55293447}
+  m_LocalPosition: {x: 0.56, y: -4.71, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -8473,6 +8767,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1143065160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143065157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1143928310
 GameObject:
   m_ObjectHideFlags: 0
@@ -8617,6 +8924,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1174830186}
   - component: {fileID: 1174830187}
+  - component: {fileID: 1174830188}
   m_Layer: 0
   m_Name: SpawnPoint (21)
   m_TagString: Untagged
@@ -8632,7 +8940,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174830185}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.82, y: -1.93, z: -0.55293447}
+  m_LocalPosition: {x: 1.82, y: -1.93, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -8688,6 +8996,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1174830188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174830185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1192682080
 GameObject:
   m_ObjectHideFlags: 0
@@ -8698,6 +9019,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1192682081}
   - component: {fileID: 1192682082}
+  - component: {fileID: 1192682083}
   m_Layer: 0
   m_Name: SpawnPoint (31)
   m_TagString: Untagged
@@ -8713,7 +9035,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1192682080}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.19, y: 2.52, z: -0.55293447}
+  m_LocalPosition: {x: -7.19, y: 2.52, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -8769,6 +9091,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1192682083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192682080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1205319928
 GameObject:
   m_ObjectHideFlags: 0
@@ -9123,6 +9458,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1291899971}
   - component: {fileID: 1291899972}
+  - component: {fileID: 1291899973}
   m_Layer: 0
   m_Name: SpawnPoint (28)
   m_TagString: Untagged
@@ -9138,7 +9474,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1291899970}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.66, y: 1.74, z: -0.55293447}
+  m_LocalPosition: {x: -8.66, y: 1.74, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -9194,6 +9530,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1291899973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291899970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1295939658
 GameObject:
   m_ObjectHideFlags: 0
@@ -9629,6 +9978,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1367292092}
   - component: {fileID: 1367292093}
+  - component: {fileID: 1367292094}
   m_Layer: 0
   m_Name: SpawnPoint (3)
   m_TagString: Untagged
@@ -9644,7 +9994,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1367292091}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.033, y: 3.153, z: -0.55293447}
+  m_LocalPosition: {x: 0.033, y: 3.153, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -9700,6 +10050,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1367292094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367292091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1376021200
 GameObject:
   m_ObjectHideFlags: 0
@@ -9759,6 +10122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1377198953}
   - component: {fileID: 1377198954}
+  - component: {fileID: 1377198955}
   m_Layer: 0
   m_Name: SpawnPoint (16)
   m_TagString: Untagged
@@ -9774,7 +10138,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1377198952}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.31, y: -4.42, z: -0.55293447}
+  m_LocalPosition: {x: 3.31, y: -4.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -9830,6 +10194,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1377198955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377198952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1409142158
 GameObject:
   m_ObjectHideFlags: 0
@@ -9941,6 +10318,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1416180355}
   - component: {fileID: 1416180356}
+  - component: {fileID: 1416180357}
   m_Layer: 0
   m_Name: SpawnPoint (15)
   m_TagString: Untagged
@@ -9956,7 +10334,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1416180354}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.52, y: -3.77, z: -0.55293447}
+  m_LocalPosition: {x: 6.52, y: -3.77, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -10012,6 +10390,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1416180357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416180354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1420350900
 GameObject:
   m_ObjectHideFlags: 0
@@ -10536,6 +10927,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1474429686}
   - component: {fileID: 1474429687}
+  - component: {fileID: 1474429688}
   m_Layer: 0
   m_Name: SpawnPoint (20)
   m_TagString: Untagged
@@ -10551,7 +10943,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1474429685}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.26, y: -2.07, z: -0.55293447}
+  m_LocalPosition: {x: 0.26, y: -2.07, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -10607,6 +10999,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1474429688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474429685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1487099199
 GameObject:
   m_ObjectHideFlags: 0
@@ -10617,6 +11022,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1487099200}
   - component: {fileID: 1487099201}
+  - component: {fileID: 1487099202}
   m_Layer: 0
   m_Name: SpawnPoint (11)
   m_TagString: Untagged
@@ -10632,7 +11038,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1487099199}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.98, y: -0.64, z: -0.55293447}
+  m_LocalPosition: {x: 4.98, y: -0.64, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -10688,6 +11094,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1487099202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487099199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1495420093
 GameObject:
   m_ObjectHideFlags: 0
@@ -11414,6 +11833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1576362282}
   - component: {fileID: 1576362283}
+  - component: {fileID: 1576362284}
   m_Layer: 0
   m_Name: SpawnPoint (34)
   m_TagString: Untagged
@@ -11429,7 +11849,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1576362281}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.86, y: 1.11, z: -0.55293447}
+  m_LocalPosition: {x: -1.86, y: 1.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -11485,6 +11905,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1576362284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576362281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn:
+  - {fileID: 261346361453317896, guid: f9ffde3cdea2494468cc37e9c77837db, type: 3}
+  - {fileID: 5901293261016833010, guid: 57d64b8186660b748abeb67a030d0fa2, type: 3}
+  - {fileID: 7926776506411911783, guid: 68fef62207c80234c9e79be6035df44a, type: 3}
+  - {fileID: 4221162209586976023, guid: 7c09cc8bd481d7e4184ec55bbdfdaaa0, type: 3}
 --- !u!1 &1580066909
 GameObject:
   m_ObjectHideFlags: 0
@@ -11691,6 +12128,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1606591562}
   - component: {fileID: 1606591563}
+  - component: {fileID: 1606591564}
   m_Layer: 0
   m_Name: SpawnPoint (29)
   m_TagString: Untagged
@@ -11706,7 +12144,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1606591561}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.95, y: -0.25, z: -0.55293447}
+  m_LocalPosition: {x: -7.95, y: -0.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -11762,6 +12200,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1606591564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1606591561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1631785743
 GameObject:
   m_ObjectHideFlags: 0
@@ -12642,6 +13093,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1732881445}
   - component: {fileID: 1732881446}
+  - component: {fileID: 1732881447}
   m_Layer: 0
   m_Name: SpawnPoint (30)
   m_TagString: Untagged
@@ -12657,7 +13109,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1732881444}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9, y: -0.78, z: -0.55293447}
+  m_LocalPosition: {x: -9, y: -0.78, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -12713,6 +13165,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1732881447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1732881444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1752217672
 GameObject:
   m_ObjectHideFlags: 0
@@ -13032,6 +13497,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1849995117}
   - component: {fileID: 1849995118}
+  - component: {fileID: 1849995119}
   m_Layer: 0
   m_Name: SpawnPoint (4)
   m_TagString: Untagged
@@ -13047,7 +13513,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849995116}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.289, y: 4.697, z: -0.55293447}
+  m_LocalPosition: {x: 6.289, y: 4.697, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -13103,6 +13569,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1849995119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849995116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1856453976
 GameObject:
   m_ObjectHideFlags: 0
@@ -13584,6 +14063,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1934130622}
   - component: {fileID: 1934130623}
+  - component: {fileID: 1934130624}
   m_Layer: 0
   m_Name: SpawnPoint (2)
   m_TagString: Untagged
@@ -13599,7 +14079,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934130621}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.818, y: 4.405, z: -0.55293447}
+  m_LocalPosition: {x: 3.818, y: 4.405, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -13655,6 +14135,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1934130624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934130621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1937821142
 GameObject:
   m_ObjectHideFlags: 0
@@ -13665,6 +14158,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1937821143}
   - component: {fileID: 1937821144}
+  - component: {fileID: 1937821145}
   m_Layer: 0
   m_Name: SpawnPoint (10)
   m_TagString: Untagged
@@ -13680,7 +14174,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1937821142}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.68, y: 1.31, z: -0.55293447}
+  m_LocalPosition: {x: 2.68, y: 1.31, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -13736,6 +14230,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1937821145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937821142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1950601375
 GameObject:
   m_ObjectHideFlags: 0
@@ -13822,6 +14329,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1952501406}
   - component: {fileID: 1952501407}
+  - component: {fileID: 1952501408}
   m_Layer: 0
   m_Name: SpawnPoint (18)
   m_TagString: Untagged
@@ -13837,7 +14345,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1952501405}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.8, y: -5.23, z: -0.55293447}
+  m_LocalPosition: {x: 1.8, y: -5.23, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -13893,6 +14401,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1952501408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952501405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1955467899
 GameObject:
   m_ObjectHideFlags: 0
@@ -14065,6 +14586,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1959165337}
   - component: {fileID: 1959165338}
+  - component: {fileID: 1959165339}
   m_Layer: 0
   m_Name: SpawnPoint (1)
   m_TagString: Untagged
@@ -14080,7 +14602,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1959165336}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.416, y: 5.587, z: -0.55293447}
+  m_LocalPosition: {x: 1.416, y: 5.587, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -14136,6 +14658,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1959165339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959165336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &1966912002
 GameObject:
   m_ObjectHideFlags: 0
@@ -14943,6 +15478,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2110699191}
   - component: {fileID: 2110699192}
+  - component: {fileID: 2110699193}
   m_Layer: 0
   m_Name: SpawnPoint (23)
   m_TagString: Untagged
@@ -14958,7 +15494,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2110699190}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.736, y: -2.307, z: -0.55293447}
+  m_LocalPosition: {x: -1.736, y: -2.307, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 574988877}
@@ -15014,6 +15550,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2110699193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2110699190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d455d9a88a5c82c49ac160dfa30e7874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponsToSpawn: []
 --- !u!1 &2131691683
 GameObject:
   m_ObjectHideFlags: 0

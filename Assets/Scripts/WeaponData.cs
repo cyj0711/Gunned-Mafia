@@ -12,6 +12,14 @@ public enum E_BulletType
     Magnum
 }
 
+public enum E_WeaponType
+{
+    Primary,
+    Sub,
+    Melee,
+    Grenade
+}
+
 [CreateAssetMenu(fileName = "Weapon Data", menuName = "Scriptable Object/Weapon Data", order = int.MaxValue)]
 public class WeaponData : ScriptableObject
 {
@@ -46,6 +54,10 @@ public class WeaponData : ScriptableObject
     [SerializeField]
     private bool isAutoFire;    // 자동사격 여부
     public bool IsAutoFire { get { return isAutoFire; } }
+
+    [SerializeField]
+    private E_WeaponType weaponType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)
+    public E_WeaponType WeaponType { get { return weaponType; } }
 
     [SerializeField]
     private E_BulletType bulleyType;

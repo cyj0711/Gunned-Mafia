@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: MachineGun
   m_EditorClassIdentifier: 
-  weaponName: MachineGun
+  weaponName: Machine Gun
   damage: 0
   criticalDamage: 0
   criticalChance: 0
@@ -20,6 +20,7 @@ MonoBehaviour:
   ammoInMagazine: 75
   reloadTime: 0
   isAutoFire: 1
+  weaponType: 0
   bulleyType: 3
   weaponPrefab: {fileID: 5901293261016833010, guid: 57d64b8186660b748abeb67a030d0fa2,
     type: 3}
