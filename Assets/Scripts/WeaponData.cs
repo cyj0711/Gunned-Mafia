@@ -15,7 +15,7 @@ public enum E_BulletType
 public enum E_WeaponType
 {
     Primary,
-    Sub,
+    Secondary,
     Melee,
     Grenade
 }

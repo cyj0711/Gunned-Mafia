@@ -4,23 +4,36 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class WeaponManager : MonoBehaviourPunCallbacks, IPunObservable
+public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 {
     public PhotonView pView;
 
     public List<GameObject> weapons = new List<GameObject>();
 
+    private Dictionary<E_WeaponType, WeaponBase> weaponDictionary = new Dictionary<E_WeaponType, WeaponBase>();
+
     public Transform muzzlePosition;
+
+    private WeaponBase currentWeapon;
 
     private float rateOfFire = 0.1f;
     float fireCoolTime;
 
     private bool canShooting = true;
 
+    private bool isSeeingRight = true;
+
 
     void Start()
     {
         fireCoolTime = rateOfFire;
+        InitWeaponManager();
+    }
+
+    public void InitWeaponManager()
+    {
+        currentWeapon = null;
+        weaponDictionary.Clear();
     }
 
     void Update()
@@ -63,12 +76,78 @@ public class WeaponManager : MonoBehaviourPunCallbacks, IPunObservable
 
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인
-    public void SetDirection(bool isSeeingRight)
+    public void SetDirection(bool playerSeeingRight)
     {
-        for(int i=0;i<weapons.Count;i++)
+        //for(int i=0;i<weapons.Count;i++)
+        //{
+        //    weapons[i].GetComponent<SpriteRenderer>().flipY = !isSeeingRight;
+        //}
+        isSeeingRight = playerSeeingRight;
+        if (currentWeapon!=null)
+            currentWeapon.gameObject.GetComponent<SpriteRenderer>().flipY = !isSeeingRight;
+    }
+
+    public void PickUpWeapon(GameObject weaponObject)
+    {
+        WeaponBase weaponBase = weaponObject.GetComponent<WeaponBase>();
+        if(weaponBase==null)
         {
-            weapons[i].GetComponent<SpriteRenderer>().flipY = !isSeeingRight;
+            Debug.Log("Debug ERROR : " + weaponObject + " weaponBase is NULL");
+            return;
         }
+
+        if(weaponDictionary.ContainsKey(weaponBase.GetWeaponData.WeaponType))
+        {
+            Debug.Log("Tried to pick up [" + weaponBase.GetWeaponData.WeaponName + "], But [" + weaponBase.GetWeaponData.WeaponType + "] type is already equiped!");
+        }
+        else
+        {
+            weaponDictionary.Add(weaponBase.GetWeaponData.WeaponType, weaponBase);
+
+            int weaponViewID = weaponObject.GetComponent<PhotonView>().ViewID;
+            pView.RPC("PuckUpWeaponRPC", RpcTarget.AllBuffered, weaponViewID);
+
+            if (currentWeapon == null)
+            {
+                pView.RPC("SetCurrentWeaponRPC", RpcTarget.AllBuffered, weaponViewID);
+            }
+        }
+    }
+
+    [PunRPC]
+    private void PuckUpWeaponRPC(int weaponViewID)
+    {
+        GameObject weaponObject = PhotonView.Find(weaponViewID).gameObject;
+
+        weaponObject.GetComponent<CapsuleCollider2D>().enabled = false;
+
+        weaponObject.transform.parent = gameObject.transform;
+        weaponObject.transform.localPosition = new Vector3(0f, 0f, 0f);
+        weaponObject.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+
+        weaponObject.SetActive(false);
+    }
+
+
+    [PunRPC]
+    private void SetCurrentWeaponRPC(int weaponViewID)
+    {
+        GameObject weaponObject = PhotonView.Find(weaponViewID).gameObject;
+        if (currentWeapon!=null)
+        {
+            currentWeapon.gameObject.SetActive(false);
+        }
+
+        currentWeapon = weaponObject.GetComponent<WeaponBase>();
+        if (currentWeapon == null)
+        {
+            Debug.Log("Debug ERROR : current " + weaponObject + " weaponBase is NULL");
+            return;
+        }
+
+        SetDirection(isSeeingRight);
+        weaponObject.SetActive(true);
+
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

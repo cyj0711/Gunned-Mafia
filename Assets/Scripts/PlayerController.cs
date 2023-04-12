@@ -16,10 +16,10 @@ public enum E_PlayerState
     Alive, Missing, Dead, Spectator // 생존, 실종, 사망, 관전
 }
 
-public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 {
     public Rigidbody2D RB;
-    public PhotonView PV;
+    public PhotonView pView;
     public Text NickNameText;
     public Image HealthImage;
 
@@ -43,17 +43,18 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     Vector2 target, mouse;
 
     bool isSeeingRight; // true이면 오른쪽을 보는 상태, false는 왼쪽
+    public bool IsSeeingRight { get { return isSeeingRight; } }
     bool lastSeeingRight;
 
     void Awake()
     {
-        NickNameText.text = PV.IsMine ? PhotonNetwork.NickName : PV.Owner.NickName;
-        NickNameText.color = PV.IsMine ? Color.green : Color.red;
+        NickNameText.text = pView.IsMine ? PhotonNetwork.NickName : pView.Owner.NickName;
+        NickNameText.color = pView.IsMine ? Color.green : Color.red;
 
         characterAnimationController = character.GetComponent<CharacterAnimationController>();
         weaponManager = weapons.GetComponent<WeaponManager>();
 
-        if(PV.IsMine)
+        if(pView.IsMine)
         {
             // 2D 카메라
             var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
@@ -78,7 +79,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void Update()
     {
-        if(PV.IsMine)
+        if(pView.IsMine)
         {
             UpdateWalkingProcess();
             UpdateWeaponAimProcess();
@@ -89,7 +90,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             //target = weapons.transform.position;
             //mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             //angle = Mathf.Atan2(mouse.y - target.y, mouse.x - target.x) * Mathf.Rad2Deg;
-            //PV.RPC("FlipXRPC", RpcTarget.AllBuffered, axisX);   // 재접속시 캐릭터 좌우반전을 동기화하기 위해 AllBuffered
+            //pView.RPC("FlipXRPC", RpcTarget.AllBuffered, axisX);   // 재접속시 캐릭터 좌우반전을 동기화하기 위해 AllBuffered
         }
 
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
@@ -127,7 +128,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         if(currentHp<=0)
         {
             GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+            pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
         }
     }
 
@@ -186,7 +187,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
         if (isSeeingRight != lastSeeingRight)
         {
-            PV.RPC("ChangeDirectionRPC", RpcTarget.AllBuffered, isSeeingRight);
+            pView.RPC("ChangeDirectionRPC", RpcTarget.AllBuffered, isSeeingRight);
         }
         lastSeeingRight = isSeeingRight;
     }
@@ -220,10 +221,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(pView.IsMine)
         // 땅에 떨어진 무기에 닿으면 해당 무기 획득
         if(collision.tag=="Weapon")
         {
             Debug.Log(collision.gameObject.GetComponent<WeaponBase>().GetWeaponData.WeaponName);
+
+            weaponManager.PickUpWeapon(collision.gameObject);
         }
     }
 }

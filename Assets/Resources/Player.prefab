@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RB: {fileID: 1359341775859407719}
-  PV: {fileID: 1359341775859407722}
+  pView: {fileID: 1359341775859407722}
   NickNameText: {fileID: 1359341775690753772}
   HealthImage: {fileID: 1359341775662255380}
   weapons: {fileID: 4553432345427618691}
@@ -581,7 +581,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6285761828897186618
 Transform:
   m_ObjectHideFlags: 0
