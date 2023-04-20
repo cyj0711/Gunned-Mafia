@@ -67,8 +67,12 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        //base.OnPlayerEnteredRoom(newPlayer);
-        //Debug.Log(newPlayer.NickName + ": " + newPlayer.ActorNumber.ToString());
+        if(newPlayer!=PhotonNetwork.LocalPlayer)
+        {
+            GameObject tagObject = (GameObject)PhotonNetwork.LocalPlayer.TagObject;
+            tagObject.GetComponent<PlayerController>().InvokeProperties();
+            tagObject.GetComponentInChildren<WeaponManager>().InvokeProperties();
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause)

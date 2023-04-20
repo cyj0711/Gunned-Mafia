@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier: 
+  weaponID: 6
   weaponName: Pistol
   damage: 0
   criticalDamage: 0
@@ -20,6 +21,7 @@ MonoBehaviour:
   ammoInMagazine: 20
   reloadTime: 0
   isAutoFire: 0
+  rateOfFire: 0.5
   weaponType: 1
   bulleyType: 0
   weaponPrefab: {fileID: 7926776506411911783, guid: 68fef62207c80234c9e79be6035df44a,

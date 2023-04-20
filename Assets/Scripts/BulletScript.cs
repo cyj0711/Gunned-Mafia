@@ -6,7 +6,7 @@ using Photon.Realtime;
 
 public class BulletScript : MonoBehaviourPunCallbacks
 {
-    public PhotonView PV;
+    public PhotonView pView;
     float bulletSpeed = 4;
     void Start()
     {
@@ -20,13 +20,31 @@ public class BulletScript : MonoBehaviourPunCallbacks
 
     private void OnTriggerEnter2D(Collider2D col)   // col을 RPC의 매개변수로 줄 수 없다.
     {
-        if (col.tag == "Blockable") PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+        //if (col.tag == "Blockable")
+        //{
+        //     pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
+        //}
 
-        if (!PV.IsMine && col.tag == "Player" && col.GetComponent<PhotonView>().IsMine)    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
+        //if (!pView.IsMine && col.tag == "Player" && col.GetComponent<PhotonView>().IsMine)    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
+        //{
+        //    PlayerController ps = col.GetComponentInParent<PlayerController>();
+        //    ps.Hit(30);
+        //    pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
+        //}
+
+        if (col.tag == "Blockable")
         {
-            PlayerController ps = col.GetComponentInParent<PlayerController>();
-            ps.Hit(30);
-            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+            Destroy(gameObject);
+        }
+
+        if (col.tag == "Player")    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
+        {
+            if(col.GetComponent<PhotonView>().IsMine)
+            {
+                PlayerController ps = col.GetComponentInParent<PlayerController>();
+                ps.Hit(30);
+            }
+            Destroy(gameObject);
         }
     }
 

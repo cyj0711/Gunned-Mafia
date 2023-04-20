@@ -24,6 +24,10 @@ public enum E_WeaponType
 public class WeaponData : ScriptableObject
 {
     [SerializeField]
+    private int weaponID;
+    public int WeaponId { get { return weaponID; } }
+
+    [SerializeField]
     private string weaponName;  // 무기 이름
     public string WeaponName { get { return weaponName; } }
 
@@ -54,6 +58,10 @@ public class WeaponData : ScriptableObject
     [SerializeField]
     private bool isAutoFire;    // 자동사격 여부
     public bool IsAutoFire { get { return isAutoFire; } }
+
+    [SerializeField]
+    private float rateOfFire;    // 연사 속도(rateOfFire 초당 1발 발사, 단발 무기는 0으로 표시)
+    public float RateOfFire { get { return rateOfFire; } }
 
     [SerializeField]
     private E_WeaponType weaponType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)

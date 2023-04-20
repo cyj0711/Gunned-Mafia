@@ -298,8 +298,9 @@ MonoBehaviour:
   pView: {fileID: 1359341775859407722}
   NickNameText: {fileID: 1359341775690753772}
   HealthImage: {fileID: 1359341775662255380}
-  weapons: {fileID: 4553432345427618691}
   character: {fileID: 7798866993823549336}
+  weaponManager: {fileID: 8246974901709166159}
+  currentHealth: 100
 --- !u!1 &1359341777276765964
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,6 +526,8 @@ MonoBehaviour:
   weapons:
   - {fileID: 7370659953123248014}
   muzzlePosition: {fileID: 3771389478156022108}
+  bullet: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e, type: 3}
+  currentWeaponID: -1
 --- !u!114 &630346595881167353
 MonoBehaviour:
   m_ObjectHideFlags: 0

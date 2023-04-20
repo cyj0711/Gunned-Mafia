@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: Glock
   m_EditorClassIdentifier: 
+  weaponID: 7
   weaponName: Glock
   damage: 0
   criticalDamage: 0
@@ -20,6 +21,7 @@ MonoBehaviour:
   ammoInMagazine: 20
   reloadTime: 0
   isAutoFire: 1
+  rateOfFire: 0.15
   weaponType: 1
   bulleyType: 0
   weaponPrefab: {fileID: 4888275939638261436, guid: 8d3d8f119e5f4124785070c3ea0004c5,

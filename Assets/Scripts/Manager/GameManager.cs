@@ -95,7 +95,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             //gameState = E_GAMESTATE.Prepare;
             if (PhotonNetwork.IsMasterClient)
             {
-                PV.RPC("SetGameStateRPC", RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPrepare, E_GAMESTATE.Prepare);
+                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPrepare, E_GAMESTATE.Prepare);
                 MapManager.I.SpawnWeapons();
             }
         }
@@ -117,7 +117,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             if (PhotonNetwork.IsMasterClient)
             {
                 SetPlayerRole();
-                PV.RPC("SetGameStateRPC", RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPlay, E_GAMESTATE.Play);
+                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPlay, E_GAMESTATE.Play);
             }
             ////else
             //{
@@ -169,7 +169,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         // RPC는 dictionary를 받지 못하므로, playerRoles dictionary를 string으로 변환하여 파라미터로 준다.
         string playerRolesString = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(playerRoles);
-        PV.RPC("SetPlayerRoleRPC", RpcTarget.AllBuffered, playerRolesString);
+        PV.RPC(nameof(SetPlayerRoleRPC), RpcTarget.AllBuffered, playerRolesString);
 
         for (int i = 0; i < sortedPlayers.Length; i ++)
         {
@@ -216,7 +216,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             //endTime = timeForCooling;
             //gameState = E_GAMESTATE.Cooling;
             if (PhotonNetwork.IsMasterClient)
-                PV.RPC("SetGameStateRPC", RpcTarget.AllBuffered, PhotonNetwork.Time, timeForCooling, E_GAMESTATE.Cooling);
+                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForCooling, E_GAMESTATE.Cooling);
         }
     }
 
@@ -228,7 +228,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         {
             //gameState = E_GAMESTATE.Wait;
             if (PhotonNetwork.IsMasterClient)
-                PV.RPC("SetGameStateRPC", RpcTarget.AllBuffered, PhotonNetwork.Time, timeForCooling, E_GAMESTATE.Wait);
+                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForCooling, E_GAMESTATE.Wait);
         }
     }
 

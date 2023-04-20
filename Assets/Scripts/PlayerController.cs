@@ -16,18 +16,18 @@ public enum E_PlayerState
     Alive, Missing, Dead, Spectator // 생존, 실종, 사망, 관전
 }
 
-public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunInstantiateMagicCallback
 {
     public Rigidbody2D RB;
     public PhotonView pView;
     public Text NickNameText;
     public Image HealthImage;
 
-    public GameObject weapons;
+    //public GameObject weapons;
     public GameObject character;
 
     CharacterAnimationController characterAnimationController;
-    WeaponManager weaponManager;
+    public WeaponManager weaponManager;
 
     public E_PlayerRole PlayerRole { get { return playerRole; } set { playerRole = value; } }
     public E_PlayerState PlayerState { get { return playerState; } set { playerState = value; } }
@@ -35,7 +35,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private E_PlayerState playerState;
 
     int hp = 100;
-    int currentHp;
+
+    //*************** Synchronization Properties *******************
+    [SerializeField] int currentHealth;
+    public int CurrentHealth { get => currentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
+    [PunRPC] void SetCurrentHealthRPC(int value) { currentHealth = value; HealthImage.fillAmount = (float)(CurrentHealth / (float)hp);}
+    //**************************************************************
+
+    void SetPropertyRPC(string functionName, object value)
+    {
+        pView.RPC(functionName, RpcTarget.All, value);
+    }
+
+    public void InvokeProperties()  // Synchronization properites에 새 속성을 넣을경우 여기에 반드시 추가한다.(변수명이 아닌 get set 명임!!)
+    {
+        CurrentHealth = CurrentHealth;
+    }
 
     Vector3 curPos;
 
@@ -52,7 +67,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         NickNameText.color = pView.IsMine ? Color.green : Color.red;
 
         characterAnimationController = character.GetComponent<CharacterAnimationController>();
-        weaponManager = weapons.GetComponent<WeaponManager>();
 
         if(pView.IsMine)
         {
@@ -70,11 +84,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         isSeeingRight = true;
         lastSeeingRight = isSeeingRight;
 
-        currentHp = 100;
-
         PlayerRole = E_PlayerRole.None;
         if (GameManager.I.GameState == E_GAMESTATE.Play || GameManager.I.GameState == E_GAMESTATE.Cooling) PlayerState = E_PlayerState.Spectator;
         else PlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
+    }
+
+    private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
+    {
+        CurrentHealth = 100;
     }
 
     void Update()
@@ -84,13 +101,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             UpdateWalkingProcess();
             UpdateWeaponAimProcess();
             UpdateWeaponShotProcess();
-
-            //Debug.Log(target.x +" "+ target.y);  // angle의 절대값이 90이하면 오른쪽, 이상이면 왼쪽을 보는것.
-
-            //target = weapons.transform.position;
-            //mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //angle = Mathf.Atan2(mouse.y - target.y, mouse.x - target.x) * Mathf.Rad2Deg;
-            //pView.RPC("FlipXRPC", RpcTarget.AllBuffered, axisX);   // 재접속시 캐릭터 좌우반전을 동기화하기 위해 AllBuffered
         }
 
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
@@ -101,31 +111,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             transform.position = Vector3.Lerp(transform.position, curPos, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
     }
 
-    //private static int PlayerID = -1;
-
-    //public void SetPlayerID()
-    //{
-    //    int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
-    //    Player[] sortedPlayers = PhotonNetwork.PlayerList;
-
-    //    for (int i = 0; i < sortedPlayers.Length; i += 1)
-    //    {
-    //        if (sortedPlayers[i].ActorNumber == actorNumber)
-    //        {
-    //            PlayerID = i;
-    //            break;
-    //        }
-    //    }
-
-    //    Debug.Log(NickNameText.text + " - PlayerID: " + PlayerID.ToString()+" / ActorNumber: "+actorNumber.ToString());
-    //}
-
     public void Hit(int damage)
     {
-        currentHp -= damage;
-        HealthImage.fillAmount = (float)(currentHp / (float)hp);
+        CurrentHealth = CurrentHealth - damage;
 
-        if(currentHp<=0)
+        if (CurrentHealth <= 0)
         {
             GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
             pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
@@ -137,7 +127,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void WeaponRotation(float angle)
     {
-        weapons.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        weaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     void UpdateWeaponShotProcess()
@@ -158,10 +148,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (axisX != 0 || axisY != 0)
         {
-            //AN.SetBool("IsWalking", true);
             characterAnimationController.SetWalk(true);
         }
-        //else AN.SetBool("IsWalking", false);
         else characterAnimationController.SetWalk(false);
     }
 
@@ -187,7 +175,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (isSeeingRight != lastSeeingRight)
         {
-            pView.RPC("ChangeDirectionRPC", RpcTarget.AllBuffered, isSeeingRight);
+            pView.RPC(nameof(ChangeDirectionRPC), RpcTarget.AllBuffered, isSeeingRight);
         }
         lastSeeingRight = isSeeingRight;
     }
@@ -198,7 +186,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         Vector3 scale = new Vector3(character.transform.localScale.x, character.transform.localScale.y, character.transform.localScale.z);
         scale.x *= -1;
         character.transform.localScale = scale;
-        weapons.GetComponent<WeaponManager>().SetDirection(isSeeingRight);
+        weaponManager.SetDirection(isSeeingRight);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -210,12 +198,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (stream.IsWriting)    // PV가 IsMine 일 때 작동돼서 넘겨줌
         {
             stream.SendNext(transform.position);        // 캐릭터 위치
-            stream.SendNext(HealthImage.fillAmount);    // 캐릭터 체력
+            //stream.SendNext(HealthImage.fillAmount);    // 캐릭터 체력
         }
         else                    // IsMine 아닐 때 작동돼서 받음
         {
             curPos = (Vector3)stream.ReceiveNext();
-            HealthImage.fillAmount = (float)stream.ReceiveNext();
+            //HealthImage.fillAmount = (float)stream.ReceiveNext();
         }
     }
 
@@ -229,5 +217,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             weaponManager.PickUpWeapon(collision.gameObject);
         }
+    }
+
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        info.Sender.TagObject = gameObject;
     }
 }

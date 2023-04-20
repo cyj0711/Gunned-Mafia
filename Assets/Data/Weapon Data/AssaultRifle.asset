@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: AssaultRifle
   m_EditorClassIdentifier: 
+  weaponID: 1
   weaponName: Assault Rifle
   damage: 0
   criticalDamage: 0
@@ -20,6 +21,7 @@ MonoBehaviour:
   ammoInMagazine: 30
   reloadTime: 0
   isAutoFire: 1
+  rateOfFire: 0.2
   weaponType: 0
   bulleyType: 0
   weaponPrefab: {fileID: 261346361453317896, guid: f9ffde3cdea2494468cc37e9c77837db,

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: Magnum
   m_EditorClassIdentifier: 
+  weaponID: 8
   weaponName: Magnum
   damage: 0
   criticalDamage: 0
@@ -20,6 +21,7 @@ MonoBehaviour:
   ammoInMagazine: 8
   reloadTime: 0
   isAutoFire: 0
+  rateOfFire: 0.7
   weaponType: 1
   bulleyType: 5
   weaponPrefab: {fileID: 2657234423793419423, guid: 06081163766f9aa4b8b707ca421e2117,
