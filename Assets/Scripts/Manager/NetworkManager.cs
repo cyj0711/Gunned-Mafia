@@ -58,12 +58,12 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         RespawnPanel.SetActive(false);
     }
 
-    private void Update()
-    {
-        // ESC 누르면 종료
-        if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected)
-            PhotonNetwork.Disconnect();
-    }
+    //private void Update()
+    //{
+    //    // ESC 누르면 종료
+    //    if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected)
+    //        PhotonNetwork.Disconnect();
+    //}
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {

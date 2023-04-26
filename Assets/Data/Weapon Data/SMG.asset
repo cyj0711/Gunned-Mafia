@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: SMG
   m_EditorClassIdentifier: 
-  weaponID: 2
-  weaponName: SMG
-  damage: 0
-  criticalDamage: 0
-  criticalChance: 0
-  maxAmmo: 60
-  ammoInMagazine: 30
-  reloadTime: 0
-  isAutoFire: 1
-  rateOfFire: 0.1
-  weaponType: 0
-  bulleyType: 2
-  weaponPrefab: {fileID: 4221162209586976023, guid: 7c09cc8bd481d7e4184ec55bbdfdaaa0,
+  m_iWeaponID: 4
+  m_strWeaponName: SMG
+  m_iDamage: 0
+  m_iCriticalDamage: 0
+  m_fCriticalChance: 0
+  m_iMaxAmmo: 60
+  m_iAmmoCapacity: 30
+  m_fReloadTime: 0
+  m_bAutoFire: 1
+  m_fRateOfFire: 0.1
+  m_eWeaponType: 0
+  m_eBulleyType: 2
+  m_vWeaponPrefab: {fileID: 4221162209586976023, guid: 7c09cc8bd481d7e4184ec55bbdfdaaa0,
     type: 3}

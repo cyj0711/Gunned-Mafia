@@ -18,7 +18,7 @@ public class MapManager : SingletonPunCallbacks<MapManager>
 
             if(weapon!=null)
             {
-                String weaponName = "WeaponPrefab/" + weapon.GetComponent<WeaponBase>().GetWeaponData.name;
+                String weaponName = "WeaponPrefab/" + weapon.GetComponent<WeaponBase>().a_vWeaponData.name;
                 PhotonNetwork.InstantiateRoomObject(weaponName, weaponSpawnPoint.transform.position, Quaternion.identity);
             }
         }

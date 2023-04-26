@@ -143,7 +143,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44bed20452c80f843bf4bb1c8b866ed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponData: {fileID: 11400000, guid: 4307d5b12e36bc446bd0a5315263dc03, type: 2}
+  m_vWeaponData: {fileID: 11400000, guid: 4307d5b12e36bc446bd0a5315263dc03, type: 2}
+  m_vPhotonView: {fileID: -8117049014078947268}
+  m_vMuzzlePosition: {fileID: 4368482808653707532}
+  m_vBulletObject: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,
+    type: 3}
 --- !u!114 &-8117049014078947268
 MonoBehaviour:
   m_ObjectHideFlags: 0

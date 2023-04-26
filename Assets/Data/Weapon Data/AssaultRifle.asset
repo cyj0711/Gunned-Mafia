@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: AssaultRifle
   m_EditorClassIdentifier: 
-  weaponID: 1
-  weaponName: Assault Rifle
-  damage: 0
-  criticalDamage: 0
-  criticalChance: 0
-  maxAmmo: 60
-  ammoInMagazine: 30
-  reloadTime: 0
-  isAutoFire: 1
-  rateOfFire: 0.2
-  weaponType: 0
-  bulleyType: 0
-  weaponPrefab: {fileID: 261346361453317896, guid: f9ffde3cdea2494468cc37e9c77837db,
+  m_iWeaponID: 1
+  m_strWeaponName: Assault Rifle
+  m_iDamage: 0
+  m_iCriticalDamage: 0
+  m_fCriticalChance: 0
+  m_iMaxAmmo: 60
+  m_iAmmoCapacity: 30
+  m_fReloadTime: 0
+  m_bAutoFire: 1
+  m_fRateOfFire: 0.2
+  m_eWeaponType: 0
+  m_eBulleyType: 0
+  m_vWeaponPrefab: {fileID: 261346361453317896, guid: f9ffde3cdea2494468cc37e9c77837db,
     type: 3}

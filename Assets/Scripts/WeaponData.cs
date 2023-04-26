@@ -24,54 +24,54 @@ public enum E_WeaponType
 public class WeaponData : ScriptableObject
 {
     [SerializeField]
-    private int weaponID;
-    public int WeaponId { get { return weaponID; } }
+    private int m_iWeaponID;
+    public int a_iWeaponId { get { return m_iWeaponID; } }
 
     [SerializeField]
-    private string weaponName;  // 무기 이름
-    public string WeaponName { get { return weaponName; } }
+    private string m_strWeaponName;  // 무기 이름
+    public string a_strWeaponName { get { return m_strWeaponName; } }
 
     [SerializeField]
-    private int damage;     // 일반 데미지
-    public int Damage { get { return damage; } }
+    private int m_iDamage;     // 일반 데미지
+    public int a_iDamage { get { return m_iDamage; } }
 
     [SerializeField]
-    private int criticalDamage;     // 치명타 데미지
-    public int CriticalDamage { get { return criticalDamage; } }
+    private int m_iCriticalDamage;     // 치명타 데미지
+    public int a_iCriticalDamage { get { return m_iCriticalDamage; } }
 
     [SerializeField]
-    private float criticalChance;   // 치명타 확률
-    public float CriticalChance { get { return criticalChance; } }
+    private float m_fCriticalChance;   // 치명타 확률
+    public float a_fCriticalChance { get { return m_fCriticalChance; } }
 
     [SerializeField]
-    private int maxAmmo;    // 최대 탄창
-    public int MaxAmmo { get { return maxAmmo; } }
+    private int m_iMaxAmmo;    // 최대 탄창
+    public int a_iMaxAmmo { get { return m_iMaxAmmo; } }
 
     [SerializeField]
-    private int ammoInMagazine;    // 한 탄창의 총알 수
-    public int AmmoInMagazine { get { return ammoInMagazine; } }
+    private int m_iAmmoCapacity;    // 한 탄창의 총알 수
+    public int a_iAmmoCapacity { get { return m_iAmmoCapacity; } }
 
     [SerializeField]
-    private float reloadTime;    // 장전 시간 (샷건은 한발당 적용)
-    public float ReloadTime { get { return reloadTime; } }
+    private float m_fReloadTime;    // 장전 시간 (샷건은 한발당 적용)
+    public float a_fReloadTime { get { return m_fReloadTime; } }
 
     [SerializeField]
-    private bool isAutoFire;    // 자동사격 여부
-    public bool IsAutoFire { get { return isAutoFire; } }
+    private bool m_bAutoFire;    // 자동사격 여부
+    public bool a_bAutoFire { get { return m_bAutoFire; } }
 
     [SerializeField]
-    private float rateOfFire;    // 연사 속도(rateOfFire 초당 1발 발사, 단발 무기는 0으로 표시)
-    public float RateOfFire { get { return rateOfFire; } }
+    private float m_fRateOfFire;    // 연사 속도(rateOfFire 초당 1발 발사)
+    public float a_fRateOfFire { get { return m_fRateOfFire; } }
 
     [SerializeField]
-    private E_WeaponType weaponType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)
-    public E_WeaponType WeaponType { get { return weaponType; } }
+    private E_WeaponType m_eWeaponType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)
+    public E_WeaponType a_eWeaponType { get { return m_eWeaponType; } }
 
     [SerializeField]
-    private E_BulletType bulleyType;
-    public E_BulletType BulleyType { get { return bulleyType; } }
+    private E_BulletType m_eBulleyType;
+    public E_BulletType a_eBulleyType { get { return m_eBulleyType; } }
 
     [SerializeField]
-    private GameObject weaponPrefab;
-    public GameObject WeaponPrefab { get { return weaponPrefab; } }
+    private GameObject m_vWeaponPrefab;
+    public GameObject a_vWeaponPrefab { get { return m_vWeaponPrefab; } }
 }

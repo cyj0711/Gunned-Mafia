@@ -34,12 +34,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     private E_PlayerRole playerRole;
     private E_PlayerState playerState;
 
-    int hp = 100;
-
     //*************** Synchronization Properties *******************
     [SerializeField] int currentHealth;
     public int CurrentHealth { get => currentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
-    [PunRPC] void SetCurrentHealthRPC(int value) { currentHealth = value; HealthImage.fillAmount = (float)(CurrentHealth / (float)hp);}
+    [PunRPC] void SetCurrentHealthRPC(int value) { currentHealth = value; HealthImage.fillAmount = (float)(CurrentHealth / 100f);}
     //**************************************************************
 
     void SetPropertyRPC(string functionName, object value)
@@ -85,7 +83,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         lastSeeingRight = isSeeingRight;
 
         PlayerRole = E_PlayerRole.None;
-        if (GameManager.I.GameState == E_GAMESTATE.Play || GameManager.I.GameState == E_GAMESTATE.Cooling) PlayerState = E_PlayerState.Spectator;
+        if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling) PlayerState = E_PlayerState.Spectator;
         else PlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
     }
 
@@ -101,6 +99,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             UpdateWalkingProcess();
             UpdateWeaponAimProcess();
             UpdateWeaponShotProcess();
+            UpdateKeyboardInputProcess();
         }
 
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
@@ -136,6 +135,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         {
             weaponManager.Shoot(angle);
 
+        }
+    }
+
+    void UpdateKeyboardInputProcess()
+    {
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            weaponManager.Reload();
         }
     }
 
@@ -213,7 +220,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         // 땅에 떨어진 무기에 닿으면 해당 무기 획득
         if(collision.tag=="Weapon")
         {
-            Debug.Log(collision.gameObject.GetComponent<WeaponBase>().GetWeaponData.WeaponName);
+            Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
 
             weaponManager.PickUpWeapon(collision.gameObject);
         }

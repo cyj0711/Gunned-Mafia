@@ -16,50 +16,50 @@ public enum E_GAMESTATE  // 현재 게임 방의 진행 상태
 
 public class GameManager : SingletonPunCallbacks<GameManager>
 {
-    private E_GAMESTATE gameState;
-    public E_GAMESTATE GameState { get { return gameState; } }
+    private E_GAMESTATE m_eGameState;
+    public E_GAMESTATE a_eGameState { get { return m_eGameState; } }
 
-    double timer;
-    double startTime;
-    double endTime;
+    double m_dProcessTimer;
+    double m_dStartTime;
+    double m_dEndTime;
 
     /* 방 속성(유저(방장)가 설정 가능) */
-    double timeForPrepare;   // 준비 시간
-    double timeForPlay;      // 플레이 시간
-    double bonusTimeForKill;      // 사람 한명 죽을때마다 추가시간
-    double timeForCooling;   // 게임 끝나고 기다리는 시간
+    double m_dPropertyTimeForPrepare;   // 준비 시간
+    double m_dPropertyTimeForPlay;      // 플레이 시간
+    double m_dPropertyBonusTimeForKill;      // 사람 한명 죽을때마다 추가시간
+    double m_dPropertyTimeForCooling;   // 게임 끝나고 기다리는 시간
 
-    int numberOfMafia;       // 마피아 수
-    int numberOfDetective;   // 탐정 수
+    int m_iPropertyNumberOfMafia;       // 마피아 수
+    int m_iPropertyNumberOfDetective;   // 탐정 수
     /***************************/
-    public Dictionary<int, E_PlayerRole> playerRoles = new Dictionary<int, E_PlayerRole>();    // 플레이어 역할 데이터, int = 플레이어의 Actor number
+    private Dictionary<int, E_PlayerRole> m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();    // 플레이어 역할 데이터, int = 플레이어의 Actor number
 
-    public PhotonView PV;
+    public PhotonView m_vPhotonView;
 
-    Hashtable ht_CustomValue;
+    Hashtable m_htCustomValue;
 
     void Start()
     {
-        gameState = E_GAMESTATE.Wait;
-        timeForPrepare = 5f;
-        timeForPlay = 300f;
-        bonusTimeForKill = 30f;
-        timeForCooling = 5f;
-        numberOfMafia = 1;
-        numberOfDetective = 0;
+        m_eGameState = E_GAMESTATE.Wait;
+        m_dPropertyTimeForPrepare = 5f;
+        m_dPropertyTimeForPlay = 300f;
+        m_dPropertyBonusTimeForKill = 30f;
+        m_dPropertyTimeForCooling = 5f;
+        m_iPropertyNumberOfMafia = 1;
+        m_iPropertyNumberOfDetective = 0;
 
-        playerRoles = new Dictionary<int, E_PlayerRole>();
+        m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
 
         if (PhotonNetwork.IsMasterClient)
         {
-            ht_CustomValue = new ExitGames.Client.Photon.Hashtable();
-            startTime = PhotonNetwork.Time;
-            ht_CustomValue.Add("StartTime", startTime);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(ht_CustomValue);
+            m_htCustomValue = new ExitGames.Client.Photon.Hashtable();
+            m_dStartTime = PhotonNetwork.Time;
+            m_htCustomValue.Add("StartTime", m_dStartTime);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(m_htCustomValue);
         }
         else    // 게스트에겐 이미 진행되고있는 시간을 표시
         {
-            startTime = double.Parse(PhotonNetwork.CurrentRoom.CustomProperties["StartTime"].ToString());
+            m_dStartTime = double.Parse(PhotonNetwork.CurrentRoom.CustomProperties["StartTime"].ToString());
         }
     }
 
@@ -67,7 +67,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     {
         //if(PhotonNetwork.IsMasterClient)
         {
-            switch(gameState)
+            switch(m_eGameState)
             {
                 case E_GAMESTATE.Wait:
                     UpdateWaitProcess();
@@ -95,7 +95,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             //gameState = E_GAMESTATE.Prepare;
             if (PhotonNetwork.IsMasterClient)
             {
-                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPrepare, E_GAMESTATE.Prepare);
+                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
                 MapManager.I.SpawnWeapons();
             }
         }
@@ -103,9 +103,9 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
     void UpdatePrepareProcess()
     {
-        timer = PhotonNetwork.Time - startTime;
+        m_dProcessTimer = PhotonNetwork.Time - m_dStartTime;
 
-        if (timer >= timeForPrepare)
+        if (m_dProcessTimer >= m_dPropertyTimeForPrepare)
         {
             //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
             //{
@@ -117,7 +117,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             if (PhotonNetwork.IsMasterClient)
             {
                 SetPlayerRole();
-                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForPlay, E_GAMESTATE.Play);
+                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
             }
             ////else
             //{
@@ -135,113 +135,113 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     // 마스터 클라이언트가 모든 플레이어의 역할을 정해주고 나머지 클라이언트에게 알려준다
     void SetPlayerRole()
     {
-        playerRoles.Clear();
-        Player[] sortedPlayers = PhotonNetwork.PlayerList;
+        m_dicPlayerRoles.Clear();
+        Player[] vSortedPlayers = PhotonNetwork.PlayerList;
 
-        for (int i = 0; i < sortedPlayers.Length; i ++)   // 전부 시민으로 초기화
+        for (int i = 0; i < vSortedPlayers.Length; i ++)   // 전부 시민으로 초기화
         {
-            playerRoles.Add(sortedPlayers[i].ActorNumber, E_PlayerRole.Civil);
+            m_dicPlayerRoles.Add(vSortedPlayers[i].ActorNumber, E_PlayerRole.Civil);
         }
 
-        for (int i = 0; i < numberOfMafia; i++)   // 마피아 뽑기
+        for (int i = 0; i < m_iPropertyNumberOfMafia; i++)   // 마피아 뽑기
         {
-            int index = UnityEngine.Random.Range(0, sortedPlayers.Length);
-            if (GetPlayerRole(sortedPlayers[index].ActorNumber) != E_PlayerRole.Civil)  // 랜덤으로 뽑은 플레이어가 이미 마피아나 경찰이면 다시뽑음
+            int index = UnityEngine.Random.Range(0, vSortedPlayers.Length);
+            if (GetPlayerRole(vSortedPlayers[index].ActorNumber) != E_PlayerRole.Civil)  // 랜덤으로 뽑은 플레이어가 이미 마피아나 경찰이면 다시뽑음
             {
                 i--;
                 continue;
             }
-            playerRoles[sortedPlayers[index].ActorNumber] = E_PlayerRole.Mafia;
+            m_dicPlayerRoles[vSortedPlayers[index].ActorNumber] = E_PlayerRole.Mafia;
 
         }
 
-        for (int i = 0; i < numberOfDetective; i++)   // 탐정 뽑기
+        for (int i = 0; i < m_iPropertyNumberOfDetective; i++)   // 탐정 뽑기
         {
-            int index = UnityEngine.Random.Range(0, sortedPlayers.Length);
-            if (GetPlayerRole(sortedPlayers[index].ActorNumber) != E_PlayerRole.Civil)  // 랜덤으로 뽑은 플레이어가 이미 마피아나 경찰이면 다시뽑음
+            int index = UnityEngine.Random.Range(0, vSortedPlayers.Length);
+            if (GetPlayerRole(vSortedPlayers[index].ActorNumber) != E_PlayerRole.Civil)  // 랜덤으로 뽑은 플레이어가 이미 마피아나 경찰이면 다시뽑음
             {
                 i--;
                 continue;
             }
-            playerRoles[sortedPlayers[index].ActorNumber] = E_PlayerRole.Detective;
+            m_dicPlayerRoles[vSortedPlayers[index].ActorNumber] = E_PlayerRole.Detective;
 
         }
 
         // RPC는 dictionary를 받지 못하므로, playerRoles dictionary를 string으로 변환하여 파라미터로 준다.
-        string playerRolesString = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(playerRoles);
-        PV.RPC(nameof(SetPlayerRoleRPC), RpcTarget.AllBuffered, playerRolesString);
+        string strPlayerRoles = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(m_dicPlayerRoles);
+        m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.AllBuffered, strPlayerRoles);
 
-        for (int i = 0; i < sortedPlayers.Length; i ++)
+        for (int i = 0; i < vSortedPlayers.Length; i ++)
         {
-            Debug.Log(sortedPlayers[i].NickName + " : " + playerRoles[sortedPlayers[i].ActorNumber].ToString());
+            Debug.Log(vSortedPlayers[i].NickName + " : " + m_dicPlayerRoles[vSortedPlayers[i].ActorNumber].ToString());
         }
 
     }
 
     // playerRoles를 string으로 받아 int, E_PlayerRole형 dictionary로 변환하여 모든 클라이언트에게 전해준다.
     [PunRPC]
-    void SetPlayerRoleRPC(string playerRolesString)
+    void SetPlayerRoleRPC(string strPlayerRoles)
     {
-        Dictionary<string, string> playerRolesStringDic = StringConverter.I.ConvertStringToDictionary(playerRolesString);
+        Dictionary<string, string> dicPlayerRolesString = StringConverter.I.ConvertStringToDictionary(strPlayerRoles);
 
-        playerRoles.Clear();
-        foreach (KeyValuePair<string, string> kvPair in playerRolesStringDic)
+        m_dicPlayerRoles.Clear();
+        foreach (KeyValuePair<string, string> kvPair in dicPlayerRolesString)
         {
-            playerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
+            m_dicPlayerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
         }
 
 
     }
 
-    public E_PlayerRole GetPlayerRole(int actorNumber)  // 특정 유저의 역할 받기
+    public E_PlayerRole GetPlayerRole(int iActorNumber)  // 특정 유저의 역할 받기
     {
-        playerRoles.TryGetValue(actorNumber, out E_PlayerRole roleToGet);
+        m_dicPlayerRoles.TryGetValue(iActorNumber, out E_PlayerRole eRoleToGet);
 
-        return roleToGet;
+        return eRoleToGet;
     }
     public E_PlayerRole GetPlayerRole() // 자기자신의 역할 받기
     {
-        playerRoles.TryGetValue(PhotonNetwork.LocalPlayer.ActorNumber, out E_PlayerRole roleToGet);
+        m_dicPlayerRoles.TryGetValue(PhotonNetwork.LocalPlayer.ActorNumber, out E_PlayerRole roleToGet);
 
         return roleToGet;
     }
 
     void UpdatePlayProcess()
     {
-        timer = PhotonNetwork.Time - startTime;
+        m_dProcessTimer = PhotonNetwork.Time - m_dStartTime;
 
-        if (timer >= timeForPlay)
+        if (m_dProcessTimer >= m_dPropertyTimeForPlay)
         {
             //startTime = PhotonNetwork.Time;
             //endTime = timeForCooling;
             //gameState = E_GAMESTATE.Cooling;
             if (PhotonNetwork.IsMasterClient)
-                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForCooling, E_GAMESTATE.Cooling);
+                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
         }
     }
 
     void UpdateCoolingProcess()
     {
-        timer = PhotonNetwork.Time - startTime;
+        m_dProcessTimer = PhotonNetwork.Time - m_dStartTime;
 
-        if (timer >= timeForCooling)
+        if (m_dProcessTimer >= m_dPropertyTimeForCooling)
         {
             //gameState = E_GAMESTATE.Wait;
             if (PhotonNetwork.IsMasterClient)
-                PV.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, timeForCooling, E_GAMESTATE.Wait);
+                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
         }
     }
 
     [PunRPC]
-    void SetGameStateRPC(double _startTime, double _endTime, E_GAMESTATE _gameState)
+    void SetGameStateRPC(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
     {
-        startTime = _startTime;
-        endTime = _endTime;
-        gameState = _gameState;
+        m_dStartTime = _dStartTime;
+        m_dEndTime = _dEndTime;
+        m_eGameState = _eGameState;
     }
 
     public double GetTime()
     {
-        return endTime - timer;
+        return m_dEndTime - m_dProcessTimer;
     }
 }

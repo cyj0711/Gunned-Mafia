@@ -144,4 +144,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74025d158d9d5d44faee6c35b841cda8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pView: {fileID: 7241911877136952809}
+  m_vPhotonView: {fileID: 7241911877136952809}

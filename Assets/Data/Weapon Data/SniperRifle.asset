@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
   m_Name: SniperRifle
   m_EditorClassIdentifier: 
-  weaponID: 5
-  weaponName: Sniper Rifle
-  damage: 0
-  criticalDamage: 0
-  criticalChance: 0
-  maxAmmo: 20
-  ammoInMagazine: 10
-  reloadTime: 0
-  isAutoFire: 0
-  rateOfFire: 1.5
-  weaponType: 0
-  bulleyType: 1
-  weaponPrefab: {fileID: 4455404082270616039, guid: 48c20525a454457409c9b04d3e7b8e3e,
+  m_iWeaponID: 5
+  m_strWeaponName: Sniper Rifle
+  m_iDamage: 0
+  m_iCriticalDamage: 0
+  m_fCriticalChance: 0
+  m_iMaxAmmo: 20
+  m_iAmmoCapacity: 5
+  m_fReloadTime: 0
+  m_bAutoFire: 0
+  m_fRateOfFire: 1.5
+  m_eWeaponType: 0
+  m_eBulleyType: 1
+  m_vWeaponPrefab: {fileID: 4455404082270616039, guid: 48c20525a454457409c9b04d3e7b8e3e,
     type: 3}

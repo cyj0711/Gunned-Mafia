@@ -5,14 +5,14 @@ using UnityEngine.UI;
 
 public class GamePanelManager : Singleton<GamePanelManager>
 {
-    public Text timeText;
-    public Text StatusText;
-    public Image StatusImage;
+    [SerializeField] private Text m_vTimeText;
+    [SerializeField] private Text m_vStatusText;
+    [SerializeField] private Image m_vStatusImage;
 
-    int time;
-    E_GAMESTATE gameState;
-    E_PlayerRole playerRole;
-    
+    [SerializeField] private GameObject m_vAmmoArea;
+    [SerializeField] private Text m_vAmmoText;
+    [SerializeField] private Image m_vAmmoImage;
+
     void Start()
     {
         SetGameState();
@@ -27,17 +27,16 @@ public class GamePanelManager : Singleton<GamePanelManager>
 
     private void SetGameState()
     {
-        gameState = GameManager.I.GameState;
-        playerRole = GameManager.I.GetPlayerRole();
+        E_GAMESTATE eGameState = GameManager.I.a_eGameState;
 
-        switch (gameState)
+        switch (eGameState)
         {
             case E_GAMESTATE.Play:
                 SetPlayingState();
                 break;
             default:
-                StatusImage.color = UIColor.Gray;
-                StatusText.text = gameState.ToString();
+                m_vStatusImage.color = UIColor.Gray;
+                m_vStatusText.text = eGameState.ToString();
                 break;
         }
 
@@ -45,27 +44,40 @@ public class GamePanelManager : Singleton<GamePanelManager>
 
     private void SetPlayingState()
     {
-        switch(playerRole)
+        E_PlayerRole ePlayerRole = GameManager.I.GetPlayerRole();
+
+        switch (ePlayerRole)
         {
             case E_PlayerRole.Civil:
-                StatusImage.color = UIColor.Green;
+                m_vStatusImage.color = UIColor.Green;
                 break;
             case E_PlayerRole.Mafia:
-                StatusImage.color = UIColor.Red;
+                m_vStatusImage.color = UIColor.Red;
                 break;
             case E_PlayerRole.Detective:
-                StatusImage.color = UIColor.Blue;
+                m_vStatusImage.color = UIColor.Blue;
                 break;
             default:
-                StatusImage.color = UIColor.Gray;
+                m_vStatusImage.color = UIColor.Gray;
                 break;
         }
-        StatusText.text = playerRole.ToString();
+        m_vStatusText.text = ePlayerRole.ToString();
     }
 
     private void SetTimeText()
     {
-        time = (int)GameManager.I.GetTime();
-        timeText.text = (time / 60).ToString("D2") + ":" + (time % 60).ToString("D2");
+        int iTime = (int)GameManager.I.GetTime();
+        m_vTimeText.text = (iTime / 60).ToString("D2") + ":" + (iTime % 60).ToString("D2");
+    }
+
+    public void SetAmmo(int iAmmoCapacity, int iCurrentAmmo, int iRemainAmmo)
+    {
+        m_vAmmoImage.fillAmount = (float)(iCurrentAmmo / (float)iAmmoCapacity);
+        m_vAmmoText.text = iCurrentAmmo.ToString("D2") + " / " + iRemainAmmo.ToString("D2");
+    }
+
+    public void SetAmmoActive(bool bActive)
+    {
+        m_vAmmoArea.SetActive(bActive);
     }
 }
