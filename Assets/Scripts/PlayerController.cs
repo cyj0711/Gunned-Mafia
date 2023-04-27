@@ -18,83 +18,83 @@ public enum E_PlayerState
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunInstantiateMagicCallback
 {
-    public Rigidbody2D RB;
-    public PhotonView pView;
-    public Text NickNameText;
-    public Image HealthImage;
+    [SerializeField] Rigidbody2D m_vRigidBody;
+    [SerializeField] PhotonView m_vPhotonView;
+    [SerializeField] Text m_vNickNameText;
+    [SerializeField] Image m_vHealthImage;
 
     //public GameObject weapons;
-    public GameObject character;
+    [SerializeField] GameObject m_vCharacterObject;
 
-    CharacterAnimationController characterAnimationController;
-    public WeaponManager weaponManager;
+    CharacterAnimationController m_vCharacterAnimationController;
+    [SerializeField] WeaponManager m_vWeaponManager;
 
-    public E_PlayerRole PlayerRole { get { return playerRole; } set { playerRole = value; } }
-    public E_PlayerState PlayerState { get { return playerState; } set { playerState = value; } }
-    private E_PlayerRole playerRole;
-    private E_PlayerState playerState;
+    public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { m_ePlayerRole = value; } }
+    public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { m_ePlayerState = value; } }
+    private E_PlayerRole m_ePlayerRole;
+    private E_PlayerState m_ePlayerState;
 
     //*************** Synchronization Properties *******************
-    [SerializeField] int currentHealth;
-    public int CurrentHealth { get => currentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
-    [PunRPC] void SetCurrentHealthRPC(int value) { currentHealth = value; HealthImage.fillAmount = (float)(CurrentHealth / 100f);}
+    [SerializeField] int m_iCurrentHealth;
+    public int a_iCurrentHealth { get => m_iCurrentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
+    [PunRPC] void SetCurrentHealthRPC(int value) { m_iCurrentHealth = value; m_vHealthImage.fillAmount = (float)(a_iCurrentHealth / 100f);}
     //**************************************************************
 
     void SetPropertyRPC(string functionName, object value)
     {
-        pView.RPC(functionName, RpcTarget.All, value);
+        m_vPhotonView.RPC(functionName, RpcTarget.All, value);
     }
 
     public void InvokeProperties()  // Synchronization properites에 새 속성을 넣을경우 여기에 반드시 추가한다.(변수명이 아닌 get set 명임!!)
     {
-        CurrentHealth = CurrentHealth;
+        a_iCurrentHealth = a_iCurrentHealth;
     }
 
-    Vector3 curPos;
+    Vector3 m_vCurrentPosition;
 
-    float angle;
-    Vector2 target, mouse;
+    float m_fAngle;
+    Vector2 m_vTargetPosition, m_vMousePosition;
 
-    bool isSeeingRight; // true이면 오른쪽을 보는 상태, false는 왼쪽
-    public bool IsSeeingRight { get { return isSeeingRight; } }
-    bool lastSeeingRight;
+    bool m_bSeeingRight; // true이면 오른쪽을 보는 상태, false는 왼쪽
+    public bool a_bSeeingRight { get { return m_bSeeingRight; } }
+    bool m_bLastSeeingRight;
 
     void Awake()
     {
-        NickNameText.text = pView.IsMine ? PhotonNetwork.NickName : pView.Owner.NickName;
-        NickNameText.color = pView.IsMine ? Color.green : Color.red;
+        m_vNickNameText.text = m_vPhotonView.IsMine ? PhotonNetwork.NickName : m_vPhotonView.Owner.NickName;
+        m_vNickNameText.color = m_vPhotonView.IsMine ? Color.green : Color.red;
 
-        characterAnimationController = character.GetComponent<CharacterAnimationController>();
+        m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
 
-        if(pView.IsMine)
+        if(m_vPhotonView.IsMine)
         {
             // 2D 카메라
-            var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
-            CM.Follow = transform;
-            CM.LookAt = transform;
+            var vCinemachineCamera = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
+            vCinemachineCamera.Follow = transform;
+            vCinemachineCamera.LookAt = transform;
         }
 
     }
 
     private void Start()
     {
-        target = transform.position;
-        isSeeingRight = true;
-        lastSeeingRight = isSeeingRight;
+        m_vTargetPosition = transform.position;
+        m_bSeeingRight = true;
+        m_bLastSeeingRight = m_bSeeingRight;
 
-        PlayerRole = E_PlayerRole.None;
-        if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling) PlayerState = E_PlayerState.Spectator;
-        else PlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
+        a_ePlayerRole = E_PlayerRole.None;
+        if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling) a_ePlayerState = E_PlayerState.Spectator;
+        else a_ePlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
     }
 
     private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
     {
-        CurrentHealth = 100;
+        a_iCurrentHealth = 100;
     }
 
     void Update()
     {
-        if(pView.IsMine)
+        if(m_vPhotonView.IsMine)
         {
             UpdateWalkingProcess();
             UpdateWeaponAimProcess();
@@ -104,20 +104,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
         // IsMine이 아닌 것들은 부드럽게 위치 동기화
-        else if ((transform.position - curPos).sqrMagnitude >= 100) // 너무 멀리 떨어져있으면 바로 순간이동
-            transform.position = curPos;
+        else if ((transform.position - m_vCurrentPosition).sqrMagnitude >= 100) // 너무 멀리 떨어져있으면 바로 순간이동
+            transform.position = m_vCurrentPosition;
         else
-            transform.position = Vector3.Lerp(transform.position, curPos, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
+            transform.position = Vector3.Lerp(transform.position, m_vCurrentPosition, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
     }
 
     public void Hit(int damage)
     {
-        CurrentHealth = CurrentHealth - damage;
+        a_iCurrentHealth = a_iCurrentHealth - damage;
 
-        if (CurrentHealth <= 0)
+        if (a_iCurrentHealth <= 0)
         {
             GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
+            m_vPhotonView.RPC("DestroyRPC", RpcTarget.AllBuffered);
         }
     }
 
@@ -126,14 +126,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void WeaponRotation(float angle)
     {
-        weaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        m_vWeaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     void UpdateWeaponShotProcess()
     {
         if(Input.GetMouseButton(0))
         {
-            weaponManager.Shoot(angle);
+            m_vWeaponManager.Shoot(m_fAngle);
 
         }
     }
@@ -142,33 +142,61 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
-            weaponManager.Reload();
+            m_vWeaponManager.Reload();
+        }
+
+        else if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            m_vWeaponManager.ChangeCurrentWeapon(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            m_vWeaponManager.ChangeCurrentWeapon(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            m_vWeaponManager.ChangeCurrentWeapon(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            m_vWeaponManager.ChangeCurrentWeapon(4);
         }
     }
+
+    //public int GetPressedNumber()
+    //{
+    //    for (int number = 0; number <= 9; number++)
+    //    {
+    //        if (Input.GetKeyDown(number.ToString()))
+    //            return number;
+    //    }
+
+    //    return -1;
+    //}
 
     void UpdateWalkingProcess()
     {
         // transform을 이동하면 벽에 부딪히면 떨리는 현상이 있으므로 velocity로 움직인다.
         float axisX = Input.GetAxisRaw("Horizontal");
         float axisY = Input.GetAxisRaw("Vertical");
-        RB.velocity = new Vector2(axisX, axisY);
+        m_vRigidBody.velocity = new Vector2(axisX, axisY);
 
         if (axisX != 0 || axisY != 0)
         {
-            characterAnimationController.SetWalk(true);
+            m_vCharacterAnimationController.SetWalk(true);
         }
-        else characterAnimationController.SetWalk(false);
+        else m_vCharacterAnimationController.SetWalk(false);
     }
 
     void UpdateWeaponAimProcess()
     {
-        target = transform.position;
-        mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        angle = Mathf.Atan2(mouse.y - target.y, mouse.x - target.x) * Mathf.Rad2Deg;
+        m_vTargetPosition = transform.position;
+        m_vMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        m_fAngle = Mathf.Atan2(m_vMousePosition.y - m_vTargetPosition.y, m_vMousePosition.x - m_vTargetPosition.x) * Mathf.Rad2Deg;
 
-        SetDirection(angle);
+        SetDirection(m_fAngle);
 
-        WeaponRotation(angle);
+        WeaponRotation(m_fAngle);
     }
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인
@@ -176,24 +204,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         angle = Mathf.Abs(angle);   // angle의 절대값이 90이하면 오른쪽, 이상이면 왼쪽을 보는것
         if (angle < 90)
-            isSeeingRight = true;
+            m_bSeeingRight = true;
         else if (angle > 90)
-            isSeeingRight = false;
+            m_bSeeingRight = false;
 
-        if (isSeeingRight != lastSeeingRight)
+        if (m_bSeeingRight != m_bLastSeeingRight)
         {
-            pView.RPC(nameof(ChangeDirectionRPC), RpcTarget.AllBuffered, isSeeingRight);
+            m_vPhotonView.RPC(nameof(ChangeDirectionRPC), RpcTarget.AllBuffered, m_bSeeingRight);
         }
-        lastSeeingRight = isSeeingRight;
+        m_bLastSeeingRight = m_bSeeingRight;
     }
 
     [PunRPC]
     void ChangeDirectionRPC(bool isSeeingRight)
     {
-        Vector3 scale = new Vector3(character.transform.localScale.x, character.transform.localScale.y, character.transform.localScale.z);
+        Vector3 scale = new Vector3(m_vCharacterObject.transform.localScale.x, m_vCharacterObject.transform.localScale.y, m_vCharacterObject.transform.localScale.z);
         scale.x *= -1;
-        character.transform.localScale = scale;
-        weaponManager.SetDirection(isSeeingRight);
+        m_vCharacterObject.transform.localScale = scale;
+        m_vWeaponManager.SetDirection(isSeeingRight);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -209,20 +237,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         }
         else                    // IsMine 아닐 때 작동돼서 받음
         {
-            curPos = (Vector3)stream.ReceiveNext();
+            m_vCurrentPosition = (Vector3)stream.ReceiveNext();
             //HealthImage.fillAmount = (float)stream.ReceiveNext();
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(pView.IsMine)
-        // 땅에 떨어진 무기에 닿으면 해당 무기 획득
-        if(collision.tag=="Weapon")
+        if (m_vPhotonView.IsMine)
         {
-            Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
+            // 땅에 떨어진 무기에 닿으면 해당 무기 획득
+            if (collision.tag == "Weapon")
+            {
+                Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
 
-            weaponManager.PickUpWeapon(collision.gameObject);
+                m_vWeaponManager.PickUpWeapon(collision.gameObject);
+            }
         }
     }
 

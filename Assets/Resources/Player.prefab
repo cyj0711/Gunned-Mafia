@@ -294,13 +294,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a8283c4645a33444ae2f81fb6199fce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RB: {fileID: 1359341775859407719}
-  pView: {fileID: 1359341775859407722}
-  NickNameText: {fileID: 1359341775690753772}
-  HealthImage: {fileID: 1359341775662255380}
-  character: {fileID: 7798866993823549336}
-  weaponManager: {fileID: 8246974901709166159}
-  currentHealth: 100
+  m_vRigidBody: {fileID: 1359341775859407719}
+  m_vPhotonView: {fileID: 1359341775859407722}
+  m_vNickNameText: {fileID: 1359341775690753772}
+  m_vHealthImage: {fileID: 1359341775662255380}
+  m_vCharacterObject: {fileID: 7798866993823549336}
+  m_vWeaponManager: {fileID: 8246974901709166159}
+  m_iCurrentHealth: 100
 --- !u!1 &1359341777276765964
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,7 +522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_vPhotonView: {fileID: 630346595881167353}
-  m_iCurrentWeaponID: -1
+  m_iCurrentWeaponViewID: -1
 --- !u!114 &630346595881167353
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -64,7 +64,7 @@ public class WeaponBase : MonoBehaviour
     }
 
 
-    public void Shoot(float fAngle)
+    public void Shoot(float fAngle, int iShooterID)
     {
         if (m_iCurrentAmmo <= 0) return;
 
@@ -78,12 +78,18 @@ public class WeaponBase : MonoBehaviour
             를 쓰면 instantiate 한 오브젝트의 rpc를 호출할 수 있다.
             */
 
-            m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle));
+            m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle), iShooterID, m_vWeaponData.a_iWeaponId);
             //Instantiate(bullet, muzzlePosition.position, Quaternion.Euler(0f, 0f, angle));
             m_iCurrentAmmo -= 1;
             SetAmmo();
 
         }
+    }
+
+    [PunRPC]
+    public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterID, int iWeaponID)
+    {
+        Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterID, iWeaponID);
     }
 
     public void Reload()
@@ -103,9 +109,4 @@ public class WeaponBase : MonoBehaviour
         GamePanelManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
     }
 
-    [PunRPC]
-    public void ShootRPC(Vector3 vPosition, Quaternion vRotation)
-    {
-        Instantiate(m_vBulletObject, vPosition, vRotation);
-    }
 }

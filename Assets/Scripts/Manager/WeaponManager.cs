@@ -9,22 +9,22 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     [SerializeField]
     private PhotonView m_vPhotonView;
 
-    private Dictionary<E_WeaponType, WeaponBase> m_dicEquippedWeapons = new Dictionary<E_WeaponType, WeaponBase>();
+    private Dictionary<E_WeaponType, WeaponBase> m_dicWeaponInventory = new Dictionary<E_WeaponType, WeaponBase>();
 
     private WeaponBase m_vCurrentWeapon;
 
     private bool m_bSeeingRight = true;
 
     //*************** Synchronization Properties *******************
-    [SerializeField] int m_iCurrentWeaponID;   // 아무것도 안들었을땐 -1 로 설정해주자.
-    public int a_iCurrentWeaponID { get => m_iCurrentWeaponID; set => SetPropertyRPC(nameof(CurrentWeaponIDRPC), value); }
+    [SerializeField] int m_iCurrentWeaponViewID;   // 아무것도 안들었을땐 -1 로 설정해주자.
+    public int a_iCurrentWeaponViewID { get => m_iCurrentWeaponViewID; set => SetPropertyRPC(nameof(CurrentWeaponIDRPC), value); }
     [PunRPC] void CurrentWeaponIDRPC(int value)
     { 
-        m_iCurrentWeaponID = value;
+        m_iCurrentWeaponViewID = value;
 
-        if (a_iCurrentWeaponID == -1) { return; }
+        if (a_iCurrentWeaponViewID == -1) { return; }
 
-        GameObject vWeaponObject = PhotonView.Find(m_iCurrentWeaponID).gameObject;
+        GameObject vWeaponObject = PhotonView.Find(m_iCurrentWeaponViewID).gameObject;
         if (m_vCurrentWeapon != null)
         {
             m_vCurrentWeapon.gameObject.SetActive(false);
@@ -49,9 +49,8 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
     public void InvokeProperties()  // Synchronization properites에 새 속성을 넣을경우 여기에 반드시 추가한다.(변수명이 아닌 get set 명임!!)
     {
-        a_iCurrentWeaponID = a_iCurrentWeaponID;
+        a_iCurrentWeaponViewID = a_iCurrentWeaponViewID;
     }
-
 
     void Start()
     {
@@ -61,7 +60,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     public void InitWeaponManager()
     {
         m_vCurrentWeapon = null;
-        m_dicEquippedWeapons.Clear();
+        m_dicWeaponInventory.Clear();
     }
 
     // 플레이어가 마우스를 누르면 이 함수가 호출되어 총알 발사
@@ -69,7 +68,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     {
         if(m_vCurrentWeapon!=null)
         {
-            m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z);
+            m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z, PhotonNetwork.LocalPlayer.ActorNumber);
         }
     }
 
@@ -85,9 +84,78 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     public void SetDirection(bool playerSeeingRight)
     {
         m_bSeeingRight = playerSeeingRight;
-        if (m_vCurrentWeapon!=null)
-            m_vCurrentWeapon.gameObject.GetComponent<SpriteRenderer>().flipY = !m_bSeeingRight;
+        if (m_vCurrentWeapon != null)
+        {
+            //m_vCurrentWeapon.gameObject.GetComponent<SpriteRenderer>().flipY = !m_bSeeingRight;
+            if(playerSeeingRight)
+            {
+                if (m_vCurrentWeapon.gameObject.transform.localScale.y < 0)
+                    m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
+                        (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+            }
+            else
+            {
+                if (m_vCurrentWeapon.gameObject.transform.localScale.y > 0)
+                    m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
+                        (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+            }
+        }
 
+    }
+
+    // 숫자키를 입력받으면 그에 해당하는 무기로 변경
+    public void ChangeCurrentWeapon(int iInputKeyNumber)
+    {
+        switch(iInputKeyNumber)
+        {
+            case 1:
+                if(CheckCanEquipWeaponType(E_WeaponType.Primary))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmo();
+                    GamePanelManager.I.SetAmmoActive(true);
+                }
+                break;
+            case 2:
+                if (CheckCanEquipWeaponType(E_WeaponType.Secondary))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmo();
+                    GamePanelManager.I.SetAmmoActive(true);
+                }
+                break;
+            case 3:
+                if (CheckCanEquipWeaponType(E_WeaponType.Melee))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmo();
+                    GamePanelManager.I.SetAmmoActive(true);
+                }
+                break;
+            case 4:
+                if (CheckCanEquipWeaponType(E_WeaponType.Grenade))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmo();
+                    GamePanelManager.I.SetAmmoActive(true);
+                }
+                break;
+        }
+    }
+
+    // 들고자 하는 무기가 들 수 있는 상태인지 확인
+    private bool CheckCanEquipWeaponType(E_WeaponType eWeaponType)
+    {
+        if (m_vCurrentWeapon != null)
+        {
+            if (m_vCurrentWeapon.a_vWeaponData.a_eWeaponType == eWeaponType)
+                return false;  // 지금 들고있는 무기라면 바꿀 필요가 없으니 false
+        }
+
+        if (!m_dicWeaponInventory.ContainsKey(eWeaponType))
+            return false;   // 들고자 하는 타입의 무기를 갖고 있지 않다면 false
+
+        return true;
     }
 
     // 플레이어가 땅에 떨어진 무기에 닿으면 해당 무기를 획득한다.
@@ -101,13 +169,13 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
         }
 
         // 만약 닿은 무기의 타입을 이미 가지고 있는 경우, 해당 무기를 획득하지 않는다.
-        if(m_dicEquippedWeapons.ContainsKey(vWeaponBase.a_vWeaponData.a_eWeaponType))
+        if(m_dicWeaponInventory.ContainsKey(vWeaponBase.a_vWeaponData.a_eWeaponType))
         {
             Debug.Log("Tried to pick up [" + vWeaponBase.a_vWeaponData.a_strWeaponName + "], But [" + vWeaponBase.a_vWeaponData.a_eWeaponType + "] type is already equiped!");
         }
         else
         {
-            m_dicEquippedWeapons.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+            m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
 
             int iWeaponViewID = vWeaponObject.GetComponent<PhotonView>().ViewID;  // RPC엔 GameObject를 줄 수 없어서 해당 무기 object의 photon view ID를 대신 준다.
             m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, iWeaponViewID);
@@ -116,7 +184,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
             if (m_vCurrentWeapon == null)
             {
                 //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
-                a_iCurrentWeaponID = iWeaponViewID;
+                a_iCurrentWeaponViewID = iWeaponViewID;
                 vWeaponBase.SetAmmo();
                 GamePanelManager.I.SetAmmoActive(true);
             }

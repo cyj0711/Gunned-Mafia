@@ -4,13 +4,14 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class BulletScript : MonoBehaviourPunCallbacks
+public class BulletController : MonoBehaviourPunCallbacks
 {
     [SerializeField] private PhotonView m_vPhotonView;
     float m_fBulletSpeed = 4;
 
     int m_iShooterID = -1;
     int m_iWeaponID = -1;
+    WeaponData m_vWeaponData;
 
     void Start()
     {
@@ -22,10 +23,10 @@ public class BulletScript : MonoBehaviourPunCallbacks
         transform.Translate(Vector3.right * m_fBulletSpeed * Time.deltaTime);
     }
 
-    public void SetBulletInfo(int shooterID, int weaponID)
+    public void SetBulletData(int _iShooterID, int _iWeaponID)
     {
-        this.m_iShooterID = shooterID;
-        this.m_iWeaponID = weaponID;
+        m_iShooterID = _iShooterID;
+        m_iWeaponID = _iWeaponID;
     }
 
     private void OnTriggerEnter2D(Collider2D col)   // col을 RPC의 매개변수로 줄 수 없다.
@@ -52,7 +53,7 @@ public class BulletScript : MonoBehaviourPunCallbacks
             if(col.GetComponent<PhotonView>().IsMine)
             {
                 PlayerController player = col.GetComponentInParent<PlayerController>();
-                player.Hit(30);
+                player.Hit(m_vWeaponData.a_iDamage);
             }
             Destroy(gameObject);
         }
