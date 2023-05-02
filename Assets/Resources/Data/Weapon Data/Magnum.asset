@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_iWeaponID: 7
   m_strWeaponName: Magnum
-  m_iDamage: 0
+  m_iDamage: 35
   m_iCriticalDamage: 0
   m_fCriticalChance: 0
   m_iMaxAmmo: 35

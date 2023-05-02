@@ -10,6 +10,9 @@ public class MapManager : SingletonPunCallbacks<MapManager>
 {
     public List<WeaponSpawn> weaponSpawnPoints = new List<WeaponSpawn>();
 
+    [SerializeField] Transform m_vDroppedItem;
+    public Transform a_vDroppedItem { get { return m_vDroppedItem; } }
+
     public void SpawnWeapons()
     {
         foreach(WeaponSpawn weaponSpawnPoint in weaponSpawnPoints)
@@ -19,7 +22,7 @@ public class MapManager : SingletonPunCallbacks<MapManager>
             if(weapon!=null)
             {
                 String weaponName = "WeaponPrefab/" + weapon.GetComponent<WeaponBase>().a_vWeaponData.name;
-                PhotonNetwork.InstantiateRoomObject(weaponName, weaponSpawnPoint.transform.position, Quaternion.identity);
+                PhotonNetwork.InstantiateRoomObject(weaponName, weaponSpawnPoint.transform.position, Quaternion.identity).transform.parent = m_vDroppedItem;
             }
         }
     }

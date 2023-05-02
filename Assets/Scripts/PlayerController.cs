@@ -29,10 +29,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     CharacterAnimationController m_vCharacterAnimationController;
     [SerializeField] WeaponManager m_vWeaponManager;
 
-    public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { m_ePlayerRole = value; } }
-    public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { m_ePlayerState = value; } }
     private E_PlayerRole m_ePlayerRole;
     private E_PlayerState m_ePlayerState;
+    public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { m_ePlayerRole = value; } }
+    public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { m_ePlayerState = value; } }
+
+    private int m_iLastAttackerID = -1;         // 최근에 플레이어를 공격한 플레이어 id
+    private int m_iLastDamagedWeaponID = -1;    // 최근에 플레이어를 공격한 무기 id
+    public int a_iLastAttackerID { get { return m_iLastAttackerID; } set { m_iLastAttackerID = value; } }
+    public int a_iLastDamagedWeaponID { get { return m_iLastDamagedWeaponID; } set { m_iLastDamagedWeaponID = value; } }
 
     //*************** Synchronization Properties *******************
     [SerializeField] int m_iCurrentHealth;
@@ -110,30 +115,38 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             transform.position = Vector3.Lerp(transform.position, m_vCurrentPosition, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
     }
 
-    public void Hit(int damage)
+    public void Hit(int damage, int _iShooterID, int _iWeaponID)
     {
         a_iCurrentHealth = a_iCurrentHealth - damage;
+        a_iLastAttackerID = _iShooterID;
+        a_iLastDamagedWeaponID = _iWeaponID;
 
         if (a_iCurrentHealth <= 0)
         {
+            //Debug.Log(PhotonNetwork.LocalPlayer.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
             GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            m_vPhotonView.RPC("DestroyRPC", RpcTarget.AllBuffered);
+            m_vPhotonView.RPC(nameof(DestroyRPC), RpcTarget.AllBuffered, _iShooterID, _iWeaponID);
         }
     }
 
     [PunRPC]
-    void DestroyRPC() => Destroy(gameObject);
-
-    void WeaponRotation(float angle)
+    //void DestroyRPC() => Destroy(gameObject);
+    void DestroyRPC(int _iShooterID, int _iWeaponID)
     {
-        m_vWeaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        Debug.Log(m_vPhotonView.Owner.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
+        Destroy(gameObject);
+    }
+
+    void WeaponRotation(float fAngle)
+    {
+        m_vWeaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(fAngle, Vector3.forward);
     }
 
     void UpdateWeaponShotProcess()
     {
         if(Input.GetMouseButton(0))
         {
-            m_vWeaponManager.Shoot(m_fAngle);
+            m_vWeaponManager.Shoot();
 
         }
     }
@@ -160,6 +173,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             m_vWeaponManager.ChangeCurrentWeapon(4);
+        }
+
+        else if(Input.GetKeyDown(KeyCode.G))
+        {
+            m_vWeaponManager.ThrowOutWeapon();
         }
     }
 

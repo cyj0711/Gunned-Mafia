@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
-  m_Name: Glock
+  m_Name: MachineGun
   m_EditorClassIdentifier: 
-  m_iWeaponID: 8
-  m_strWeaponName: Glock
-  m_iDamage: 0
+  m_iWeaponID: 2
+  m_strWeaponName: Machine Gun
+  m_iDamage: 20
   m_iCriticalDamage: 0
   m_fCriticalChance: 0
-  m_iMaxAmmo: 60
-  m_iAmmoCapacity: 20
+  m_iMaxAmmo: 75
+  m_iAmmoCapacity: 75
   m_fReloadTime: 0
   m_bAutoFire: 1
   m_fRateOfFire: 0.15
-  m_eWeaponType: 1
-  m_eBulleyType: 0
-  m_vWeaponPrefab: {fileID: 4888275939638261436, guid: 8d3d8f119e5f4124785070c3ea0004c5,
+  m_eWeaponType: 0
+  m_eBulleyType: 3
+  m_vWeaponPrefab: {fileID: 5901293261016833010, guid: 57d64b8186660b748abeb67a030d0fa2,
     type: 3}

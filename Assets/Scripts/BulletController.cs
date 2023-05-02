@@ -10,7 +10,6 @@ public class BulletController : MonoBehaviourPunCallbacks
     float m_fBulletSpeed = 4;
 
     int m_iShooterID = -1;
-    int m_iWeaponID = -1;
     WeaponData m_vWeaponData;
 
     void Start()
@@ -26,7 +25,7 @@ public class BulletController : MonoBehaviourPunCallbacks
     public void SetBulletData(int _iShooterID, int _iWeaponID)
     {
         m_iShooterID = _iShooterID;
-        m_iWeaponID = _iWeaponID;
+        m_vWeaponData = DataManager.I.GetWeaponDataWithID(_iWeaponID);
     }
 
     private void OnTriggerEnter2D(Collider2D col)   // col을 RPC의 매개변수로 줄 수 없다.
@@ -52,8 +51,10 @@ public class BulletController : MonoBehaviourPunCallbacks
         {
             if(col.GetComponent<PhotonView>().IsMine)
             {
-                PlayerController player = col.GetComponentInParent<PlayerController>();
-                player.Hit(m_vWeaponData.a_iDamage);
+                if (col.GetComponent<PhotonView>().Owner.ActorNumber == m_iShooterID) return;
+
+                PlayerController vPlayer = col.GetComponentInParent<PlayerController>();
+                vPlayer.Hit(m_vWeaponData.a_iDamage, m_iShooterID, m_vWeaponData.a_iWeaponId);
             }
             Destroy(gameObject);
         }

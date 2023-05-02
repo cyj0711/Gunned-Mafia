@@ -22,7 +22,11 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     { 
         m_iCurrentWeaponViewID = value;
 
-        if (a_iCurrentWeaponViewID == -1) { return; }
+        if (a_iCurrentWeaponViewID == -1) 
+        { 
+            m_vCurrentWeapon = null; 
+            return; 
+        }
 
         GameObject vWeaponObject = PhotonView.Find(m_iCurrentWeaponViewID).gameObject;
         if (m_vCurrentWeapon != null)
@@ -59,12 +63,12 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
     public void InitWeaponManager()
     {
-        m_vCurrentWeapon = null;
+        a_iCurrentWeaponViewID = -1;
         m_dicWeaponInventory.Clear();
     }
 
     // 플레이어가 마우스를 누르면 이 함수가 호출되어 총알 발사
-    public void Shoot(float angle)
+    public void Shoot()
     {
         if(m_vCurrentWeapon!=null)
         {
@@ -103,6 +107,34 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
     }
 
+    // 키보드 g를 누르면 현재 들고있는 무기를 땅에 버린다.
+    public void ThrowOutWeapon()
+    {
+        if (m_vCurrentWeapon == null)
+            return;
+
+        m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
+
+        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.AllBuffered, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo);
+
+        a_iCurrentWeaponViewID = -1;
+        GamePanelManager.I.SetAmmoActive(false);
+    }
+
+    [PunRPC]
+    private void ThrowOutWeaponRPC(int _iCurrentAmmo, int _iRemainAmmo)
+    {
+        m_vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
+
+        m_vCurrentWeapon.transform.parent = MapManager.I.a_vDroppedItem;
+        m_vCurrentWeapon.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        if (m_vCurrentWeapon.gameObject.transform.localScale.y < 0)
+            m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
+                (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+
+        m_vCurrentWeapon.ThrowOutWeapon();
+    }
+
     // 숫자키를 입력받으면 그에 해당하는 무기로 변경
     public void ChangeCurrentWeapon(int iInputKeyNumber)
     {
@@ -112,7 +144,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
                 if(CheckCanEquipWeaponType(E_WeaponType.Primary))
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
-                    m_vCurrentWeapon.SetAmmo();
+                    m_vCurrentWeapon.SetAmmoUI();
                     GamePanelManager.I.SetAmmoActive(true);
                 }
                 break;
@@ -120,7 +152,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
                 if (CheckCanEquipWeaponType(E_WeaponType.Secondary))
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
-                    m_vCurrentWeapon.SetAmmo();
+                    m_vCurrentWeapon.SetAmmoUI();
                     GamePanelManager.I.SetAmmoActive(true);
                 }
                 break;
@@ -128,7 +160,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
                 if (CheckCanEquipWeaponType(E_WeaponType.Melee))
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
-                    m_vCurrentWeapon.SetAmmo();
+                    m_vCurrentWeapon.SetAmmoUI();
                     GamePanelManager.I.SetAmmoActive(true);
                 }
                 break;
@@ -136,7 +168,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
                 if (CheckCanEquipWeaponType(E_WeaponType.Grenade))
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
-                    m_vCurrentWeapon.SetAmmo();
+                    m_vCurrentWeapon.SetAmmoUI();
                     GamePanelManager.I.SetAmmoActive(true);
                 }
                 break;
@@ -185,7 +217,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
             {
                 //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
                 a_iCurrentWeaponViewID = iWeaponViewID;
-                vWeaponBase.SetAmmo();
+                vWeaponBase.SetAmmoUI();
                 GamePanelManager.I.SetAmmoActive(true);
             }
         }

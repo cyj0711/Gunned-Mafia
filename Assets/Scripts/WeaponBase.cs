@@ -20,6 +20,8 @@ public class WeaponBase : MonoBehaviour
 
     int m_iCurrentAmmo;    // 현재 장전된 총알
     int m_iRemainAmmo;     // 남은 총알
+    public int a_iCurrentAmmo { get { return m_iCurrentAmmo; } }
+    public int a_iRemainAmmo { get { return m_iRemainAmmo; } }
 
     bool m_bCanShooting;
 
@@ -32,6 +34,12 @@ public class WeaponBase : MonoBehaviour
     {
         m_iCurrentAmmo = a_vWeaponData.a_iAmmoCapacity;
         m_iRemainAmmo = a_vWeaponData.a_iMaxAmmo;
+        m_bCanShooting = true;
+    }
+    public void InitWeaponData(int _iCurrentAmmo, int _iRemainAmmo)
+    {
+        m_iCurrentAmmo = _iCurrentAmmo;
+        m_iRemainAmmo = _iRemainAmmo;
         m_bCanShooting = true;
     }
 
@@ -81,7 +89,7 @@ public class WeaponBase : MonoBehaviour
             m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle), iShooterID, m_vWeaponData.a_iWeaponId);
             //Instantiate(bullet, muzzlePosition.position, Quaternion.Euler(0f, 0f, angle));
             m_iCurrentAmmo -= 1;
-            SetAmmo();
+            SetAmmoUI();
 
         }
     }
@@ -101,12 +109,23 @@ public class WeaponBase : MonoBehaviour
         m_iRemainAmmo -= iAmmoNumberToReload;
         m_iCurrentAmmo += iAmmoNumberToReload;
 
-        SetAmmo();
+        SetAmmoUI();
     }
 
-    public void SetAmmo()
+    public void SetAmmoUI()
     {
         GamePanelManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
     }
 
+    public void ThrowOutWeapon()
+    {
+        StartCoroutine(ColliderOnCoroutine());
+    }
+
+    private IEnumerator ColliderOnCoroutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        gameObject.GetComponent<CapsuleCollider2D>().enabled = true;
+    }
 }

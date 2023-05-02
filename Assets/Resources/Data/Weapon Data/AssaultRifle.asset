@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_iWeaponID: 1
   m_strWeaponName: Assault Rifle
-  m_iDamage: 0
+  m_iDamage: 20
   m_iCriticalDamage: 0
   m_fCriticalChance: 0
   m_iMaxAmmo: 60
