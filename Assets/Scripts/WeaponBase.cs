@@ -25,7 +25,7 @@ public class WeaponBase : MonoBehaviour
 
     bool m_bCanShooting;
 
-    private void Start()
+    private void Awake()    // Start로 하면 RPC의 allbuffered로 호출된 함수가 먼저 발동돼서 초기화가 제대로 안되므로 awake를 사용
     {
         InitWeaponData();
     }

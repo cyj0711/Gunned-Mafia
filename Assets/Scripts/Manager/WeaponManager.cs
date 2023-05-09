@@ -31,7 +31,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
         GameObject vWeaponObject = PhotonView.Find(m_iCurrentWeaponViewID).gameObject;
         if (m_vCurrentWeapon != null)
         {
-            m_vCurrentWeapon.gameObject.SetActive(false);
+            m_vCurrentWeapon.gameObject.SetActive(false);   // 바꾸기 전 무기 오브젝트를 끈다.
         }
 
         m_vCurrentWeapon = vWeaponObject.GetComponent<WeaponBase>();
@@ -115,24 +115,39 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
         m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
 
-        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.AllBuffered, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo);
+        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.AllBuffered, a_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position);
 
         a_iCurrentWeaponViewID = -1;
         GamePanelManager.I.SetAmmoActive(false);
     }
 
     [PunRPC]
-    private void ThrowOutWeaponRPC(int _iCurrentAmmo, int _iRemainAmmo)
+    private void ThrowOutWeaponRPC(int _iCurrentWeaponViewID, int _iCurrentAmmo, int _iRemainAmmo, Vector3 _vWeaponPosition)
     {
-        m_vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
+        WeaponBase vCurrentWeapon = PhotonView.Find(_iCurrentWeaponViewID).gameObject.GetComponent<WeaponBase>();
 
-        m_vCurrentWeapon.transform.parent = MapManager.I.a_vDroppedItem;
-        m_vCurrentWeapon.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        if (m_vCurrentWeapon.gameObject.transform.localScale.y < 0)
-            m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
-                (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+        //m_vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
 
-        m_vCurrentWeapon.ThrowOutWeapon();
+        //m_vCurrentWeapon.transform.parent = MapManager.I.a_vDroppedItem;
+        //m_vCurrentWeapon.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        //if (m_vCurrentWeapon.gameObject.transform.localScale.y < 0)
+        //    m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
+        //        (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+
+        //m_vCurrentWeapon.ThrowOutWeapon();
+
+        vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
+
+        vCurrentWeapon.transform.parent = MapManager.I.a_vDroppedItem;
+        vCurrentWeapon.transform.position = _vWeaponPosition;
+        vCurrentWeapon.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        if (vCurrentWeapon.gameObject.transform.localScale.y < 0)
+            vCurrentWeapon.gameObject.transform.localScale = new Vector3
+                (vCurrentWeapon.gameObject.transform.localScale.x, vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+
+        vCurrentWeapon.gameObject.SetActive(true);
+
+        vCurrentWeapon.ThrowOutWeapon();
     }
 
     // 숫자키를 입력받으면 그에 해당하는 무기로 변경
