@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,14 +17,15 @@ public class WeaponBase : MonoBehaviour
     [SerializeField]
     private GameObject m_vBulletObject;
 
-    float m_fFireTimer;
-
     int m_iCurrentAmmo;    // 현재 장전된 총알
     int m_iRemainAmmo;     // 남은 총알
     public int a_iCurrentAmmo { get { return m_iCurrentAmmo; } }
     public int a_iRemainAmmo { get { return m_iRemainAmmo; } }
 
-    bool m_bCanShooting;
+    int m_iOwnerPlayerActorNumber;
+    public int a_iOwnerPlayerActorNumber { get { return m_iOwnerPlayerActorNumber; } set { m_iOwnerPlayerActorNumber = value; } }
+
+    DateTime m_vLastShootTime = DateTime.MinValue;
 
     private void Awake()    // Start로 하면 RPC의 allbuffered로 호출된 함수가 먼저 발동돼서 초기화가 제대로 안되므로 awake를 사용
     {
@@ -32,53 +34,32 @@ public class WeaponBase : MonoBehaviour
 
     public void InitWeaponData()
     {
+        InitCommonData();
+
         m_iCurrentAmmo = a_vWeaponData.a_iAmmoCapacity;
         m_iRemainAmmo = a_vWeaponData.a_iMaxAmmo;
-        m_bCanShooting = true;
     }
     public void InitWeaponData(int _iCurrentAmmo, int _iRemainAmmo)
     {
+        InitCommonData();
+
         m_iCurrentAmmo = _iCurrentAmmo;
         m_iRemainAmmo = _iRemainAmmo;
-        m_bCanShooting = true;
     }
 
-    void Update()
+    private void InitCommonData()
     {
-        CheckCanShooting();
-
-        //Debug.Log(gameObject.transform.eulerAngles.z);
-        //if (transform.eulerAngles.z > 90 && transform.eulerAngles.z < 270)
-        //    SetDirection(false);
-        //else if (transform.eulerAngles.z < 90 || transform.eulerAngles.z > 270)
-        //    SetDirection(true);
+        a_iOwnerPlayerActorNumber = -1;
     }
-
-    // 연사속도를 통해 연사 조절
-    private void CheckCanShooting()
-    {
-        if (m_bCanShooting == false)
-        {
-            if (m_fFireTimer <= 0f)
-            {
-                m_bCanShooting = true;
-                m_fFireTimer = m_vWeaponData.a_fRateOfFire;
-            }
-            else
-            {
-                m_fFireTimer -= Time.deltaTime;
-            }
-        }
-    }
-
 
     public void Shoot(float fAngle, int iShooterID)
     {
         if (m_iCurrentAmmo <= 0) return;
 
-        if (m_bCanShooting)
+        if (DateTime.Now.Subtract(m_vLastShootTime).TotalSeconds >= m_vWeaponData.a_fRateOfFire)
         {
-            m_bCanShooting = false;
+            m_vLastShootTime = DateTime.Now;
+
             //PhotonNetwork.Instantiate("Bullet", muzzlePosition.position, Quaternion.Euler(0f, 0f, angle));
             /* 꿀팁 
             PhotonNetwork.Instantiate("Bullet", muzzlePosition.position, Quaternion.Euler(0f, 0f, angle))
@@ -87,10 +68,9 @@ public class WeaponBase : MonoBehaviour
             */
 
             m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle), iShooterID, m_vWeaponData.a_iWeaponId);
-            //Instantiate(bullet, muzzlePosition.position, Quaternion.Euler(0f, 0f, angle));
+
             m_iCurrentAmmo -= 1;
             SetAmmoUI();
-
         }
     }
 

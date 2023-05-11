@@ -222,9 +222,12 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
         }
         else
         {
+            int iWeaponViewID = vWeaponObject.GetComponent<PhotonView>().ViewID;  // RPC엔 GameObject를 줄 수 없어서 해당 무기 object의 photon view ID를 대신 준다.
+
+            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber);
+
             m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
 
-            int iWeaponViewID = vWeaponObject.GetComponent<PhotonView>().ViewID;  // RPC엔 GameObject를 줄 수 없어서 해당 무기 object의 photon view ID를 대신 준다.
             m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, iWeaponViewID);
 
             // 현재 아무 무기도 들고있지 않은 상태면, 획득한 무기를 즉시 장착한다.

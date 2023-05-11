@@ -244,4 +244,38 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     {
         return m_dEndTime - m_dProcessTimer;
     }
+
+    public void CheckCanPlayerPickUpWeapon(int _iWeaponViewID, int _iPlayerNumber)
+    {
+        m_vPhotonView.RPC(nameof(CheckCanPlayerPickUpWeaponRPC), RpcTarget.MasterClient, _iWeaponViewID, _iPlayerNumber);
+    }
+
+    [PunRPC]
+    private void CheckCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerNumber)
+    {
+        WeaponBase vWeaponBase = PhotonView.Find(_iWeaponViewID).gameObject.GetComponent<WeaponBase>();
+
+        if (vWeaponBase == null)
+        {
+            Debug.LogError("Player(" + _iPlayerNumber + ") tried to get weapon(" + _iWeaponViewID + "), But the weaponBase is null");
+            return;
+        }
+
+        if (vWeaponBase.a_iOwnerPlayerActorNumber == -1)
+        {
+            vWeaponBase.a_iOwnerPlayerActorNumber = _iPlayerNumber;
+            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerNumber), _iWeaponViewID, _iPlayerNumber, true);
+        }
+        else
+        {
+            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerNumber), _iWeaponViewID, _iPlayerNumber, false);
+        }
+
+    }
+
+    [PunRPC]
+    public void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerNumber, bool _bCanPickUp)
+    {
+        
+    }
 }
