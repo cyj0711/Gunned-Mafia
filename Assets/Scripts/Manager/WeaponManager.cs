@@ -206,7 +206,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     }
 
     // 플레이어가 땅에 떨어진 무기에 닿으면 해당 무기를 획득한다.
-    public void PickUpWeapon(GameObject vWeaponObject)
+    public void CheckPickUpWeapon(GameObject vWeaponObject)
     {
         WeaponBase vWeaponBase = vWeaponObject.GetComponent<WeaponBase>();
         if(vWeaponBase==null)
@@ -224,20 +224,38 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
         {
             int iWeaponViewID = vWeaponObject.GetComponent<PhotonView>().ViewID;  // RPC엔 GameObject를 줄 수 없어서 해당 무기 object의 photon view ID를 대신 준다.
 
-            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber);
+            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber, m_vPhotonView.ViewID);
 
-            m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+            //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
 
-            m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, iWeaponViewID);
+            //m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, iWeaponViewID);
 
-            // 현재 아무 무기도 들고있지 않은 상태면, 획득한 무기를 즉시 장착한다.
-            if (m_vCurrentWeapon == null)
-            {
-                //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
-                a_iCurrentWeaponViewID = iWeaponViewID;
-                vWeaponBase.SetAmmoUI();
-                GamePanelManager.I.SetAmmoActive(true);
-            }
+            //// 현재 아무 무기도 들고있지 않은 상태면, 획득한 무기를 즉시 장착한다.
+            //if (m_vCurrentWeapon == null)
+            //{
+            //    //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
+            //    a_iCurrentWeaponViewID = iWeaponViewID;
+            //    vWeaponBase.SetAmmoUI();
+            //    GamePanelManager.I.SetAmmoActive(true);
+            //}
+        }
+    }
+
+    public void PickUpWeapon(int _iWeaponViewID)
+    {
+        WeaponBase vWeaponBase = PhotonView.Find(_iWeaponViewID).gameObject.GetComponent<WeaponBase>();
+
+        m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+
+        m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, _iWeaponViewID);
+
+        // 현재 아무 무기도 들고있지 않은 상태면, 획득한 무기를 즉시 장착한다.
+        if (m_vCurrentWeapon == null)
+        {
+            //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
+            a_iCurrentWeaponViewID = _iWeaponViewID;
+            vWeaponBase.SetAmmoUI();
+            GamePanelManager.I.SetAmmoActive(true);
         }
     }
 

@@ -267,9 +267,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             // 땅에 떨어진 무기에 닿으면 해당 무기 획득
             if (collision.tag == "Weapon")
             {
-                Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
+                //Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
 
-                m_vWeaponManager.PickUpWeapon(collision.gameObject);
+                m_vWeaponManager.CheckPickUpWeapon(collision.gameObject);
             }
         }
     }

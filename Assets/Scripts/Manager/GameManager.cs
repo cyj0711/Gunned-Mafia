@@ -245,37 +245,61 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         return m_dEndTime - m_dProcessTimer;
     }
 
-    public void CheckCanPlayerPickUpWeapon(int _iWeaponViewID, int _iPlayerNumber)
+    // 플레이어가 무기에 닿으면 서버를 통해 해당 무기를 얻을 수 있는지 확인받는다.
+    public void CheckCanPlayerPickUpWeapon(int _iWeaponViewID, int _iPlayerActorNumber, int _iWeaponManagerViewID)
     {
-        m_vPhotonView.RPC(nameof(CheckCanPlayerPickUpWeaponRPC), RpcTarget.MasterClient, _iWeaponViewID, _iPlayerNumber);
+        m_vPhotonView.RPC(nameof(CheckCanPlayerPickUpWeaponRPC), RpcTarget.MasterClient, _iWeaponViewID, _iPlayerActorNumber, _iWeaponManagerViewID);
     }
 
+    // 하나의 무기를 여러 플레이어가 동시에 주울때 꼬이는걸 막기위해 서버가 한명에게만 무기를 줍도록 조절한다.
     [PunRPC]
-    private void CheckCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerNumber)
+    private void CheckCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerActorNumber, int _iWeaponManagerViewID)
     {
+        if(!PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            Debug.LogError(nameof(CheckCanPlayerPickUpWeaponRPC) + "must be called on the master client, BUT "+ PhotonNetwork.LocalPlayer.NickName+" is not MASTER!!");
+            return;
+        }
+
         WeaponBase vWeaponBase = PhotonView.Find(_iWeaponViewID).gameObject.GetComponent<WeaponBase>();
 
         if (vWeaponBase == null)
         {
-            Debug.LogError("Player(" + _iPlayerNumber + ") tried to get weapon(" + _iWeaponViewID + "), But the weaponBase is null");
+            Debug.LogError("Player(" + _iPlayerActorNumber + ") tried to get weapon(" + _iWeaponViewID + "), But the weaponBase is null");
             return;
         }
 
         if (vWeaponBase.a_iOwnerPlayerActorNumber == -1)
         {
-            vWeaponBase.a_iOwnerPlayerActorNumber = _iPlayerNumber;
-            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerNumber), _iWeaponViewID, _iPlayerNumber, true);
+            vWeaponBase.a_iOwnerPlayerActorNumber = _iPlayerActorNumber;
+            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iWeaponManagerViewID, true);
         }
         else
         {
-            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerNumber), _iWeaponViewID, _iPlayerNumber, false);
+            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iWeaponManagerViewID, false);
         }
 
     }
 
+    // 무기를 주우려는 플레이어에게 무기 획득 가능 여부를 알려준다.
     [PunRPC]
-    public void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerNumber, bool _bCanPickUp)
+    public void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iWeaponManagerViewID, bool _bCanPickUp)
     {
-        
+        if(!_bCanPickUp)
+        {
+            Debug.LogWarning("Player(" + PhotonNetwork.LocalPlayer.NickName + ") tried to get weapon(" + _iWeaponViewID + "), But the weaponBase is not on the field");
+            return;
+        }
+
+        WeaponManager vWeaponManager = PhotonView.Find(_iWeaponManagerViewID).gameObject.GetComponent<WeaponManager>();
+
+        if (vWeaponManager == null)
+        {
+            Debug.LogError("Player(" + PhotonNetwork.LocalPlayer.NickName + ") tried to get weapon(" + _iWeaponViewID + "), But the weaponManager is null");
+            return;
+        }
+
+        vWeaponManager.PickUpWeapon(_iWeaponViewID);
+
     }
 }
