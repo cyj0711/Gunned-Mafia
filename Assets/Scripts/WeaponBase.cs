@@ -52,7 +52,7 @@ public class WeaponBase : MonoBehaviour
         a_iOwnerPlayerActorNumber = -1;
     }
 
-    public void Shoot(float fAngle, int iShooterID)
+    public void Shoot(float fAngle, int iShooterActorNumber)
     {
         if (m_iCurrentAmmo <= 0) return;
 
@@ -67,7 +67,7 @@ public class WeaponBase : MonoBehaviour
             를 쓰면 instantiate 한 오브젝트의 rpc를 호출할 수 있다.
             */
 
-            m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle), iShooterID, m_vWeaponData.a_iWeaponId);
+            m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle), iShooterActorNumber, m_vWeaponData.a_iWeaponId);
 
             m_iCurrentAmmo -= 1;
             SetAmmoUI();
@@ -75,9 +75,9 @@ public class WeaponBase : MonoBehaviour
     }
 
     [PunRPC]
-    public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterID, int iWeaponID)
+    public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
     {
-        Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterID, iWeaponID);
+        Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID);
     }
 
     public void Reload()
@@ -97,9 +97,27 @@ public class WeaponBase : MonoBehaviour
         GamePanelManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
     }
 
-    public void ThrowOutWeapon()
+    public void ThrowOutWeapon(Quaternion _WeaponRoration)
     {
-        StartCoroutine(ColliderOnCoroutine());
+        //StartCoroutine(ColliderOnCoroutine());
+        StartCoroutine(SmoothLerp(0.2f, _WeaponRoration));
+    }
+
+    private IEnumerator SmoothLerp(float time, Quaternion _WeaponRoration)
+    {
+        Vector3 startingPos = transform.position;
+        Vector3 finalPos = transform.position + (_WeaponRoration.normalized * Vector3.right * 0.4f);
+        float elapsedTime = 0;
+
+        while (elapsedTime < time)
+        {
+            transform.position = Vector3.Lerp(startingPos, finalPos, (elapsedTime / time));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+        gameObject.GetComponent<CapsuleCollider2D>().enabled = true;
     }
 
     private IEnumerator ColliderOnCoroutine()

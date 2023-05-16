@@ -34,9 +34,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { m_ePlayerRole = value; } }
     public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { m_ePlayerState = value; } }
 
-    private int m_iLastAttackerID = -1;         // 최근에 플레이어를 공격한 플레이어 id
+    private int m_iLastAttackerActorNumber = -1;         // 최근에 플레이어를 공격한 플레이어 id
     private int m_iLastDamagedWeaponID = -1;    // 최근에 플레이어를 공격한 무기 id
-    public int a_iLastAttackerID { get { return m_iLastAttackerID; } set { m_iLastAttackerID = value; } }
+    public int a_iLastAttackerActorNumber { get { return m_iLastAttackerActorNumber; } set { m_iLastAttackerActorNumber = value; } }
     public int a_iLastDamagedWeaponID { get { return m_iLastDamagedWeaponID; } set { m_iLastDamagedWeaponID = value; } }
 
     //*************** Synchronization Properties *******************
@@ -57,8 +57,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     Vector3 m_vCurrentPosition;
 
-    float m_fAngle;
-    Vector2 m_vTargetPosition, m_vMousePosition;
+    //float m_fAngle;
+    Vector2 m_vTargetPosition;
 
     bool m_bSeeingRight; // true이면 오른쪽을 보는 상태, false는 왼쪽
     public bool a_bSeeingRight { get { return m_bSeeingRight; } }
@@ -115,31 +115,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             transform.position = Vector3.Lerp(transform.position, m_vCurrentPosition, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
     }
 
-    public void Hit(int damage, int _iShooterID, int _iWeaponID)
+    public void Hit(int _idamage, int _iShooterActorNumber, int _iWeaponID)
     {
-        a_iCurrentHealth = a_iCurrentHealth - damage;
-        a_iLastAttackerID = _iShooterID;
+        a_iCurrentHealth = a_iCurrentHealth - _idamage;
+        a_iLastAttackerActorNumber = _iShooterActorNumber;
         a_iLastDamagedWeaponID = _iWeaponID;
 
         if (a_iCurrentHealth <= 0)
         {
             //Debug.Log(PhotonNetwork.LocalPlayer.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
             GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            m_vPhotonView.RPC(nameof(DestroyRPC), RpcTarget.AllBuffered, _iShooterID, _iWeaponID);
+            m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBuffered, _iShooterActorNumber, _iWeaponID);
         }
     }
 
     [PunRPC]
     //void DestroyRPC() => Destroy(gameObject);
-    void DestroyRPC(int _iShooterID, int _iWeaponID)
+    void PlayerDeadRPC(int _iShooterActorNumber, int _iWeaponID)
     {
-        Debug.Log(m_vPhotonView.Owner.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
+        //Debug.Log(m_vPhotonView.Owner.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterActorNumber).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
+        PlayerDead vPlayerDead = ((GameObject)Instantiate(Resources.Load("PlayerDeadBody"), transform.position, Quaternion.identity)).GetComponent<PlayerDead>();
+        vPlayerDead.InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
         Destroy(gameObject);
     }
 
-    void WeaponRotation(float fAngle)
+    void WeaponRotation(float _fAngle)
     {
-        m_vWeaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(fAngle, Vector3.forward);
+        m_vWeaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(_fAngle, Vector3.forward);
     }
 
     void UpdateWeaponShotProcess()
@@ -209,12 +211,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     void UpdateWeaponAimProcess()
     {
         m_vTargetPosition = transform.position;
-        m_vMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        m_fAngle = Mathf.Atan2(m_vMousePosition.y - m_vTargetPosition.y, m_vMousePosition.x - m_vTargetPosition.x) * Mathf.Rad2Deg;
+        Vector2 vMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        float fAngle = Mathf.Atan2(vMousePosition.y - m_vTargetPosition.y, vMousePosition.x - m_vTargetPosition.x) * Mathf.Rad2Deg;
 
-        SetDirection(m_fAngle);
+        SetDirection(fAngle);
 
-        WeaponRotation(m_fAngle);
+        WeaponRotation(fAngle);
     }
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인

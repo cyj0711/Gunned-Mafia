@@ -147,7 +147,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
         vCurrentWeapon.gameObject.SetActive(true);
 
-        vCurrentWeapon.ThrowOutWeapon();
+        vCurrentWeapon.ThrowOutWeapon(transform.rotation);
     }
 
     // 숫자키를 입력받으면 그에 해당하는 무기로 변경

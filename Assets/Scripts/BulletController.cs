@@ -9,7 +9,7 @@ public class BulletController : MonoBehaviourPunCallbacks
     [SerializeField] private PhotonView m_vPhotonView;
     float m_fBulletSpeed = 4;
 
-    int m_iShooterID = -1;
+    int m_iShooterActorNumber = -1;
     WeaponData m_vWeaponData;
 
     void Start()
@@ -22,9 +22,9 @@ public class BulletController : MonoBehaviourPunCallbacks
         transform.Translate(Vector3.right * m_fBulletSpeed * Time.deltaTime);
     }
 
-    public void SetBulletData(int _iShooterID, int _iWeaponID)
+    public void SetBulletData(int _iShooterActorNumber, int _iWeaponID)
     {
-        m_iShooterID = _iShooterID;
+        m_iShooterActorNumber = _iShooterActorNumber;
         m_vWeaponData = DataManager.I.GetWeaponDataWithID(_iWeaponID);
     }
 
@@ -51,10 +51,10 @@ public class BulletController : MonoBehaviourPunCallbacks
         {
             if(col.GetComponent<PhotonView>().IsMine)
             {
-                if (col.GetComponent<PhotonView>().Owner.ActorNumber == m_iShooterID) return;
+                if (col.GetComponent<PhotonView>().Owner.ActorNumber == m_iShooterActorNumber) return;
 
                 PlayerController vPlayer = col.GetComponentInParent<PlayerController>();
-                vPlayer.Hit(m_vWeaponData.a_iDamage, m_iShooterID, m_vWeaponData.a_iWeaponId);
+                vPlayer.Hit(m_vWeaponData.a_iDamage, m_iShooterActorNumber, m_vWeaponData.a_iWeaponId);
             }
             Destroy(gameObject);
         }
