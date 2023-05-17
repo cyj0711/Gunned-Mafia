@@ -283,7 +283,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
     // 무기를 주우려는 플레이어에게 무기 획득 가능 여부를 알려준다.
     [PunRPC]
-    public void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iWeaponManagerViewID, bool _bCanPickUp)
+    private void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iWeaponManagerViewID, bool _bCanPickUp)
     {
         if(!_bCanPickUp)
         {

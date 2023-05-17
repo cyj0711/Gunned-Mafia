@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -989,6 +989,7 @@ GameObject:
   m_Component:
   - component: {fileID: 154119600}
   - component: {fileID: 154119601}
+  - component: {fileID: 154119602}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -1064,6 +1065,29 @@ MonoBehaviour:
   - {fileID: 376465441}
   - {fileID: 1576362284}
   m_vDroppedItem: {fileID: 409590360}
+  m_vPhotonView: {fileID: 154119602}
+--- !u!114 &154119602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154119599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 5
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &154740808
 GameObject:
   m_ObjectHideFlags: 0

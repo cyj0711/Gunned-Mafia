@@ -125,19 +125,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         {
             //Debug.Log(PhotonNetwork.LocalPlayer.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
             GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBuffered, _iShooterActorNumber, _iWeaponID);
+            //m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBufferedViaServer, _iShooterActorNumber, _iWeaponID);
+            MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+            //PhotonNetwork.Instantiate("PlayerDeadBody", transform.position, Quaternion.identity).GetComponent<PlayerDead>()
+            //    .InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 
-    [PunRPC]
-    //void DestroyRPC() => Destroy(gameObject);
-    void PlayerDeadRPC(int _iShooterActorNumber, int _iWeaponID)
-    {
-        //Debug.Log(m_vPhotonView.Owner.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterActorNumber).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
-        PlayerDead vPlayerDead = ((GameObject)Instantiate(Resources.Load("PlayerDeadBody"), transform.position, Quaternion.identity)).GetComponent<PlayerDead>();
-        vPlayerDead.InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
-        Destroy(gameObject);
-    }
+    //[PunRPC]
+    ////void DestroyRPC() => Destroy(gameObject);
+    //void PlayerDeadRPC(int _iShooterActorNumber, int _iWeaponID)
+    //{
+    //    //Debug.Log(m_vPhotonView.Owner.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterActorNumber).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
+    //    PlayerDead vPlayerDead = ((GameObject)Instantiate(Resources.Load("PlayerDeadBody"), transform.position, Quaternion.identity)).GetComponent<PlayerDead>();
+    //    vPlayerDead.InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+    //    Destroy(gameObject);
+    //}
 
     void WeaponRotation(float _fAngle)
     {
