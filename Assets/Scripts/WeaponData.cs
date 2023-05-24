@@ -74,4 +74,8 @@ public class WeaponData : ScriptableObject
     [SerializeField]
     private GameObject m_vWeaponPrefab;
     public GameObject a_vWeaponPrefab { get { return m_vWeaponPrefab; } }
+
+    [SerializeField]
+    private GameObject m_vBulletPrefab;
+    public GameObject a_vBulletPrefab { get { return m_vBulletPrefab; } }
 }

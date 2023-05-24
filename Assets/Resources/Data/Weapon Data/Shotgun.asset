@@ -26,3 +26,5 @@ MonoBehaviour:
   m_eBulleyType: 4
   m_vWeaponPrefab: {fileID: 4988549205327503408, guid: f638036167bbfa047984df4e202fe41b,
     type: 3}
+  m_vBulletPrefab: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,
+    type: 3}

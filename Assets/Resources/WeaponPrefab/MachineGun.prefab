@@ -91,7 +91,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4958219616080211451}
   m_Layer: 0
-  m_Name: muzzlePosition
+  m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,9 +122,6 @@ GameObject:
   - component: {fileID: 8136955678765827178}
   - component: {fileID: 7827342574409074676}
   - component: {fileID: 7829137328320554766}
-  - component: {fileID: 2522013699759789630}
-  - component: {fileID: -5879972309296070997}
-  - component: {fileID: -4680226844047544467}
   m_Layer: 0
   m_Name: MachineGun
   m_TagString: Weapon
@@ -214,63 +211,3 @@ CapsuleCollider2D:
   m_Offset: {x: 4.5, y: -1.6}
   m_Size: {x: 17, y: 5}
   m_Direction: 1
---- !u!114 &2522013699759789630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5901293261016833010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44bed20452c80f843bf4bb1c8b866ed0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_vWeaponData: {fileID: 11400000, guid: 0097e44e528d5e44696342cba02031c8, type: 2}
-  m_vPhotonView: {fileID: -5879972309296070997}
-  m_vMuzzlePosition: {fileID: 4958219616080211451}
-  m_vBulletObject: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,
-    type: 3}
---- !u!114 &-5879972309296070997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5901293261016833010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!50 &-4680226844047544467
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5901293261016833010}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4

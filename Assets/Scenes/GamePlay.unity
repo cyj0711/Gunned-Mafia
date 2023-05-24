@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2440,8 +2440,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponsToSpawn:
-  - {fileID: 2657234423793419423, guid: 06081163766f9aa4b8b707ca421e2117, type: 3}
-  - {fileID: 4888275939638261436, guid: 8d3d8f119e5f4124785070c3ea0004c5, type: 3}
+  - {fileID: 11400000, guid: 1c20fcf3ab4742c45aff8bafda26fd8e, type: 2}
+  - {fileID: 11400000, guid: d69c8edb09378374db78a1f07a52eb6a, type: 2}
 --- !u!1 &320155685
 GameObject:
   m_ObjectHideFlags: 0
@@ -2847,7 +2847,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponsToSpawn:
-  - {fileID: 4455404082270616039, guid: 48c20525a454457409c9b04d3e7b8e3e, type: 3}
+  - {fileID: 11400000, guid: 4307d5b12e36bc446bd0a5315263dc03, type: 2}
 --- !u!1 &393866230
 GameObject:
   m_ObjectHideFlags: 0
@@ -12098,7 +12098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponsToSpawn:
-  - {fileID: 5901293261016833010, guid: 57d64b8186660b748abeb67a030d0fa2, type: 3}
+  - {fileID: 11400000, guid: 0097e44e528d5e44696342cba02031c8, type: 2}
 --- !u!1 &1580066909
 GameObject:
   m_ObjectHideFlags: 0

@@ -88,7 +88,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
     void UpdateWaitProcess()
     {
-        if(PhotonNetwork.CurrentRoom.PlayerCount >= 1)
+        if(PhotonNetwork.CurrentRoom.PlayerCount >= 2)
         {
             //startTime = PhotonNetwork.Time;
             //endTime = timeForPrepare;

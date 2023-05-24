@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponBase : MonoBehaviour
+public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
 {
     [SerializeField]
     private WeaponData m_vWeaponData;
@@ -16,6 +16,10 @@ public class WeaponBase : MonoBehaviour
     private Transform m_vMuzzlePosition;
     [SerializeField]
     private GameObject m_vBulletObject;
+    [SerializeField]
+    private GameObject m_vWeaponSkinObject;
+
+    private Collider2D m_vWeaponSkinCollider;
 
     int m_iCurrentAmmo;    // 현재 장전된 총알
     int m_iRemainAmmo;     // 남은 총알
@@ -25,19 +29,22 @@ public class WeaponBase : MonoBehaviour
     int m_iOwnerPlayerActorNumber;
     public int a_iOwnerPlayerActorNumber { get { return m_iOwnerPlayerActorNumber; } set { m_iOwnerPlayerActorNumber = value; } }
 
+    int m_iWeaponID;
+    public int a_iWeaponID { get { return m_iWeaponID; } set { m_iWeaponID = value; } }
+
     DateTime m_vLastShootTime = DateTime.MinValue;
 
     private void Awake()    // Start로 하면 RPC의 allbuffered로 호출된 함수가 먼저 발동돼서 초기화가 제대로 안되므로 awake를 사용
     {
-        InitWeaponData();
+        //InitWeaponData();
     }
 
     public void InitWeaponData()
     {
         InitCommonData();
 
-        m_iCurrentAmmo = a_vWeaponData.a_iAmmoCapacity;
-        m_iRemainAmmo = a_vWeaponData.a_iMaxAmmo;
+        m_iCurrentAmmo = m_vWeaponData.a_iAmmoCapacity;
+        m_iRemainAmmo = m_vWeaponData.a_iMaxAmmo;
     }
     public void InitWeaponData(int _iCurrentAmmo, int _iRemainAmmo)
     {
@@ -49,7 +56,23 @@ public class WeaponBase : MonoBehaviour
 
     private void InitCommonData()
     {
-        a_iOwnerPlayerActorNumber = -1;
+        SetWeaponSkin();
+        m_iOwnerPlayerActorNumber = -1;
+    }
+
+    private void SetWeaponSkin()
+    {
+        if (m_vWeaponSkinObject == null)
+        {
+            m_vWeaponSkinObject = Instantiate(m_vWeaponData.a_vWeaponPrefab);
+            m_vWeaponSkinObject.transform.parent = transform;
+            m_vWeaponSkinObject.transform.localPosition = new Vector3(0f, 0f, 0f);
+            m_vWeaponSkinObject.transform.rotation = Quaternion.identity;
+
+            m_vMuzzlePosition = m_vWeaponSkinObject.transform.Find("ShootPosition");
+
+            m_vWeaponSkinCollider = m_vWeaponSkinObject.GetComponent<Collider2D>();
+        }
     }
 
     public void Shoot(float fAngle, int iShooterActorNumber)
@@ -100,7 +123,12 @@ public class WeaponBase : MonoBehaviour
     public void ThrowOutWeapon(Quaternion _WeaponRoration)
     {
         //StartCoroutine(ColliderOnCoroutine());
-        StartCoroutine(SmoothLerp(0.2f, _WeaponRoration));
+        StartCoroutine(SmoothLerp(0.5f, _WeaponRoration));
+    }
+
+    public void SetWeaponCollider(bool _bIsEnable)
+    {
+        m_vWeaponSkinCollider.enabled = _bIsEnable;
     }
 
     private IEnumerator SmoothLerp(float time, Quaternion _WeaponRoration)
@@ -117,13 +145,24 @@ public class WeaponBase : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
-        gameObject.GetComponent<CapsuleCollider2D>().enabled = true;
+        SetWeaponCollider(true);
     }
 
-    private IEnumerator ColliderOnCoroutine()
-    {
-        yield return new WaitForSeconds(1.5f);
+    //private IEnumerator ColliderOnCoroutine()
+    //{
+    //    yield return new WaitForSeconds(1.5f);
 
-        gameObject.GetComponent<CapsuleCollider2D>().enabled = true;
+    //    SetWeaponCollider(true);
+    //}
+
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        object[] vInstantiationData = info.photonView.InstantiationData;
+
+        if (vInstantiationData != null && vInstantiationData.Length == 1)
+        {
+            m_vWeaponData = DataManager.I.GetWeaponDataWithID((int)vInstantiationData[0]);
+            InitWeaponData();
+        }
     }
 }

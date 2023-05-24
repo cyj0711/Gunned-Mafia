@@ -5,9 +5,9 @@ using UnityEngine;
 public class WeaponSpawn : MonoBehaviour
 {
 
-    public List<GameObject> weaponsToSpawn = new List<GameObject>();
+    public List<WeaponData> weaponsToSpawn = new List<WeaponData>();
 
-    public GameObject GetWeaponToSpawn()
+    public WeaponData GetWeaponToSpawn()
     {
         if (weaponsToSpawn.Count == 0)
             return null;

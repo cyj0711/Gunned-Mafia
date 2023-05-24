@@ -53,7 +53,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
     public void InvokeProperties()  // Synchronization properites에 새 속성을 넣을경우 여기에 반드시 추가한다.(변수명이 아닌 get set 명임!!)
     {
-        a_iCurrentWeaponViewID = a_iCurrentWeaponViewID;
+        a_iCurrentWeaponViewID = m_iCurrentWeaponViewID;
     }
 
     void Start()
@@ -115,14 +115,15 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
         m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
 
-        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.AllBuffered, a_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position);
+        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.AllBuffered, 
+            m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
 
         a_iCurrentWeaponViewID = -1;
         GamePanelManager.I.SetAmmoActive(false);
     }
 
     [PunRPC]
-    private void ThrowOutWeaponRPC(int _iCurrentWeaponViewID, int _iCurrentAmmo, int _iRemainAmmo, Vector3 _vWeaponPosition)
+    private void ThrowOutWeaponRPC(int _iCurrentWeaponViewID, int _iCurrentAmmo, int _iRemainAmmo, Vector3 _vWeaponPosition, Quaternion _qPlayerAimRotation)
     {
         WeaponBase vCurrentWeapon = PhotonView.Find(_iCurrentWeaponViewID).gameObject.GetComponent<WeaponBase>();
 
@@ -147,7 +148,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
 
         vCurrentWeapon.gameObject.SetActive(true);
 
-        vCurrentWeapon.ThrowOutWeapon(transform.rotation);
+        vCurrentWeapon.ThrowOutWeapon(_qPlayerAimRotation);
     }
 
     // 숫자키를 입력받으면 그에 해당하는 무기로 변경
@@ -224,7 +225,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
         {
             int iWeaponViewID = vWeaponObject.GetComponent<PhotonView>().ViewID;  // RPC엔 GameObject를 줄 수 없어서 해당 무기 object의 photon view ID를 대신 준다.
 
-            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber, m_vPhotonView.ViewID);
+            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber, m_vPhotonView.ViewID); // 서버의 GameManager가 무기 획득 여부를 확인한뒤 클라이언트의 PickUpWeapon을 호출
 
             //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
 
@@ -265,7 +266,7 @@ public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
     {
         GameObject vWeaponObject = PhotonView.Find(iWeaponViewID).gameObject;
 
-        vWeaponObject.GetComponent<CapsuleCollider2D>().enabled = false;
+        vWeaponObject.GetComponent<WeaponBase>().SetWeaponCollider(false);
 
         vWeaponObject.transform.parent = gameObject.transform;
         vWeaponObject.transform.localPosition = new Vector3(0f, 0f, 0f);

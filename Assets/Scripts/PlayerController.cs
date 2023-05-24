@@ -275,7 +275,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             {
                 //Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
 
-                m_vWeaponManager.CheckPickUpWeapon(collision.gameObject);
+                m_vWeaponManager.CheckPickUpWeapon(collision.gameObject.transform.parent.gameObject);
             }
         }
     }

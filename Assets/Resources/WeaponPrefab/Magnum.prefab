@@ -11,9 +11,6 @@ GameObject:
   - component: {fileID: 6618667822784991567}
   - component: {fileID: 7533098787915202973}
   - component: {fileID: 3026405393284956451}
-  - component: {fileID: -4280172317782713904}
-  - component: {fileID: -8481939101520579309}
-  - component: {fileID: -825584392712381816}
   m_Layer: 0
   m_Name: Magnum
   m_TagString: Weapon
@@ -103,66 +100,6 @@ CapsuleCollider2D:
   m_Offset: {x: 10, y: -2}
   m_Size: {x: 10, y: 10}
   m_Direction: 0
---- !u!114 &-4280172317782713904
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2657234423793419423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44bed20452c80f843bf4bb1c8b866ed0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_vWeaponData: {fileID: 11400000, guid: d69c8edb09378374db78a1f07a52eb6a, type: 2}
-  m_vPhotonView: {fileID: -8481939101520579309}
-  m_vMuzzlePosition: {fileID: 5857819459121544326}
-  m_vBulletObject: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,
-    type: 3}
---- !u!114 &-8481939101520579309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2657234423793419423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!50 &-825584392712381816
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2657234423793419423}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
 --- !u!1 &6515106559088265519
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,7 +110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5857819459121544326}
   m_Layer: 0
-  m_Name: muzzlePosition
+  m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

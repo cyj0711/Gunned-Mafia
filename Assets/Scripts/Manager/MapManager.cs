@@ -21,12 +21,14 @@ public class MapManager : SingletonPunCallbacks<MapManager>
     {
         foreach(WeaponSpawn weaponSpawnPoint in weaponSpawnPoints)
         {
-            GameObject weapon = weaponSpawnPoint.GetWeaponToSpawn();
+            WeaponData vWeaponData = weaponSpawnPoint.GetWeaponToSpawn();
 
-            if(weapon!=null)
+            if (vWeaponData != null)
             {
-                String weaponName = "WeaponPrefab/" + weapon.GetComponent<WeaponBase>().a_vWeaponData.name;
-                PhotonNetwork.InstantiateRoomObject(weaponName, weaponSpawnPoint.transform.position, Quaternion.identity).transform.parent = a_vDroppedItem;
+                object[] vPhotonData = new object[1];
+                vPhotonData[0] = vWeaponData.a_iWeaponId;
+
+                PhotonNetwork.InstantiateRoomObject("WeaponPrefab/WeaponBaseObject", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonData);
             }
         }
     }

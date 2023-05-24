@@ -77,7 +77,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        DisconnectPanel.SetActive(true);
+        //DisconnectPanel.SetActive(true);
         RespawnPanel.SetActive(false);
     }
 }
