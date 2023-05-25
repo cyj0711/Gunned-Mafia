@@ -23,6 +23,9 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     double m_dStartTime;
     double m_dEndTime;
 
+    int m_iCurrentNumberOfMafia;
+    int m_iCurrentNumberOfCivil;
+
     /* 방 속성(유저(방장)가 설정 가능) */
     double m_dPropertyTimeForPrepare;   // 준비 시간
     double m_dPropertyTimeForPlay;      // 플레이 시간
@@ -33,10 +36,13 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     int m_iPropertyNumberOfDetective;   // 탐정 수
     /***************************/
     private Dictionary<int, E_PlayerRole> m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();    // 플레이어 역할 데이터, int = 플레이어의 Actor number
+    private Dictionary<int, E_PlayerRole> m_dicLivingPlayerRoles; // 현재 살아있는 플레이어 역할 데이터
 
     public PhotonView m_vPhotonView;
 
     Hashtable m_htCustomValue;
+
+    bool m_bIsRoleSet;
 
     void Start()
     {
@@ -52,14 +58,22 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         if (PhotonNetwork.IsMasterClient)
         {
+            //m_dStartTime = PhotonNetwork.Time;
             m_htCustomValue = new ExitGames.Client.Photon.Hashtable();
-            m_dStartTime = PhotonNetwork.Time;
-            m_htCustomValue.Add("StartTime", m_dStartTime);
+
+            m_htCustomValue.Add("GameState", m_eGameState);
+            m_htCustomValue.Add("StartTime", PhotonNetwork.Time);
+            m_htCustomValue.Add("EndTime", -1.0);
+
+            //m_htCustomValue.Add("StartTime", m_dStartTime);
             PhotonNetwork.CurrentRoom.SetCustomProperties(m_htCustomValue);
         }
         else    // 게스트에겐 이미 진행되고있는 시간을 표시
         {
-            m_dStartTime = double.Parse(PhotonNetwork.CurrentRoom.CustomProperties["StartTime"].ToString());
+            m_htCustomValue = PhotonNetwork.CurrentRoom.CustomProperties;
+            m_eGameState = (E_GAMESTATE)((int)m_htCustomValue["GameState"]);
+            m_dStartTime = (double)m_htCustomValue["StartTime"];
+            m_dEndTime = (double)m_htCustomValue["EndTime"];
         }
     }
 
@@ -95,8 +109,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             //gameState = E_GAMESTATE.Prepare;
             if (PhotonNetwork.IsMasterClient)
             {
-                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
+                //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
                 MapManager.I.SpawnWeapons();
+                m_bIsRoleSet = false;
             }
         }
     }
@@ -117,7 +133,9 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             if (PhotonNetwork.IsMasterClient)
             {
                 SetPlayerRole();
-                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
+                //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
+
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
             }
             ////else
             //{
@@ -135,6 +153,9 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     // 마스터 클라이언트가 모든 플레이어의 역할을 정해주고 나머지 클라이언트에게 알려준다
     void SetPlayerRole()
     {
+        if (m_bIsRoleSet)   // 서버 시간차이로 인한 SetPlayerRole 중복 호출을 방지한다.
+            return;
+
         m_dicPlayerRoles.Clear();
         Player[] vSortedPlayers = PhotonNetwork.PlayerList;
 
@@ -169,20 +190,21 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         // RPC는 dictionary를 받지 못하므로, playerRoles dictionary를 string으로 변환하여 파라미터로 준다.
         string strPlayerRoles = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(m_dicPlayerRoles);
-        m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.AllBuffered, strPlayerRoles);
+        m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.AllBuffered, strPlayerRoles, vSortedPlayers.Length - m_iPropertyNumberOfMafia, m_iPropertyNumberOfMafia);
 
         for (int i = 0; i < vSortedPlayers.Length; i ++)
         {
             Debug.Log(vSortedPlayers[i].NickName + " : " + m_dicPlayerRoles[vSortedPlayers[i].ActorNumber].ToString());
         }
 
+        m_bIsRoleSet = true;
     }
 
     // playerRoles를 string으로 받아 int, E_PlayerRole형 dictionary로 변환하여 모든 클라이언트에게 전해준다.
     [PunRPC]
-    void SetPlayerRoleRPC(string strPlayerRoles)
+    void SetPlayerRoleRPC(string _strPlayerRoles, int _iCurrentNumberOfCivil, int _iCurrentNumberOfMafia)
     {
-        Dictionary<string, string> dicPlayerRolesString = StringConverter.I.ConvertStringToDictionary(strPlayerRoles);
+        Dictionary<string, string> dicPlayerRolesString = StringConverter.I.ConvertStringToDictionary(_strPlayerRoles);
 
         m_dicPlayerRoles.Clear();
         foreach (KeyValuePair<string, string> kvPair in dicPlayerRolesString)
@@ -190,6 +212,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_dicPlayerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
         }
 
+        m_iCurrentNumberOfCivil = _iCurrentNumberOfCivil;
+        m_iCurrentNumberOfMafia = _iCurrentNumberOfMafia;
+
+        m_dicLivingPlayerRoles = new Dictionary<int, E_PlayerRole>(m_dicPlayerRoles);
 
     }
 
@@ -216,8 +242,49 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             //endTime = timeForCooling;
             //gameState = E_GAMESTATE.Cooling;
             if (PhotonNetwork.IsMasterClient)
-                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
+            {
+                //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
+
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
+            }
         }
+    }
+
+    // 플레이어가 죽거나 나갔을때 게임이 끝나는지 확인
+    public void CheckGameOver(int _iPlayerActorNumber)
+    {
+        if (!PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            Debug.LogError("Local called CheckGameOver in GameManager, but it is not Master Clinet!!");
+            return;
+        }
+
+        m_dicLivingPlayerRoles.Remove(_iPlayerActorNumber);
+
+        E_PlayerRole eDeadPlayerRole = GetPlayerRole(_iPlayerActorNumber);
+
+        if (eDeadPlayerRole == E_PlayerRole.Mafia)
+        {
+            m_iCurrentNumberOfMafia -= 1;
+
+            if (m_iCurrentNumberOfMafia <= 0 && PhotonNetwork.LocalPlayer.IsMasterClient)
+            {
+                Debug.Log("CIVIL WIN !!");
+
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
+            }
+        }
+        else
+        {
+            m_iCurrentNumberOfCivil -= 1;
+            if (m_iCurrentNumberOfCivil <= 0 && PhotonNetwork.LocalPlayer.IsMasterClient)
+            {
+                Debug.Log("MAFIA WIN !!");
+
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
+            }
+        }
+
     }
 
     void UpdateCoolingProcess()
@@ -228,17 +295,41 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         {
             //gameState = E_GAMESTATE.Wait;
             if (PhotonNetwork.IsMasterClient)
-                m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
+            {
+                //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
+
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
+            }
         }
     }
 
-    [PunRPC]
-    void SetGameStateRPC(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
+    void SetGameState(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
     {
-        m_dStartTime = _dStartTime;
-        m_dEndTime = _dEndTime;
-        m_eGameState = _eGameState;
+        m_htCustomValue["GameState"] = (int)_eGameState;
+        m_htCustomValue["StartTime"] = _dStartTime;
+        m_htCustomValue["EndTime"] =  _dEndTime;
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(m_htCustomValue);
+
+        m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllViaServer);
     }
+
+    [PunRPC]
+    void SetGameStateRPC()
+    {
+        m_htCustomValue = PhotonNetwork.CurrentRoom.CustomProperties;
+        m_eGameState = (E_GAMESTATE)((int)m_htCustomValue["GameState"]);
+        m_dStartTime = (double)m_htCustomValue["StartTime"];
+        m_dEndTime = (double)m_htCustomValue["EndTime"];
+    }
+
+    //[PunRPC]
+    //void SetGameStateRPC(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
+    //{
+    //    m_dStartTime = _dStartTime;
+    //    m_dEndTime = _dEndTime;
+    //    m_eGameState = _eGameState;
+    //}
 
     public double GetTime()
     {
