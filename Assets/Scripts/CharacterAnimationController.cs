@@ -14,4 +14,9 @@ public class CharacterAnimationController : MonoBehaviour
     {
         animator.SetBool("IsWalking", isWalking);
     }
+
+    public void SetGhost(bool isGhost)
+    {
+        animator.SetBool("IsGhost", isGhost);
+    }
 }

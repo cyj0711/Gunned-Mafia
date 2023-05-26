@@ -2442,6 +2442,7 @@ MonoBehaviour:
   weaponsToSpawn:
   - {fileID: 11400000, guid: 1c20fcf3ab4742c45aff8bafda26fd8e, type: 2}
   - {fileID: 11400000, guid: d69c8edb09378374db78a1f07a52eb6a, type: 2}
+  - {fileID: 11400000, guid: ca5f806bab56c394b8e4ad648cef6dfc, type: 2}
 --- !u!1 &320155685
 GameObject:
   m_ObjectHideFlags: 0
@@ -2848,6 +2849,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponsToSpawn:
   - {fileID: 11400000, guid: 4307d5b12e36bc446bd0a5315263dc03, type: 2}
+  - {fileID: 11400000, guid: 7315993ea81b33340bad58c6176aff75, type: 2}
 --- !u!1 &393866230
 GameObject:
   m_ObjectHideFlags: 0
@@ -12099,6 +12101,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponsToSpawn:
   - {fileID: 11400000, guid: 0097e44e528d5e44696342cba02031c8, type: 2}
+  - {fileID: 11400000, guid: e3ad43f12022f7e4291fcbf3d9f7b87d, type: 2}
+  - {fileID: 11400000, guid: 7d2173d18945a5741a8ea9fc950b04d5, type: 2}
 --- !u!1 &1580066909
 GameObject:
   m_ObjectHideFlags: 0

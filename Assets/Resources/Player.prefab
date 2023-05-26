@@ -301,6 +301,7 @@ MonoBehaviour:
   m_vCharacterObject: {fileID: 7798866993823549336}
   m_vWeaponManager: {fileID: 8246974901709166159}
   m_iCurrentHealth: 100
+  m_bIsDead: 0
 --- !u!1 &1359341777276765964
 GameObject:
   m_ObjectHideFlags: 0

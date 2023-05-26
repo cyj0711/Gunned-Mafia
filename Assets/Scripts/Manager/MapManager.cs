@@ -17,8 +17,14 @@ public class MapManager : SingletonPunCallbacks<MapManager>
 
     private Dictionary<int, PlayerDead> m_dicPlayerDeadInfo = new Dictionary<int, PlayerDead>();
 
+    private bool m_bIsWeaponSpawned = false;
+    public bool a_bIsWeaponSpawned { set { m_bIsWeaponSpawned = value; } }
+
     public void SpawnWeapons()
     {
+        if (m_bIsWeaponSpawned)     // 서버 시간차이로 인한 SpawnWeapons 중복 호출을 방지한다.
+            return;
+
         foreach(WeaponSpawn weaponSpawnPoint in weaponSpawnPoints)
         {
             WeaponData vWeaponData = weaponSpawnPoint.GetWeaponToSpawn();
@@ -31,6 +37,8 @@ public class MapManager : SingletonPunCallbacks<MapManager>
                 PhotonNetwork.InstantiateRoomObject("WeaponPrefab/WeaponBaseObject", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonData);
             }
         }
+
+        m_bIsWeaponSpawned = true;
     }
 
     // 플레이어가 사망하면 해당 클라이언트가 MapManager를 호출하고, 호출된 매니저는 서버(마스터클라이언트)를 통해 시체를 생성한다.

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_iWeaponID: 3
   m_strWeaponName: Shotgun
-  m_iDamage: 0
+  m_iDamage: 40
   m_iCriticalDamage: 0
   m_fCriticalChance: 0
   m_iMaxAmmo: 32

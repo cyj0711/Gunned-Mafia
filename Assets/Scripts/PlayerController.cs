@@ -40,9 +40,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public int a_iLastDamagedWeaponID { get { return m_iLastDamagedWeaponID; } set { m_iLastDamagedWeaponID = value; } }
 
     //*************** Synchronization Properties *******************
-    [SerializeField] int m_iCurrentHealth;
+    [SerializeField] private int m_iCurrentHealth;
     public int a_iCurrentHealth { get => m_iCurrentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
     [PunRPC] void SetCurrentHealthRPC(int value) { m_iCurrentHealth = value; m_vHealthImage.fillAmount = (float)(a_iCurrentHealth / 100f);}
+
+    [SerializeField] private bool m_bIsDead;
+    public bool a_bIsDead { get => m_bIsDead; set => SetPropertyRPC(nameof(PlayerDeadRPC), value); }
+    [PunRPC] private void PlayerDeadRPC(bool _bIsDead)
+    {
+        if (!_bIsDead)
+            return;
+
+        m_bIsDead = true;
+
+        m_vCharacterAnimationController.SetGhost(true);
+        m_vCharacterObject.GetComponent<Collider2D>().enabled = false;
+        m_vWeaponManager.enabled = false;
+        m_vHealthImage.enabled = false;
+    }
     //**************************************************************
 
     void SetPropertyRPC(string functionName, object value)
@@ -52,7 +67,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     public void InvokeProperties()  // Synchronization properites에 새 속성을 넣을경우 여기에 반드시 추가한다.(변수명이 아닌 get set 명임!!)
     {
-        a_iCurrentHealth = a_iCurrentHealth;
+        a_iCurrentHealth = m_iCurrentHealth;
+        a_bIsDead = m_bIsDead;
     }
 
     Vector3 m_vCurrentPosition;
@@ -83,13 +99,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     private void Start()
     {
-        m_vTargetPosition = transform.position;
-        m_bSeeingRight = true;
-        m_bLastSeeingRight = m_bSeeingRight;
+        if (m_vPhotonView.IsMine)
+        {
+            m_vTargetPosition = transform.position;
+            m_bSeeingRight = true;
+            m_bLastSeeingRight = m_bSeeingRight;
 
-        a_ePlayerRole = E_PlayerRole.None;
-        if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling) a_ePlayerState = E_PlayerState.Spectator;
-        else a_ePlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
+            a_ePlayerRole = E_PlayerRole.None;
+            if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling)
+            {
+                a_ePlayerState = E_PlayerState.Spectator;
+                a_bIsDead = true;
+            }
+            else
+            {
+                a_ePlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
+            }
+        }
     }
 
     private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
@@ -117,19 +143,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     public void Hit(int _idamage, int _iShooterActorNumber, int _iWeaponID)
     {
-        a_iCurrentHealth = a_iCurrentHealth - _idamage;
+        a_iCurrentHealth = m_iCurrentHealth - _idamage;
         a_iLastAttackerActorNumber = _iShooterActorNumber;
         a_iLastDamagedWeaponID = _iWeaponID;
 
-        if (a_iCurrentHealth <= 0)
+        if (m_iCurrentHealth <= 0)
         {
             //Debug.Log(PhotonNetwork.LocalPlayer.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
-            GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
+            //GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
             //m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBufferedViaServer, _iShooterActorNumber, _iWeaponID);
+            a_bIsDead = true;
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+
+            GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
             //PhotonNetwork.Instantiate("PlayerDeadBody", transform.position, Quaternion.identity).GetComponent<PlayerDead>()
             //    .InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
-            PhotonNetwork.Destroy(gameObject);
+            //PhotonNetwork.Destroy(gameObject);
         }
     }
 
