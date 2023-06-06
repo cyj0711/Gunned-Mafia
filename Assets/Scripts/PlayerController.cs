@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 {
     [SerializeField] Rigidbody2D m_vRigidBody;
     [SerializeField] PhotonView m_vPhotonView;
+    public PhotonView a_vPhotonView { get { return m_vPhotonView; } }
     [SerializeField] Text m_vNickNameText;
     [SerializeField] Image m_vHealthImage;
 
@@ -27,7 +28,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     [SerializeField] GameObject m_vCharacterObject;
 
     CharacterAnimationController m_vCharacterAnimationController;
-    [SerializeField] WeaponManager m_vWeaponManager;
+    [SerializeField] WeaponController m_vWeaponController;
+    [SerializeField] CharacterUIController m_vCharacterController;
+    public CharacterUIController a_vCharacterUIController { get { return m_vCharacterController; } }
 
     private E_PlayerRole m_ePlayerRole;
     private E_PlayerState m_ePlayerState;
@@ -42,7 +45,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     //*************** Synchronization Properties *******************
     [SerializeField] private int m_iCurrentHealth;
     public int a_iCurrentHealth { get => m_iCurrentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
-    [PunRPC] void SetCurrentHealthRPC(int value) { m_iCurrentHealth = value; m_vHealthImage.fillAmount = (float)(a_iCurrentHealth / 100f);}
+    [PunRPC] void SetCurrentHealthRPC(int value) { m_iCurrentHealth = value; m_vCharacterController.a_iHealth = m_iCurrentHealth; }
 
     [SerializeField] private bool m_bIsDead;
     public bool a_bIsDead { get => m_bIsDead; set => SetPropertyRPC(nameof(PlayerDeadRPC), value); }
@@ -55,7 +58,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         m_vCharacterAnimationController.SetGhost(true);
         m_vCharacterObject.GetComponent<Collider2D>().enabled = false;
-        m_vWeaponManager.enabled = false;
+        m_vWeaponController.enabled = false;
         m_vHealthImage.enabled = false;
     }
     //**************************************************************
@@ -99,6 +102,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     private void Start()
     {
+        GameManager.I.AddPlayerController(m_vPhotonView.OwnerActorNr, this);
+
         if (m_vPhotonView.IsMine)
         {
             m_vTargetPosition = transform.position;
@@ -116,6 +121,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
                 a_ePlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
             }
         }
+
+        m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
+        m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
+
     }
 
     private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
@@ -174,14 +183,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void WeaponRotation(float _fAngle)
     {
-        m_vWeaponManager.gameObject.transform.rotation = Quaternion.AngleAxis(_fAngle, Vector3.forward);
+        m_vWeaponController.gameObject.transform.rotation = Quaternion.AngleAxis(_fAngle, Vector3.forward);
     }
 
     void UpdateWeaponShotProcess()
     {
         if(Input.GetMouseButton(0))
         {
-            m_vWeaponManager.Shoot();
+            m_vWeaponController.Shoot();
 
         }
     }
@@ -190,29 +199,29 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
-            m_vWeaponManager.Reload();
+            m_vWeaponController.Reload();
         }
 
         else if(Input.GetKeyDown(KeyCode.Alpha1))
         {
-            m_vWeaponManager.ChangeCurrentWeapon(1);
+            m_vWeaponController.ChangeCurrentWeapon(1);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            m_vWeaponManager.ChangeCurrentWeapon(2);
+            m_vWeaponController.ChangeCurrentWeapon(2);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            m_vWeaponManager.ChangeCurrentWeapon(3);
+            m_vWeaponController.ChangeCurrentWeapon(3);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            m_vWeaponManager.ChangeCurrentWeapon(4);
+            m_vWeaponController.ChangeCurrentWeapon(4);
         }
 
         else if(Input.GetKeyDown(KeyCode.G))
         {
-            m_vWeaponManager.ThrowOutWeapon();
+            m_vWeaponController.ThrowOutWeapon();
         }
     }
 
@@ -274,7 +283,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         Vector3 scale = new Vector3(m_vCharacterObject.transform.localScale.x, m_vCharacterObject.transform.localScale.y, m_vCharacterObject.transform.localScale.z);
         scale.x *= -1;
         m_vCharacterObject.transform.localScale = scale;
-        m_vWeaponManager.SetDirection(isSeeingRight);
+        m_vWeaponController.SetDirection(isSeeingRight);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -304,7 +313,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             {
                 //Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
 
-                m_vWeaponManager.CheckPickUpWeapon(collision.gameObject.transform.parent.gameObject);
+                m_vWeaponController.CheckPickUpWeapon(collision.gameObject.transform.parent.gameObject);
             }
         }
     }

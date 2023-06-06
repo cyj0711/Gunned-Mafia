@@ -26,6 +26,8 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     int m_iCurrentNumberOfMafia;
     int m_iCurrentNumberOfCivil;
 
+    private Dictionary<int, PlayerController> m_dicPlayerController = new Dictionary<int, PlayerController>();
+
     /* 방 속성(유저(방장)가 설정 가능) */
     double m_dPropertyTimeForPrepare;   // 준비 시간
     double m_dPropertyTimeForPlay;      // 플레이 시간
@@ -51,8 +53,8 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 1;
-        m_iPropertyNumberOfDetective = 0;
+        m_iPropertyNumberOfMafia = 2;
+        m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
 
@@ -98,6 +100,28 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             }
         }
         // Debug.Log(gameState + " " + timer);
+    }
+
+    public void AddPlayerController(int _iActorNumber, PlayerController _vPlayerController)
+    {
+        if (m_dicPlayerController.ContainsKey(_iActorNumber))
+        {
+            m_dicPlayerController[_iActorNumber] = _vPlayerController;
+        }
+        else
+        { 
+            m_dicPlayerController.Add(_iActorNumber, _vPlayerController);
+        }
+
+        //Debug.Log(m_dicPlayerController.Count);
+    }
+
+    public PlayerController GetPlayerController(int _iActorNumber)
+    {
+        if (m_dicPlayerController.ContainsKey(_iActorNumber))
+            return m_dicPlayerController[_iActorNumber];
+
+        return null;
     }
 
     void UpdateWaitProcess()
@@ -208,13 +232,33 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dicPlayerRoles.Clear();
         foreach (KeyValuePair<string, string> kvPair in dicPlayerRolesString)
         {
-            m_dicPlayerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
+            int iActorNumber = int.Parse(kvPair.Key);
+            E_PlayerRole ePlayerRole = (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value);
+            //m_dicPlayerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
+            m_dicPlayerRoles.Add(iActorNumber, ePlayerRole);
+
+            //PlayerController vPlayerController = GetPlayerController(iActorNumber);
+            //if(vPlayerController!=null)
+            //{
+            //    // TODO: 플레이어 역할 UI 갱신
+            //    vPlayerController.a_vCharacterUIController.a_ePlayerRole = ePlayerRole;
+            //}
+            //CharacterUIController vCharacterUIManager = PhotonView.Find(int.Parse(kvPair.Key)).gameObject.GetComponentInChildren<CharacterUIController>();
+            //vCharacterUIManager.a_ePlayerRole=
         }
 
         m_iCurrentNumberOfCivil = _iCurrentNumberOfCivil;
         m_iCurrentNumberOfMafia = _iCurrentNumberOfMafia;
 
-        //m_dicLivingPlayerRoles = new Dictionary<int, E_PlayerRole>(m_dicPlayerRoles);
+        // 각 플레이어의 역할에 따라 이름에 색깔을 부여한다.
+        foreach (KeyValuePair<int, E_PlayerRole> _dicPlayerRoles in m_dicPlayerRoles)
+        {
+            PlayerController vPlayerController = GetPlayerController(_dicPlayerRoles.Key);
+            if (vPlayerController != null)
+            {
+                vPlayerController.a_vCharacterUIController.a_ePlayerRole = _dicPlayerRoles.Value;
+            }
+        }
 
     }
 
@@ -387,7 +431,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             return;
         }
 
-        WeaponManager vWeaponManager = PhotonView.Find(_iWeaponManagerViewID).gameObject.GetComponent<WeaponManager>();
+        WeaponController vWeaponManager = PhotonView.Find(_iWeaponManagerViewID).gameObject.GetComponent<WeaponController>();
 
         if (vWeaponManager == null)
         {

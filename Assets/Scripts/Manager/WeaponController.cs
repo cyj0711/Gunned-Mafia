@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class WeaponManager : MonoBehaviourPunCallbacks , IPunObservable
+public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 {
     [SerializeField]
     private PhotonView m_vPhotonView;

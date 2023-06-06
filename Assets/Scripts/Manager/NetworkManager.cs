@@ -54,8 +54,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     public void Spawn()
     {
-        PhotonNetwork.Instantiate("Player", new Vector3 (Random.Range(-0.5f,1f),Random.Range(-1f,0f),0), Quaternion.identity);
-        RespawnPanel.SetActive(false);
+        PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(-0.5f, 1f), Random.Range(-1f, 0f), 0), Quaternion.identity);
     }
 
     //private void Update()
@@ -71,7 +70,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         {
             GameObject tagObject = (GameObject)PhotonNetwork.LocalPlayer.TagObject;
             tagObject.GetComponent<PlayerController>().InvokeProperties();
-            tagObject.GetComponentInChildren<WeaponManager>().InvokeProperties();
+            tagObject.GetComponentInChildren<WeaponController>().InvokeProperties();
         }
     }
 
