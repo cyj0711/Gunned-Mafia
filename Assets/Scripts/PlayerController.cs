@@ -21,21 +21,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     [SerializeField] Rigidbody2D m_vRigidBody;
     [SerializeField] PhotonView m_vPhotonView;
     public PhotonView a_vPhotonView { get { return m_vPhotonView; } }
-    [SerializeField] Text m_vNickNameText;
-    [SerializeField] Image m_vHealthImage;
 
-    //public GameObject weapons;
     [SerializeField] GameObject m_vCharacterObject;
 
     CharacterAnimationController m_vCharacterAnimationController;
     [SerializeField] WeaponController m_vWeaponController;
     [SerializeField] CharacterUIController m_vCharacterController;
     public CharacterUIController a_vCharacterUIController { get { return m_vCharacterController; } }
-
-    private E_PlayerRole m_ePlayerRole;
-    private E_PlayerState m_ePlayerState;
-    public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { m_ePlayerRole = value; } }
-    public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { m_ePlayerState = value; } }
 
     private int m_iLastAttackerActorNumber = -1;         // 최근에 플레이어를 공격한 플레이어 id
     private int m_iLastDamagedWeaponID = -1;    // 최근에 플레이어를 공격한 무기 id
@@ -45,23 +37,38 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     //*************** Synchronization Properties *******************
     [SerializeField] private int m_iCurrentHealth;
     public int a_iCurrentHealth { get => m_iCurrentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
-    [PunRPC] void SetCurrentHealthRPC(int value) { m_iCurrentHealth = value; m_vCharacterController.a_iHealth = m_iCurrentHealth; }
-
-    [SerializeField] private bool m_bIsDead;
-    public bool a_bIsDead { get => m_bIsDead; set => SetPropertyRPC(nameof(PlayerDeadRPC), value); }
-    [PunRPC] private void PlayerDeadRPC(bool _bIsDead)
-    {
-        if (!_bIsDead)
-            return;
-
-        m_bIsDead = true;
-
-        m_vCharacterAnimationController.SetGhost(true);
-        m_vCharacterObject.GetComponent<Collider2D>().enabled = false;
-        m_vWeaponController.enabled = false;
-        m_vHealthImage.enabled = false;
+    [PunRPC] void SetCurrentHealthRPC(int _iHealth)
+    { 
+        m_iCurrentHealth = _iHealth; 
+        m_vCharacterController.a_iHealth = m_iCurrentHealth; 
     }
-    //**************************************************************
+    //===============================================================
+    private E_PlayerState m_ePlayerState;
+    public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { SetPropertyRPC(nameof(SetPlayerStateRPC), (int)value); } }
+    [PunRPC]
+    private void SetPlayerStateRPC(int _iPlayerState)
+    {
+        m_ePlayerState = (E_PlayerState)_iPlayerState;
+
+        bool bIsDead = (m_ePlayerState == E_PlayerState.Alive ? false : true);
+
+        m_vCharacterAnimationController.SetGhost(bIsDead);
+        m_vCharacterObject.GetComponent<Collider2D>().enabled = !bIsDead;
+        m_vWeaponController.enabled = !bIsDead;
+
+        a_vCharacterUIController.a_ePlayerState = m_ePlayerState;
+    }
+    //================================================================
+    [SerializeField ]private E_PlayerRole m_ePlayerRole;
+    public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { SetPropertyRPC(nameof(SetPlayerRoleRPC), (int)value); } }
+    [PunRPC] private void SetPlayerRoleRPC(int _iPlayerRole)
+    {
+        m_ePlayerRole = (E_PlayerRole)_iPlayerRole;
+
+        m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
+        m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
+    }
+    //*************** Synchronization Properties End ****************
 
     void SetPropertyRPC(string functionName, object value)
     {
@@ -71,12 +78,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public void InvokeProperties()  // Synchronization properites에 새 속성을 넣을경우 여기에 반드시 추가한다.(변수명이 아닌 get set 명임!!)
     {
         a_iCurrentHealth = m_iCurrentHealth;
-        a_bIsDead = m_bIsDead;
+        a_ePlayerState = m_ePlayerState;
+        a_ePlayerRole = m_ePlayerRole;
     }
 
     Vector3 m_vCurrentPosition;
-
-    //float m_fAngle;
     Vector2 m_vTargetPosition;
 
     bool m_bSeeingRight; // true이면 오른쪽을 보는 상태, false는 왼쪽
@@ -85,9 +91,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void Awake()
     {
-        m_vNickNameText.text = m_vPhotonView.IsMine ? PhotonNetwork.NickName : m_vPhotonView.Owner.NickName;
-        m_vNickNameText.color = m_vPhotonView.IsMine ? Color.green : Color.red;
-
         m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
 
         if(m_vPhotonView.IsMine)
@@ -114,7 +117,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling)
             {
                 a_ePlayerState = E_PlayerState.Spectator;
-                a_bIsDead = true;
             }
             else
             {
@@ -122,8 +124,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             }
         }
 
-        m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
-        m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
+        //m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
+        //m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
 
     }
 
@@ -156,14 +158,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         a_iLastAttackerActorNumber = _iShooterActorNumber;
         a_iLastDamagedWeaponID = _iWeaponID;
 
-        if (m_iCurrentHealth <= 0)
+        if (m_iCurrentHealth <= 0)  // 플레이어 사망
         {
             //Debug.Log(PhotonNetwork.LocalPlayer.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
             //GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
             //m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBufferedViaServer, _iShooterActorNumber, _iWeaponID);
-            a_bIsDead = true;
-            MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
 
+            //a_bIsDead = true;
+            a_ePlayerState = E_PlayerState.Missing;
+            MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+            GameManager.I.PlayerNameColorUpdate();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
             //PhotonNetwork.Instantiate("PlayerDeadBody", transform.position, Quaternion.identity).GetComponent<PlayerDead>()
             //    .InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);

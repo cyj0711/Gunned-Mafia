@@ -77,6 +77,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_dStartTime = (double)m_htCustomValue["StartTime"];
             m_dEndTime = (double)m_htCustomValue["EndTime"];
         }
+        GamePanelManager.I.SetGameState();
     }
 
     void Update()
@@ -124,9 +125,17 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         return null;
     }
 
+    public void PlayerNameColorUpdate()
+    {
+        foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
+        {
+            _kvPair.Value.a_vCharacterUIController.SetRoleUI();
+        }
+    }
+
     void UpdateWaitProcess()
     {
-        if(PhotonNetwork.CurrentRoom.PlayerCount >= 1)
+        if (PhotonNetwork.CurrentRoom.PlayerCount >= (m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective))
         {
             //startTime = PhotonNetwork.Time;
             //endTime = timeForPrepare;
@@ -213,7 +222,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         // RPC는 dictionary를 받지 못하므로, playerRoles dictionary를 string으로 변환하여 파라미터로 준다.
         string strPlayerRoles = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(m_dicPlayerRoles);
-        m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.AllBuffered, strPlayerRoles, vSortedPlayers.Length - m_iPropertyNumberOfMafia, m_iPropertyNumberOfMafia);
+        m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.All, strPlayerRoles, vSortedPlayers.Length - m_iPropertyNumberOfMafia, m_iPropertyNumberOfMafia);
 
         for (int i = 0; i < vSortedPlayers.Length; i ++)
         {
@@ -250,14 +259,21 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_iCurrentNumberOfCivil = _iCurrentNumberOfCivil;
         m_iCurrentNumberOfMafia = _iCurrentNumberOfMafia;
 
-        // 각 플레이어의 역할에 따라 이름에 색깔을 부여한다.
-        foreach (KeyValuePair<int, E_PlayerRole> _dicPlayerRoles in m_dicPlayerRoles)
+        //// 각 플레이어의 역할에 따라 이름에 색깔을 부여한다.
+        //foreach (KeyValuePair<int, E_PlayerRole> _dicPlayerRoles in m_dicPlayerRoles)
+        //{
+        //    PlayerController vPlayerController = GetPlayerController(_dicPlayerRoles.Key);
+        //    if (vPlayerController != null)
+        //    {
+        //        vPlayerController.a_ePlayerRole = _dicPlayerRoles.Value;
+        //    }
+        //}
+
+        int iLocalPlayerActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+        PlayerController vPlayerController = GetPlayerController(iLocalPlayerActorNumber);
+        if (vPlayerController != null)
         {
-            PlayerController vPlayerController = GetPlayerController(_dicPlayerRoles.Key);
-            if (vPlayerController != null)
-            {
-                vPlayerController.a_vCharacterUIController.a_ePlayerRole = _dicPlayerRoles.Value;
-            }
+            vPlayerController.a_ePlayerRole = m_dicPlayerRoles[iLocalPlayerActorNumber];
         }
 
     }
@@ -370,6 +386,8 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_eGameState = (E_GAMESTATE)((int)m_htCustomValue["GameState"]);
         m_dStartTime = (double)m_htCustomValue["StartTime"];
         m_dEndTime = (double)m_htCustomValue["EndTime"];
+
+        GamePanelManager.I.SetGameState();
     }
 
     //[PunRPC]

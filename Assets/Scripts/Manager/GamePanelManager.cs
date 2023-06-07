@@ -21,22 +21,29 @@ public class GamePanelManager : Singleton<GamePanelManager>
 
     void Update()
     {
-        SetGameState();
+        //SetGameState();
         SetTimeText();
     }
 
-    private void SetGameState()
+    public void SetGameState()
     {
         E_GAMESTATE eGameState = GameManager.I.a_eGameState;
 
         switch (eGameState)
         {
+            case E_GAMESTATE.Wait:
+                m_vStatusImage.color = UIColor.Gray;
+                m_vStatusText.text = eGameState.ToString();
+                m_vTimeText.enabled = false;
+                break;
             case E_GAMESTATE.Play:
                 SetPlayingState();
+                m_vTimeText.enabled = true;
                 break;
             default:
                 m_vStatusImage.color = UIColor.Gray;
                 m_vStatusText.text = eGameState.ToString();
+                m_vTimeText.enabled = true;
                 break;
         }
 

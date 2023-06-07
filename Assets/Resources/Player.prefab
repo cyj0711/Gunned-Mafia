@@ -36,7 +36,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.18}
+  m_AnchoredPosition: {x: 0, y: -0.06}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7667886338500239063
@@ -220,7 +220,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.06}
+  m_AnchoredPosition: {x: 0, y: -0.18}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1359341775690753771
@@ -406,13 +406,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_vRigidBody: {fileID: 1359341775859407719}
   m_vPhotonView: {fileID: 1359341775859407722}
-  m_vNickNameText: {fileID: 1359341775690753772}
-  m_vHealthImage: {fileID: 1359341775662255380}
   m_vCharacterObject: {fileID: 7798866993823549336}
   m_vWeaponController: {fileID: 8246974901709166159}
   m_vCharacterController: {fileID: 6615775683309902769}
   m_iCurrentHealth: 100
-  m_bIsDead: 0
+  m_ePlayerRole: 0
 --- !u!1 &1359341777276765964
 GameObject:
   m_ObjectHideFlags: 0

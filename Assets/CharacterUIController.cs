@@ -8,8 +8,13 @@ public class CharacterUIController : MonoBehaviour
 {
     string m_sNickName;
     public string a_sNickName { set { m_sNickName = value; SetNickNameUI(); } }
+
     E_PlayerRole m_ePlayerRole;
     public E_PlayerRole a_ePlayerRole { set { m_ePlayerRole = value; SetRoleUI(); } }
+
+    E_PlayerState m_ePlayerState;
+    public E_PlayerState a_ePlayerState { set { m_ePlayerState = value; SetStateUI(); } }
+
     int m_iHealth;
     public int a_iHealth { set { m_iHealth = value; SetHealthUI(); } }
 
@@ -41,7 +46,7 @@ public class CharacterUIController : MonoBehaviour
         m_vNickNameText.text = m_sNickName;
     }
 
-    private void SetRoleUI()
+    public void SetRoleUI()
     {
         E_PlayerRole eLocalPlayerRole = GameManager.I.GetPlayerRole(PhotonNetwork.LocalPlayer.ActorNumber);
         switch (m_ePlayerRole)
@@ -49,15 +54,20 @@ public class CharacterUIController : MonoBehaviour
             case E_PlayerRole.Civil:
                 m_vNickNameText.color = UIColor.Green;
                 break;
+
             case E_PlayerRole.Mafia:
+                m_vNickNameText.color = UIColor.Red;
                 if (eLocalPlayerRole == E_PlayerRole.Civil || eLocalPlayerRole == E_PlayerRole.Detective)
-                    m_vNickNameText.color = UIColor.Green;
-                else
-                    m_vNickNameText.color = UIColor.Red;
+                {
+                    if (GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).a_ePlayerState == E_PlayerState.Alive)
+                        m_vNickNameText.color = UIColor.Green;
+                }
                 break;
+
             case E_PlayerRole.Detective:
                 m_vNickNameText.color = UIColor.Blue;
                 break;
+
             default:
                 m_vNickNameText.color = UIColor.Gray;
                 break;
@@ -74,6 +84,18 @@ public class CharacterUIController : MonoBehaviour
         SetRoleUI();
         SetNickNameUI();
         SetHealthUI();
+    }
+
+    private void SetStateUI()
+    {
+        if(m_ePlayerState==E_PlayerState.Alive)
+        {
+            m_vHealthText.enabled = true;
+        }
+        else
+        {
+            m_vHealthText.enabled = false;
+        }
     }
 
     private void OnMouseEnter()
