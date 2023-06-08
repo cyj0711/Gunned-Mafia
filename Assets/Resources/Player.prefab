@@ -408,7 +408,7 @@ MonoBehaviour:
   m_vPhotonView: {fileID: 1359341775859407722}
   m_vCharacterObject: {fileID: 7798866993823549336}
   m_vWeaponController: {fileID: 8246974901709166159}
-  m_vCharacterController: {fileID: 6615775683309902769}
+  m_vCharacterUIController: {fileID: 6615775683309902769}
   m_iCurrentHealth: 100
   m_ePlayerRole: 0
 --- !u!1 &1359341777276765964

@@ -26,8 +26,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     CharacterAnimationController m_vCharacterAnimationController;
     [SerializeField] WeaponController m_vWeaponController;
-    [SerializeField] CharacterUIController m_vCharacterController;
-    public CharacterUIController a_vCharacterUIController { get { return m_vCharacterController; } }
+    [SerializeField] CharacterUIController m_vCharacterUIController;
+    public CharacterUIController a_vCharacterUIController { get { return m_vCharacterUIController; } }
 
     private int m_iLastAttackerActorNumber = -1;         // 최근에 플레이어를 공격한 플레이어 id
     private int m_iLastDamagedWeaponID = -1;    // 최근에 플레이어를 공격한 무기 id
@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     [PunRPC] void SetCurrentHealthRPC(int _iHealth)
     { 
         m_iCurrentHealth = _iHealth; 
-        m_vCharacterController.a_iHealth = m_iCurrentHealth; 
+        m_vCharacterUIController.a_iHealth = m_iCurrentHealth; 
     }
     //===============================================================
     private E_PlayerState m_ePlayerState;
@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         m_ePlayerState = (E_PlayerState)_iPlayerState;
 
+        // 플레이어가 죽었으면 유령으로 변한다.
         bool bIsDead = (m_ePlayerState == E_PlayerState.Alive ? false : true);
 
         m_vCharacterAnimationController.SetGhost(bIsDead);
@@ -57,6 +58,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         m_vWeaponController.enabled = !bIsDead;
 
         a_vCharacterUIController.a_ePlayerState = m_ePlayerState;
+
+        // 살아있는 플레이어는 유령 플레이어를 볼 수 없다.
+        if (m_ePlayerState != E_PlayerState.Alive)
+        {
+            if (GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).m_ePlayerState == E_PlayerState.Alive)
+            {
+                SetCharacterSprite(false);
+            }
+        }
     }
     //================================================================
     [SerializeField ]private E_PlayerRole m_ePlayerRole;
@@ -65,8 +75,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         m_ePlayerRole = (E_PlayerRole)_iPlayerRole;
 
-        m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
-        m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
+        m_vCharacterUIController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
+        m_vCharacterUIController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
     }
     //*************** Synchronization Properties End ****************
 
@@ -165,9 +175,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             //m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBufferedViaServer, _iShooterActorNumber, _iWeaponID);
 
             //a_bIsDead = true;
-            a_ePlayerState = E_PlayerState.Missing;
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+            a_ePlayerState = E_PlayerState.Missing;
             GameManager.I.PlayerNameColorUpdate();
+            GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
             //PhotonNetwork.Instantiate("PlayerDeadBody", transform.position, Quaternion.identity).GetComponent<PlayerDead>()
             //    .InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
@@ -281,6 +292,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         m_bLastSeeingRight = m_bSeeingRight;
     }
 
+    public void SetCharacterSprite(bool _bIsEnabled)
+    {
+        m_vCharacterObject.GetComponent<SpriteRenderer>().enabled = _bIsEnabled;
+        a_vCharacterUIController.gameObject.SetActive(_bIsEnabled);
+    }
+
     [PunRPC]
     void ChangeDirectionRPC(bool isSeeingRight)
     {
@@ -325,5 +342,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         info.Sender.TagObject = gameObject;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.I.RemovePlayerController(m_vPhotonView.OwnerActorNr);
     }
 }

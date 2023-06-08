@@ -123,7 +123,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     public void ThrowOutWeapon(Quaternion _WeaponRoration)
     {
         //StartCoroutine(ColliderOnCoroutine());
-        StartCoroutine(SmoothLerp(0.5f, _WeaponRoration));
+        StartCoroutine(SmoothLerp(0.2f, _WeaponRoration));
     }
 
     public void SetWeaponCollider(bool _bIsEnable)
@@ -144,7 +144,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
             yield return null;
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(time);
         SetWeaponCollider(true);
     }
 

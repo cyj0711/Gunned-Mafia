@@ -53,7 +53,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 2;
+        m_iPropertyNumberOfMafia = 0;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
@@ -114,7 +114,15 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_dicPlayerController.Add(_iActorNumber, _vPlayerController);
         }
 
-        //Debug.Log(m_dicPlayerController.Count);
+    }
+
+    public void RemovePlayerController(int _iActorNumber)
+    {
+        if (m_dicPlayerController.ContainsKey(_iActorNumber))
+        {
+            m_dicPlayerController.Remove(_iActorNumber);
+        }
+
     }
 
     public PlayerController GetPlayerController(int _iActorNumber)
@@ -125,11 +133,22 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         return null;
     }
 
+    // 시민 플레이어가 사망하면 나머지 플레이어들의 진짜 직업을 표시한다.
     public void PlayerNameColorUpdate()
     {
         foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
         {
-            _kvPair.Value.a_vCharacterUIController.SetRoleUI();
+            if(_kvPair.Value!=null)
+                _kvPair.Value.a_vCharacterUIController.SetRoleUI();
+        }
+    }
+
+    public void DisplayGhosts()
+    {
+        foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
+        {
+            if (_kvPair.Value != null)
+                _kvPair.Value.SetCharacterSprite(true);
         }
     }
 

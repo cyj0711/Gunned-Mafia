@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_iWeaponID: 6
   m_strWeaponName: Pistol
-  m_iDamage: 0
+  m_iDamage: 15
   m_iCriticalDamage: 0
   m_fCriticalChance: 0
   m_iMaxAmmo: 60
