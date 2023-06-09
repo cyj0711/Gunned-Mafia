@@ -344,8 +344,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         info.Sender.TagObject = gameObject;
     }
 
+    //private void OnMouseEnter()
+    //{
+    //    //m_vNickNameText.enabled = true;
+    //    //m_vHealthText.enabled = true;
+    //    Debug.Log("Mouse On Player");
+    //}
+    //private void OnMouseExit()
+    //{
+    //    //m_vNickNameText.enabled = false;
+    //    //m_vHealthText.enabled = false;
+
+    //    Debug.Log("Mouse Out Player");
+    //}
+
     private void OnDestroy()
     {
-        GameManager.I.RemovePlayerController(m_vPhotonView.OwnerActorNr);
+        GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
     }
 }

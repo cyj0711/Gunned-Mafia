@@ -7785,6 +7785,7 @@ GameObject:
   - component: {fileID: 969085676}
   - component: {fileID: 969085675}
   - component: {fileID: 969085674}
+  - component: {fileID: 969085678}
   - component: {fileID: 969085677}
   m_Layer: 0
   m_Name: sprite_storage_box
@@ -7909,6 +7910,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &969085678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 969085673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01059e4830bac3b45bc208b9191a58a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &999575823
 GameObject:
   m_ObjectHideFlags: 0

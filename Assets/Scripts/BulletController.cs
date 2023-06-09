@@ -42,12 +42,12 @@ public class BulletController : MonoBehaviourPunCallbacks
         //    pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
         //}
 
-        if (col.tag == "Blockable")
+        if (col.gameObject.layer == LayerMask.NameToLayer("Blockable"))
         {
             Destroy(gameObject);
         }
 
-        if (col.tag == "Player")    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
+        if (col.gameObject.layer == LayerMask.NameToLayer("Player"))    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
         {
             if(col.GetComponent<PhotonView>().IsMine)
             {

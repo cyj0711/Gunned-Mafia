@@ -25,10 +25,17 @@ public class CharacterUIController : MonoBehaviour
     Text m_vNickNameText;
     [SerializeField]
     Text m_vHealthText;
+    [SerializeField]
+    GameObject m_vCanvasBody;
+    [SerializeField] PhotonView m_vPhotonView;
 
     void Start()
     {
-
+        if (!m_vPhotonView.IsMine)
+        {
+            if (GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).a_ePlayerState == E_PlayerState.Alive)
+                m_vCanvasBody.SetActive(false);
+        }
     }
 
     public void SetUIData(string _sNickName, E_PlayerRole _ePlayerRole, int _iHealth)
@@ -90,25 +97,33 @@ public class CharacterUIController : MonoBehaviour
     {
         if(m_ePlayerState==E_PlayerState.Alive)
         {
-            m_vHealthText.enabled = true;
+            m_vHealthText.gameObject.SetActive(true);
         }
         else
         {
-            m_vHealthText.enabled = false;
+            m_vHealthText.gameObject.SetActive(false);
         }
     }
 
     private void OnMouseEnter()
     {
-        //m_vNickNameText.enabled = true;
-        //m_vHealthText.enabled = true;
-        Debug.Log("Mouse On");
+        if (!m_vPhotonView.IsMine)
+        {
+            m_vCanvasBody.SetActive(true);
+        }
     }
+
     private void OnMouseExit()
     {
-        //m_vNickNameText.enabled = false;
-        //m_vHealthText.enabled = false;
+        if (!m_vPhotonView.IsMine)
+        {
+            if (GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).a_ePlayerState == E_PlayerState.Alive)
+                m_vCanvasBody.SetActive(false);
+        }
+    }
 
-        Debug.Log("Mouse Out");
+    public void SetCanvasBadyActive(bool _bIsActive)
+    {
+        m_vCanvasBody.SetActive(_bIsActive);
     }
 }

@@ -19,4 +19,5 @@ public class CharacterAnimationController : MonoBehaviour
     {
         animator.SetBool("IsGhost", isGhost);
     }
+
 }

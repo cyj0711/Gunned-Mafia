@@ -53,7 +53,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 0;
+        m_iPropertyNumberOfMafia = 2;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
@@ -148,7 +148,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
         {
             if (_kvPair.Value != null)
+            {
                 _kvPair.Value.SetCharacterSprite(true);
+                _kvPair.Value.a_vCharacterUIController.SetCanvasBadyActive(true);
+            }
         }
     }
 
