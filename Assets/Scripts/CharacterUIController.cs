@@ -122,7 +122,7 @@ public class CharacterUIController : MonoBehaviour
         }
     }
 
-    public void SetCanvasBadyActive(bool _bIsActive)
+    public void SetCanvasBodyActive(bool _bIsActive)
     {
         m_vCanvasBody.SetActive(_bIsActive);
     }

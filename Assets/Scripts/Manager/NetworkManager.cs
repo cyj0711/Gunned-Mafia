@@ -24,8 +24,8 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     private void StartSetting()
     {
-        DisconnectPanel.SetActive(false);
-        StartCoroutine("DestroyBullet");
+        //DisconnectPanel.SetActive(false);
+        //StartCoroutine("DestroyBullet");
         Spawn();
     }
 

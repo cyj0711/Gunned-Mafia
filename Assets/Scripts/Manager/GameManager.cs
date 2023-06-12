@@ -150,7 +150,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             if (_kvPair.Value != null)
             {
                 _kvPair.Value.SetCharacterSprite(true);
-                _kvPair.Value.a_vCharacterUIController.SetCanvasBadyActive(true);
+                _kvPair.Value.a_vCharacterUIController.SetCanvasBodyActive(true);
             }
         }
     }

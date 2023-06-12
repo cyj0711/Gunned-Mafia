@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     [SerializeField] WeaponController m_vWeaponController;
     [SerializeField] CharacterUIController m_vCharacterUIController;
     public CharacterUIController a_vCharacterUIController { get { return m_vCharacterUIController; } }
+    [SerializeField] Collider2D m_vCharacterUIClickCollider;
 
     private int m_iLastAttackerActorNumber = -1;         // 최근에 플레이어를 공격한 플레이어 id
     private int m_iLastDamagedWeaponID = -1;    // 최근에 플레이어를 공격한 무기 id
@@ -55,6 +56,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         m_vCharacterAnimationController.SetGhost(bIsDead);
         m_vCharacterObject.GetComponent<Collider2D>().enabled = !bIsDead;
+        m_vCharacterUIClickCollider.enabled = !bIsDead;
         m_vWeaponController.enabled = !bIsDead;
 
         a_vCharacterUIController.a_ePlayerState = m_ePlayerState;
@@ -294,8 +296,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     public void SetCharacterSprite(bool _bIsEnabled)
     {
+        //m_vCharacterObject.SetActive(_bIsEnabled);
         m_vCharacterObject.GetComponent<SpriteRenderer>().enabled = _bIsEnabled;
-        a_vCharacterUIController.gameObject.SetActive(_bIsEnabled);
+        m_vCharacterUIController.SetCanvasBodyActive(_bIsEnabled);
     }
 
     [PunRPC]
