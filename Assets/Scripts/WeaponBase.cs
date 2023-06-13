@@ -26,7 +26,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     public int a_iCurrentAmmo { get { return m_iCurrentAmmo; } }
     public int a_iRemainAmmo { get { return m_iRemainAmmo; } }
 
-    int m_iOwnerPlayerActorNumber;
+    int m_iOwnerPlayerActorNumber;  // 이 무기를 들고있는 플레이어
     public int a_iOwnerPlayerActorNumber { get { return m_iOwnerPlayerActorNumber; } set { m_iOwnerPlayerActorNumber = value; } }
 
     int m_iWeaponID;
@@ -117,7 +117,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
 
     public void SetAmmoUI()
     {
-        GamePanelManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
+        GameUIManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
     }
 
     public void ThrowOutWeapon(Quaternion _WeaponRoration)
@@ -155,6 +155,34 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     //    SetWeaponCollider(true);
     //}
 
+    private void SetPosition()
+    {
+        m_vPhotonView.RPC(nameof(SetPositionRPC), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber);
+    }
+
+    [PunRPC]
+    public void SetPositionRPC(int _iLocalPlayerActorNumber)
+    {
+        m_vPhotonView.RPC(nameof(ReturnPositionRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iLocalPlayerActorNumber), m_iOwnerPlayerActorNumber, transform.position);
+    }
+
+    [PunRPC]
+    public void ReturnPositionRPC(int _iOwnerPlayerActorNumber, Vector3 _vPosition)
+    {
+        if(_iOwnerPlayerActorNumber==-1)
+        {
+            transform.parent = MapManager.I.a_vDroppedItem;
+            transform.position = _vPosition;
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            gameObject.SetActive(true);
+        }
+        else
+        {
+
+        }
+    }
+
+
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         object[] vInstantiationData = info.photonView.InstantiationData;
@@ -163,6 +191,9 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
         {
             m_vWeaponData = DataManager.I.GetWeaponDataWithID((int)vInstantiationData[0]);
             InitWeaponData();
+
+            SetPosition();
         }
+
     }
 }

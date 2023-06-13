@@ -20,6 +20,15 @@ public class MapManager : SingletonPunCallbacks<MapManager>
     private bool m_bIsWeaponSpawned = false;
     public bool a_bIsWeaponSpawned { set { m_bIsWeaponSpawned = value; } }
 
+    private List<GameObject> m_lSpawnedWeaponObject = new List<GameObject>();
+    private List<GameObject> m_lSpawnedBodyObject = new List<GameObject>();
+
+    public void InitObjectList()
+    {
+        m_lSpawnedWeaponObject.Clear();
+        m_lSpawnedBodyObject.Clear();
+    }
+
     public void SpawnWeapons()
     {
         if (m_bIsWeaponSpawned)     // 서버 시간차이로 인한 SpawnWeapons 중복 호출을 방지한다.

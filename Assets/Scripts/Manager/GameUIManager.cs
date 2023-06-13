@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GamePanelManager : Singleton<GamePanelManager>
+public class GameUIManager : Singleton<GameUIManager>
 {
     [SerializeField] private Text m_vTimeText;
     [SerializeField] private Text m_vStatusText;

@@ -115,11 +115,11 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
 
-        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.AllBuffered, 
+        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.All, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
 
         a_iCurrentWeaponViewID = -1;
-        GamePanelManager.I.SetAmmoActive(false);
+        GameUIManager.I.SetAmmoActive(false);
     }
 
     [PunRPC]
@@ -161,7 +161,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GamePanelManager.I.SetAmmoActive(true);
+                    GameUIManager.I.SetAmmoActive(true);
                 }
                 break;
             case 2:
@@ -169,7 +169,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GamePanelManager.I.SetAmmoActive(true);
+                    GameUIManager.I.SetAmmoActive(true);
                 }
                 break;
             case 3:
@@ -177,7 +177,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GamePanelManager.I.SetAmmoActive(true);
+                    GameUIManager.I.SetAmmoActive(true);
                 }
                 break;
             case 4:
@@ -185,7 +185,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GamePanelManager.I.SetAmmoActive(true);
+                    GameUIManager.I.SetAmmoActive(true);
                 }
                 break;
         }
@@ -237,7 +237,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             //    //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
             //    a_iCurrentWeaponViewID = iWeaponViewID;
             //    vWeaponBase.SetAmmoUI();
-            //    GamePanelManager.I.SetAmmoActive(true);
+            //    GameUIManager.I.SetAmmoActive(true);
             //}
         }
     }
@@ -256,7 +256,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
             a_iCurrentWeaponViewID = _iWeaponViewID;
             vWeaponBase.SetAmmoUI();
-            GamePanelManager.I.SetAmmoActive(true);
+            GameUIManager.I.SetAmmoActive(true);
         }
     }
 
@@ -265,8 +265,10 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     private void PuckUpWeaponRPC(int iWeaponViewID)
     {
         GameObject vWeaponObject = PhotonView.Find(iWeaponViewID).gameObject;
+        WeaponBase vWeaponBase = vWeaponObject.GetComponent<WeaponBase>();
 
-        vWeaponObject.GetComponent<WeaponBase>().SetWeaponCollider(false);
+        vWeaponBase.a_iOwnerPlayerActorNumber = m_vPhotonView.OwnerActorNr;
+        vWeaponBase.SetWeaponCollider(false);
 
         vWeaponObject.transform.parent = gameObject.transform;
         vWeaponObject.transform.localPosition = new Vector3(0f, 0f, 0f);
