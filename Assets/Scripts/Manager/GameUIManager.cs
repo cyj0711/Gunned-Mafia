@@ -13,6 +13,10 @@ public class GameUIManager : Singleton<GameUIManager>
     [SerializeField] private Text m_vAmmoText;
     [SerializeField] private Image m_vAmmoImage;
 
+    [SerializeField] private GameObject m_vScoreBoardPanelObject;
+    [SerializeField] private Scrollbar m_vScoreBoardScrollBar;
+    [SerializeField] private GameObject m_vScoreBoardItemPrefab;
+
     void Start()
     {
         SetGameState();
@@ -86,5 +90,11 @@ public class GameUIManager : Singleton<GameUIManager>
     public void SetAmmoActive(bool bActive)
     {
         m_vAmmoArea.SetActive(bActive);
+    }
+
+    public void ShowScoreBoard(bool bActive)
+    {
+        m_vScoreBoardPanelObject.SetActive(bActive);
+        //m_vScoreBoardScrollBar.value = 1.0f;
     }
 }

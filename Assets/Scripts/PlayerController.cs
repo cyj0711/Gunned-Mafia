@@ -214,31 +214,40 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void UpdateKeyboardInputProcess()
     {
-        if(Input.GetKeyDown(KeyCode.R))
+        if(Input.GetKeyDown(KeyCode.R)) // 장전
         {
             m_vWeaponController.Reload();
         }
 
-        else if(Input.GetKeyDown(KeyCode.Alpha1))
+        else if(Input.GetKeyDown(KeyCode.Alpha1))   // 주무기
         {
             m_vWeaponController.ChangeCurrentWeapon(1);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        else if (Input.GetKeyDown(KeyCode.Alpha2))  // 보조무기
         {
             m_vWeaponController.ChangeCurrentWeapon(2);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        else if (Input.GetKeyDown(KeyCode.Alpha3))  // 근접무기
         {
             m_vWeaponController.ChangeCurrentWeapon(3);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        else if (Input.GetKeyDown(KeyCode.Alpha4))  // 투척무기
         {
             m_vWeaponController.ChangeCurrentWeapon(4);
         }
 
-        else if(Input.GetKeyDown(KeyCode.G))
+        else if(Input.GetKeyDown(KeyCode.G))    // 무기 버리기
         {
             m_vWeaponController.ThrowOutWeapon();
+        }
+
+        else if(Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기
+        {
+            GameUIManager.I.ShowScoreBoard(true);
+        }
+        else if (Input.GetKeyUp(KeyCode.Tab))   // 점수창 닫기
+        {
+            GameUIManager.I.ShowScoreBoard(false);
         }
     }
 
