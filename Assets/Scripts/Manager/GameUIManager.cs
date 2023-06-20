@@ -17,6 +17,13 @@ public class GameUIManager : Singleton<GameUIManager>
     [SerializeField] private Scrollbar m_vScoreBoardScrollBar;
     [SerializeField] private GameObject m_vScoreBoardItemPrefab;
 
+    [SerializeField] private Transform m_vAlivePlayerListTransform;
+    [SerializeField] private Transform m_vMissingPlayerListTransform;
+    [SerializeField] private Transform m_vDeadPlayerListTransform;
+    [SerializeField] private Transform m_vSpectatorPlayerListTransform;
+
+    private Dictionary<int, ScoreBoardItemController> m_dicScoreBoardItems = new Dictionary<int, ScoreBoardItemController>();
+
     void Start()
     {
         SetGameState();
@@ -96,5 +103,48 @@ public class GameUIManager : Singleton<GameUIManager>
     {
         m_vScoreBoardPanelObject.SetActive(bActive);
         //m_vScoreBoardScrollBar.value = 1.0f;
+    }
+
+    public void CreateScoreBoardItem(int _iActorNumber, ScoreBoardItemController _vScoreBoardItem)
+    {
+        if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))
+        {
+            m_dicScoreBoardItems.Add(_iActorNumber, _vScoreBoardItem);
+        }
+        else
+        {
+            Debug.LogError("Tried to Add ScoreBoard, but player " + _iActorNumber + " alredy exist");
+            return;
+        }
+    }
+
+    public void RemoveScoreBoardItem(int _iActorNumber)
+    {
+        if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))
+        {
+            ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
+            m_dicScoreBoardItems.Remove(_iActorNumber);
+            Destroy(vScoreBoardItemController.gameObject);
+        }
+    }
+
+    public void SetScoreBoardItemParent(int _iActorNumber, E_PlayerState _ePlayerState)
+    {
+        switch (_ePlayerState)
+        {
+            case E_PlayerState.Alive:
+                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vAlivePlayerListTransform;
+                break;
+            case E_PlayerState.Missing:
+                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vMissingPlayerListTransform;
+                break;
+            case E_PlayerState.Dead:
+                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vDeadPlayerListTransform;
+                break;
+            case E_PlayerState.Spectator:
+                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vSpectatorPlayerListTransform;
+                break;
+        }
+        m_dicScoreBoardItems[_iActorNumber].transform.localScale = new Vector3(1f, 1f, 1f);
     }
 }

@@ -30,6 +30,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public CharacterUIController a_vCharacterUIController { get { return m_vCharacterUIController; } }
     [SerializeField] Collider2D m_vCharacterUIClickCollider;
 
+    [SerializeField] GameObject m_vScoreBoardItemPrefab;
+    ScoreBoardItemController m_vScoreBoardItemController;
+
     private int m_iLastAttackerActorNumber = -1;         // 최근에 플레이어를 공격한 플레이어 id
     private int m_iLastDamagedWeaponID = -1;    // 최근에 플레이어를 공격한 무기 id
     public int a_iLastAttackerActorNumber { get { return m_iLastAttackerActorNumber; } set { m_iLastAttackerActorNumber = value; } }
@@ -60,6 +63,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         m_vWeaponController.enabled = !bIsDead;
 
         a_vCharacterUIController.a_ePlayerState = m_ePlayerState;
+        m_vScoreBoardItemController.UpdatePlayerState(m_ePlayerState);
 
         // 살아있는 플레이어는 유령 플레이어를 볼 수 없다.
         if (m_ePlayerState != E_PlayerState.Alive)
@@ -79,6 +83,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         m_vCharacterUIController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
         m_vCharacterUIController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
+
+        m_vScoreBoardItemController.UpdatePlayerRole(m_ePlayerRole);
     }
     //*************** Synchronization Properties End ****************
 
@@ -105,7 +111,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
 
-        if(m_vPhotonView.IsMine)
+        m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
+        m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName);
+
+        if (m_vPhotonView.IsMine)
         {
             // 2D 카메라
             var vCinemachineCamera = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
@@ -126,19 +135,31 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             m_bLastSeeingRight = m_bSeeingRight;
 
             a_ePlayerRole = E_PlayerRole.None;
+            // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
             if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling)
             {
                 a_ePlayerState = E_PlayerState.Spectator;
             }
             else
             {
-                a_ePlayerState = E_PlayerState.Alive; // 게임중이거나 쿨링다운이면 관전으로 입장, 준비중이면 생존상태로 입장
+                a_ePlayerState = E_PlayerState.Alive;
             }
+
+            //m_vPhotonView.RPC(nameof(InitScoreBoardRPC), RpcTarget.AllBuffered);
         }
 
         //m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
         //m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
 
+    }
+
+    [PunRPC]
+    private void InitScoreBoardRPC()
+    {
+        m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
+        m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName);
+        GameUIManager.I.CreateScoreBoardItem(m_vPhotonView.OwnerActorNr, m_vScoreBoardItemController);
+        GameUIManager.I.SetScoreBoardItemParent(m_vPhotonView.OwnerActorNr, m_ePlayerState);
     }
 
     private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
@@ -373,5 +394,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     private void OnDestroy()
     {
         GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
+        Destroy(m_vScoreBoardItemController.gameObject);
     }
 }

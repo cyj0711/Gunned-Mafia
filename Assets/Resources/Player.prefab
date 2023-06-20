@@ -411,6 +411,8 @@ MonoBehaviour:
   m_vWeaponController: {fileID: 8246974901709166159}
   m_vCharacterUIController: {fileID: 5104187387630893799}
   m_vCharacterUIClickCollider: {fileID: 7378585772382976552}
+  m_vScoreBoardItemPrefab: {fileID: 7936072764318214349, guid: 0edb8c4659ba322418a7123980a92e10,
+    type: 3}
   m_iCurrentHealth: 100
   m_ePlayerRole: 0
 --- !u!114 &5104187387630893799

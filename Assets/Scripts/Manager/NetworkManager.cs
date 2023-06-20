@@ -74,6 +74,11 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         }
     }
 
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+
+    }
+
     public override void OnDisconnected(DisconnectCause cause)
     {
         //DisconnectPanel.SetActive(true);
