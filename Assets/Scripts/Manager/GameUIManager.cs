@@ -57,7 +57,6 @@ public class GameUIManager : Singleton<GameUIManager>
                 m_vTimeText.enabled = true;
                 break;
         }
-
     }
 
     private void SetPlayingState()
@@ -120,7 +119,7 @@ public class GameUIManager : Singleton<GameUIManager>
 
     public void RemoveScoreBoardItem(int _iActorNumber)
     {
-        if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))
+        if (m_dicScoreBoardItems.ContainsKey(_iActorNumber))
         {
             ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
             m_dicScoreBoardItems.Remove(_iActorNumber);

@@ -86,6 +86,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         m_vScoreBoardItemController.UpdatePlayerRole(m_ePlayerRole);
     }
+    //===============================================================
+    [SerializeField] private int m_iPlayerPing;
+    public int a_iPlayerPing { get { return m_iPlayerPing; } set { SetPropertyRPC(nameof(SetPlayerPingRPC),(int)value); } }
+    [PunRPC] public void SetPlayerPingRPC(int _iPlayerPing)
+    {
+        m_iPlayerPing = _iPlayerPing;
+        m_vScoreBoardItemController.UpdatePingText(_iPlayerPing);
+    }
     //*************** Synchronization Properties End ****************
 
     void SetPropertyRPC(string functionName, object value)
@@ -98,6 +106,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         a_iCurrentHealth = m_iCurrentHealth;
         a_ePlayerState = m_ePlayerState;
         a_ePlayerRole = m_ePlayerRole;
+        a_iPlayerPing = m_iPlayerPing;
     }
 
     Vector3 m_vCurrentPosition;
@@ -130,6 +139,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_vPhotonView.IsMine)
         {
+            StartCoroutine(UpdatePingCoroutine());
+
             m_vTargetPosition = transform.position;
             m_bSeeingRight = true;
             m_bLastSeeingRight = m_bSeeingRight;
@@ -151,6 +162,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         //m_vCharacterController.a_iPlayerActorNumber = m_vPhotonView.OwnerActorNr;
         //m_vCharacterController.SetUIData((m_vPhotonView.Owner.NickName), m_ePlayerRole, m_iCurrentHealth);
 
+    }
+
+    // WaitForSeconds 시간마다 반복해서 유저 핑을 확인하여 점수창에 출력한다.
+    private IEnumerator UpdatePingCoroutine()
+    {
+        a_iPlayerPing = PhotonNetwork.GetPing();
+
+       yield return new WaitForSeconds(4f);
+
+        StartCoroutine(UpdatePingCoroutine());
     }
 
     [PunRPC]

@@ -415,6 +415,7 @@ MonoBehaviour:
     type: 3}
   m_iCurrentHealth: 100
   m_ePlayerRole: 0
+  m_iPlayerPing: -1
 --- !u!114 &5104187387630893799
 MonoBehaviour:
   m_ObjectHideFlags: 0
