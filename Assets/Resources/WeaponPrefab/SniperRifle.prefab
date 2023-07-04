@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4368482808653707532}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 2330838014769926428}
   - component: {fileID: 2317937190774390267}
   - component: {fileID: 303810959436909303}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SniperRifle
   m_TagString: Weapon
   m_Icon: {fileID: 0}

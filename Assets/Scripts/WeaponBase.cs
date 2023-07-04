@@ -18,6 +18,8 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     private GameObject m_vBulletObject;
     [SerializeField]
     private GameObject m_vWeaponSkinObject;
+    [SerializeField]
+    private Rigidbody2D m_vRigidbody;
 
     private Collider2D m_vWeaponSkinCollider;
 
@@ -120,7 +122,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
         GameUIManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
     }
 
-    public void ThrowOutWeapon(Quaternion _WeaponRoration)
+    public void DropWeapon(Quaternion _WeaponRoration)
     {
         //StartCoroutine(ColliderOnCoroutine());
         StartCoroutine(SmoothLerp(0.2f, _WeaponRoration));
@@ -155,6 +157,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     //    SetWeaponCollider(true);
     //}
 
+    // 게임 도중 관전자 플레이어가 들어왔을 때 게임 내 무기들의 위치를 바로잡는다.
     private void SetPosition()
     {
         m_vPhotonView.RPC(nameof(SetPositionRPC), RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber);
@@ -195,5 +198,10 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
             SetPosition();
         }
 
+    }
+
+    public int GetPhotonViewID()
+    {
+        return m_vPhotonView.ViewID;
     }
 }

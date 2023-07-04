@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5520973667121764279}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 6467937067716555401}
   - component: {fileID: 8410851767203704540}
   - component: {fileID: 7105768182692042244}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Pistol
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6627756111245017852}
   - component: {fileID: 9041676452714024746}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Pistol_mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}

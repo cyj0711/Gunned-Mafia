@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4888275939374685161}
   - component: {fileID: 4888275939374685160}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Glock_mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 4888275939638261439}
   - component: {fileID: 4888275939638261438}
   - component: {fileID: 3799487539048400306}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Glock
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -190,7 +190,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6409257979449407828}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}

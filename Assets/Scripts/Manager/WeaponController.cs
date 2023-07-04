@@ -107,15 +107,32 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     }
 
+    public void DropAllWeapons()
+    {
+        int i = 0;
+        float fDropRotation = 360f / m_dicWeaponInventory.Count;
+        foreach (KeyValuePair<E_WeaponType,WeaponBase> _dicWeaponInventory in m_dicWeaponInventory)
+        {
+            WeaponBase _vCurrentWeapon = _dicWeaponInventory.Value;
+
+            m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.All,
+                _vCurrentWeapon.GetPhotonViewID(), _vCurrentWeapon.a_iCurrentAmmo, _vCurrentWeapon.a_iRemainAmmo, _vCurrentWeapon.transform.position, Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0f, 0f, i * fDropRotation)));
+            i++;
+        }
+        m_dicWeaponInventory.Clear();
+        a_iCurrentWeaponViewID = -1;
+        GameUIManager.I.SetAmmoActive(false);
+    }
+
     // 키보드 g를 누르면 현재 들고있는 무기를 땅에 버린다.
-    public void ThrowOutWeapon()
+    public void DropWeapon()
     {
         if (m_vCurrentWeapon == null)
             return;
 
         m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
 
-        m_vPhotonView.RPC(nameof(ThrowOutWeaponRPC), RpcTarget.All, 
+        m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.All, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
 
         a_iCurrentWeaponViewID = -1;
@@ -123,7 +140,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     }
 
     [PunRPC]
-    private void ThrowOutWeaponRPC(int _iCurrentWeaponViewID, int _iCurrentAmmo, int _iRemainAmmo, Vector3 _vWeaponPosition, Quaternion _qPlayerAimRotation)
+    private void DropWeaponRPC(int _iCurrentWeaponViewID, int _iCurrentAmmo, int _iRemainAmmo, Vector3 _vWeaponPosition, Quaternion _qPlayerAimRotation)
     {
         WeaponBase vCurrentWeapon = PhotonView.Find(_iCurrentWeaponViewID).gameObject.GetComponent<WeaponBase>();
 
@@ -135,7 +152,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         //    m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
         //        (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
 
-        //m_vCurrentWeapon.ThrowOutWeapon();
+        //m_vCurrentWeapon.DropWeapon();
 
         vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
 
@@ -148,7 +165,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         vCurrentWeapon.gameObject.SetActive(true);
 
-        vCurrentWeapon.ThrowOutWeapon(_qPlayerAimRotation);
+        vCurrentWeapon.DropWeapon(_qPlayerAimRotation);
     }
 
     // 숫자키를 입력받으면 그에 해당하는 무기로 변경

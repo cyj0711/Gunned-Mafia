@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6618667822784991567}
   - component: {fileID: 7533098787915202973}
   - component: {fileID: 3026405393284956451}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Magnum
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5857819459121544326}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5172243096801156797}
   - component: {fileID: 1761526432908845595}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Magnum_slide
   m_TagString: Untagged
   m_Icon: {fileID: 0}

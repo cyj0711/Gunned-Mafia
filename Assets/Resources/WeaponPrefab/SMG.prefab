@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7471526364831666421}
   - component: {fileID: 2906455686674445818}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SMG_mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3989905297004953666}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 2937281365621278164}
   - component: {fileID: 7860169883510196933}
   - component: {fileID: 7714156938541100137}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SMG
   m_TagString: Weapon
   m_Icon: {fileID: 0}

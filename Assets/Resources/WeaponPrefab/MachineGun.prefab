@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2711849004023464298}
   - component: {fileID: 5073881344648481392}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MachineGun_mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4958219616080211451}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 8136955678765827178}
   - component: {fileID: 7827342574409074676}
   - component: {fileID: 7829137328320554766}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MachineGun
   m_TagString: Weapon
   m_Icon: {fileID: 0}

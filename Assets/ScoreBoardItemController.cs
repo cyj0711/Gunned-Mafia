@@ -75,6 +75,11 @@ public class ScoreBoardItemController : MonoBehaviour
                 break;
             case E_PlayerRole.Mafia:
                 m_vImage.color = new Color(UIColor.Red.r, UIColor.Red.g, UIColor.Red.b, 0.3f);
+                if (GameManager.I.GetPlayerRole() == E_PlayerRole.Civil || GameManager.I.GetPlayerRole() == E_PlayerRole.Detective)
+                {
+                    if (GameManager.I.GetPlayerController().a_ePlayerState == E_PlayerState.Alive)
+                        m_vImage.color = new Color(UIColor.Gray.r, UIColor.Gray.g, UIColor.Gray.b, 0.3f);
+                }
                 break;
             default:
                 m_vImage.color = new Color(UIColor.Gray.r, UIColor.Gray.g, UIColor.Gray.b, 0.3f);

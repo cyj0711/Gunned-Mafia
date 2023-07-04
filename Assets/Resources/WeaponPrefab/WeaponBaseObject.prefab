@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2911773412442034754}
   - component: {fileID: 4997182931150679074}
   - component: {fileID: 8029190538863868678}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WeaponBaseObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,6 +51,7 @@ MonoBehaviour:
   m_vBulletObject: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,
     type: 3}
   m_vWeaponSkinObject: {fileID: 0}
+  m_vRigidbody: {fileID: 8029190538863868678}
 --- !u!114 &4997182931150679074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,8 +70,7 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents:
-  - {fileID: 0}
+  ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         m_vCharacterUIController.a_iHealth = m_iCurrentHealth; 
     }
     //===============================================================
-    private E_PlayerState m_ePlayerState;
+    [SerializeField] private E_PlayerState m_ePlayerState;
     public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { SetPropertyRPC(nameof(SetPlayerStateRPC), (int)value); } }
     [PunRPC]
     private void SetPlayerStateRPC(int _iPlayerState)
@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         }
     }
     //================================================================
-    [SerializeField ]private E_PlayerRole m_ePlayerRole;
+    [SerializeField] private E_PlayerRole m_ePlayerRole;
     public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { SetPropertyRPC(nameof(SetPlayerRoleRPC), (int)value); } }
     [PunRPC] private void SetPlayerRoleRPC(int _iPlayerRole)
     {
@@ -220,6 +220,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
             //a_bIsDead = true;
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+            m_vWeaponController.DropAllWeapons();
             a_ePlayerState = E_PlayerState.Missing;
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
@@ -280,7 +281,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         else if(Input.GetKeyDown(KeyCode.G))    // 무기 버리기
         {
-            m_vWeaponController.ThrowOutWeapon();
+            m_vWeaponController.DropWeapon();
         }
 
         else if(Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기

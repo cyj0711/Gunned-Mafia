@@ -53,7 +53,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 2;
+        m_iPropertyNumberOfMafia = 0;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
@@ -127,6 +127,16 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
     public PlayerController GetPlayerController(int _iActorNumber)
     {
+        if (m_dicPlayerController.ContainsKey(_iActorNumber))
+            return m_dicPlayerController[_iActorNumber];
+
+        return null;
+    }
+
+    public PlayerController GetPlayerController()
+    {
+        int _iActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+
         if (m_dicPlayerController.ContainsKey(_iActorNumber))
             return m_dicPlayerController[_iActorNumber];
 

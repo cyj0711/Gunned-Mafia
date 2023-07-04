@@ -132,16 +132,16 @@ public class GameUIManager : Singleton<GameUIManager>
         switch (_ePlayerState)
         {
             case E_PlayerState.Alive:
-                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vAlivePlayerListTransform;
+                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vAlivePlayerListTransform);
                 break;
             case E_PlayerState.Missing:
-                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vMissingPlayerListTransform;
+                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
                 break;
             case E_PlayerState.Dead:
-                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vDeadPlayerListTransform;
+                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vDeadPlayerListTransform);
                 break;
             case E_PlayerState.Spectator:
-                m_dicScoreBoardItems[_iActorNumber].transform.parent = m_vSpectatorPlayerListTransform;
+                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vSpectatorPlayerListTransform);
                 break;
         }
         m_dicScoreBoardItems[_iActorNumber].transform.localScale = new Vector3(1f, 1f, 1f);

@@ -8563,7 +8563,7 @@ GameObject:
   - component: {fileID: 969085675}
   - component: {fileID: 969085674}
   - component: {fileID: 969085677}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: sprite_storage_box
   m_TagString: Blockable
   m_Icon: {fileID: 0}

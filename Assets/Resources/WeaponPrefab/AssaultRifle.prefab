@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5518708158457867179}
   - component: {fileID: 3109527196087530657}
   - component: {fileID: 4699229830036711162}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: AssaultRifle
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7551406449552501696}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3461039633220512809}
   - component: {fileID: 8495030533732580191}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: AssaultRifle_mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
