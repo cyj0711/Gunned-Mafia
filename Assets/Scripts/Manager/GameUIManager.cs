@@ -13,16 +13,21 @@ public class GameUIManager : Singleton<GameUIManager>
     [SerializeField] private Text m_vAmmoText;
     [SerializeField] private Image m_vAmmoImage;
 
-    [SerializeField] private GameObject m_vScoreBoardPanelObject;
-    [SerializeField] private Scrollbar m_vScoreBoardScrollBar;
-    [SerializeField] private GameObject m_vScoreBoardItemPrefab;
+    //[SerializeField] private GameObject m_vScoreBoardPanelObject;
+    //[SerializeField] private Scrollbar m_vScoreBoardScrollBar;
+    //[SerializeField] private GameObject m_vScoreBoardItemPrefab;
 
-    [SerializeField] private Transform m_vAlivePlayerListTransform;
-    [SerializeField] private Transform m_vMissingPlayerListTransform;
-    [SerializeField] private Transform m_vDeadPlayerListTransform;
-    [SerializeField] private Transform m_vSpectatorPlayerListTransform;
+    //[SerializeField] private Transform m_vAlivePlayerListHeader;
+    //[SerializeField] private Transform m_vMissingPlayerListHeader;
+    //[SerializeField] private Transform m_vDeadPlayerListHeader;
+    //[SerializeField] private Transform m_vSpectatorPlayerListHeader;
 
-    private Dictionary<int, ScoreBoardItemController> m_dicScoreBoardItems = new Dictionary<int, ScoreBoardItemController>();
+    //[SerializeField] private Transform m_vAlivePlayerListTransform;
+    //[SerializeField] private Transform m_vMissingPlayerListTransform;
+    //[SerializeField] private Transform m_vDeadPlayerListTransform;
+    //[SerializeField] private Transform m_vSpectatorPlayerListTransform;
+
+    //private Dictionary<int, ScoreBoardItemController> m_dicScoreBoardItems = new Dictionary<int, ScoreBoardItemController>();
 
     void Start()
     {
@@ -98,52 +103,69 @@ public class GameUIManager : Singleton<GameUIManager>
         m_vAmmoArea.SetActive(bActive);
     }
 
-    public void ShowScoreBoard(bool bActive)
-    {
-        m_vScoreBoardPanelObject.SetActive(bActive);
-        //m_vScoreBoardScrollBar.value = 1.0f;
-    }
+    //public void ShowScoreBoard(bool bActive)
+    //{
+    //    m_vScoreBoardPanelObject.SetActive(bActive);
+    //    //m_vScoreBoardScrollBar.value = 1.0f;
+    //}
 
-    public void CreateScoreBoardItem(int _iActorNumber, ScoreBoardItemController _vScoreBoardItem)
-    {
-        if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))
-        {
-            m_dicScoreBoardItems.Add(_iActorNumber, _vScoreBoardItem);
-        }
-        else
-        {
-            Debug.LogError("Tried to Add ScoreBoard, but player " + _iActorNumber + " alredy exist");
-            return;
-        }
-    }
+    //public void CreateScoreBoardItem(int _iActorNumber, ScoreBoardItemController _vScoreBoardItem)
+    //{
+    //    if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))
+    //    {
+    //        m_dicScoreBoardItems.Add(_iActorNumber, _vScoreBoardItem);
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("Tried to Add ScoreBoard, but player " + _iActorNumber + " alredy exist");
+    //        return;
+    //    }
+    //}
 
-    public void RemoveScoreBoardItem(int _iActorNumber)
-    {
-        if (m_dicScoreBoardItems.ContainsKey(_iActorNumber))
-        {
-            ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
-            m_dicScoreBoardItems.Remove(_iActorNumber);
-            Destroy(vScoreBoardItemController.gameObject);
-        }
-    }
+    //public void RemoveScoreBoardItem(int _iActorNumber)
+    //{
+    //    if (m_dicScoreBoardItems.ContainsKey(_iActorNumber))
+    //    {
+    //        ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
+    //        m_dicScoreBoardItems.Remove(_iActorNumber);
+    //        Destroy(vScoreBoardItemController.gameObject);
+    //    }
+    //}
 
-    public void SetScoreBoardItemParent(int _iActorNumber, E_PlayerState _ePlayerState)
-    {
-        switch (_ePlayerState)
-        {
-            case E_PlayerState.Alive:
-                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vAlivePlayerListTransform);
-                break;
-            case E_PlayerState.Missing:
-                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
-                break;
-            case E_PlayerState.Dead:
-                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vDeadPlayerListTransform);
-                break;
-            case E_PlayerState.Spectator:
-                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vSpectatorPlayerListTransform);
-                break;
-        }
-        m_dicScoreBoardItems[_iActorNumber].transform.localScale = new Vector3(1f, 1f, 1f);
-    }
+    //public void SetScoreBoardItemParent(int _iActorNumber, E_PlayerState _ePlayerState)
+    //{
+    //    switch (_ePlayerState)
+    //    {
+    //        case E_PlayerState.Alive:
+    //            m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vAlivePlayerListTransform);
+    //            break;
+    //        case E_PlayerState.Missing: // 마피아와 사망자(관전자)만 현재 실종자가 누구인지 알 수 있다.
+    //            //m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
+    //            //if (GameManager.I.GetPlayerRole() == E_PlayerRole.Civil || GameManager.I.GetPlayerRole() == E_PlayerRole.Detective)
+    //            //{
+    //            //    if (GameManager.I.GetPlayerController().a_ePlayerState == E_PlayerState.Alive)
+    //            //        m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vAlivePlayerListTransform);
+    //            //}
+    //            if ((GameManager.I.GetPlayerController().a_ePlayerState != E_PlayerState.Alive) || (GameManager.I.GetPlayerRole() == E_PlayerRole.Mafia))
+    //                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
+    //            break;
+    //        case E_PlayerState.Dead:
+    //            m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vDeadPlayerListTransform);
+    //            break;
+    //        case E_PlayerState.Spectator:
+    //            m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vSpectatorPlayerListTransform);
+    //            break;
+    //    }
+    //    m_dicScoreBoardItems[_iActorNumber].transform.localScale = new Vector3(1f, 1f, 1f);
+    //}
+
+    //public void UpdateAllPlayerRole()
+    //{
+    //    foreach (KeyValuePair<int, ScoreBoardItemController> _dicScoreBoardItem in m_dicScoreBoardItems)
+    //    {
+    //        ScoreBoardItemController _vPlayerScoreBoard = _dicScoreBoardItem.Value;
+
+    //        _vPlayerScoreBoard.UpdatePlayerRealRole();
+    //    }
+    //}
 }

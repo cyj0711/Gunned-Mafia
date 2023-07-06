@@ -65,6 +65,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         a_vCharacterUIController.a_ePlayerState = m_ePlayerState;
         m_vScoreBoardItemController.UpdatePlayerState(m_ePlayerState);
 
+        if(m_ePlayerState==E_PlayerState.Missing)
+        {
+            m_vScoreBoardItemController.UpdatePlayerRealRole(); // TODO: 원래는 죽고난 뒤 시체 확인까지 해야 직업공개해야됨. 시체조사 시스템 추가 후 해당 코드 옮기길 바람.
+        }
+
         // 살아있는 플레이어는 유령 플레이어를 볼 수 없다.
         if (m_ePlayerState != E_PlayerState.Alive)
         {
@@ -73,6 +78,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
                 SetCharacterSprite(false);
             }
         }
+
+
     }
     //================================================================
     [SerializeField] private E_PlayerRole m_ePlayerRole;
@@ -174,14 +181,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         StartCoroutine(UpdatePingCoroutine());
     }
 
-    [PunRPC]
-    private void InitScoreBoardRPC()
-    {
-        m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
-        m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName);
-        GameUIManager.I.CreateScoreBoardItem(m_vPhotonView.OwnerActorNr, m_vScoreBoardItemController);
-        GameUIManager.I.SetScoreBoardItemParent(m_vPhotonView.OwnerActorNr, m_ePlayerState);
-    }
+    //[PunRPC]
+    //private void InitScoreBoardRPC()
+    //{
+    //    m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
+    //    m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName);
+    //    GameUIManager.I.CreateScoreBoardItem(m_vPhotonView.OwnerActorNr, m_vScoreBoardItemController);
+    //    GameUIManager.I.SetScoreBoardItemParent(m_vPhotonView.OwnerActorNr, m_ePlayerState);
+    //}
 
     private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
     {
@@ -214,32 +221,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_iCurrentHealth <= 0)  // 플레이어 사망
         {
-            //Debug.Log(PhotonNetwork.LocalPlayer.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterID).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
-            //GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            //m_vPhotonView.RPC(nameof(PlayerDeadRPC), RpcTarget.AllBufferedViaServer, _iShooterActorNumber, _iWeaponID);
-
-            //a_bIsDead = true;
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
             m_vWeaponController.DropAllWeapons();
             a_ePlayerState = E_PlayerState.Missing;
+            ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
-            //PhotonNetwork.Instantiate("PlayerDeadBody", transform.position, Quaternion.identity).GetComponent<PlayerDead>()
-            //    .InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
-            //PhotonNetwork.Destroy(gameObject);
+
         }
     }
-
-    //[PunRPC]
-    ////void DestroyRPC() => Destroy(gameObject);
-    //void PlayerDeadRPC(int _iShooterActorNumber, int _iWeaponID)
-    //{
-    //    //Debug.Log(m_vPhotonView.Owner.NickName + " is killed by " + PhotonNetwork.CurrentRoom.GetPlayer(_iShooterActorNumber).NickName + " with " + DataManager.I.GetWeaponDataWithID(_iWeaponID).a_strWeaponName);
-    //    PlayerDead vPlayerDead = ((GameObject)Instantiate(Resources.Load("PlayerDeadBody"), transform.position, Quaternion.identity)).GetComponent<PlayerDead>();
-    //    vPlayerDead.InitData(m_vPhotonView.Owner.ActorNumber, GameManager.I.GetPlayerRole(m_vPhotonView.Owner.ActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
-    //    Destroy(gameObject);
-    //}
 
     void WeaponRotation(float _fAngle)
     {
@@ -286,24 +277,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         else if(Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기
         {
-            GameUIManager.I.ShowScoreBoard(true);
+            ScoreBoardManager.I.ShowScoreBoard(true);
         }
         else if (Input.GetKeyUp(KeyCode.Tab))   // 점수창 닫기
         {
-            GameUIManager.I.ShowScoreBoard(false);
+            ScoreBoardManager.I.ShowScoreBoard(false);
         }
     }
-
-    //public int GetPressedNumber()
-    //{
-    //    for (int number = 0; number <= 9; number++)
-    //    {
-    //        if (Input.GetKeyDown(number.ToString()))
-    //            return number;
-    //    }
-
-    //    return -1;
-    //}
 
     void UpdateWalkingProcess()
     {
@@ -348,7 +328,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     public void SetCharacterSprite(bool _bIsEnabled)
     {
-        //m_vCharacterObject.SetActive(_bIsEnabled);
         m_vCharacterObject.GetComponent<SpriteRenderer>().enabled = _bIsEnabled;
         m_vCharacterUIController.SetCanvasBodyActive(_bIsEnabled);
     }
@@ -387,8 +366,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             // 땅에 떨어진 무기에 닿으면 해당 무기 획득
             if (collision.tag == "Weapon")
             {
-                //Debug.Log(collision.gameObject.GetComponent<WeaponBase>().a_vWeaponData.a_strWeaponName);
-
                 m_vWeaponController.CheckPickUpWeapon(collision.gameObject.transform.parent.gameObject);
             }
         }
@@ -398,20 +375,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         info.Sender.TagObject = gameObject;
     }
-
-    //private void OnMouseEnter()
-    //{
-    //    //m_vNickNameText.enabled = true;
-    //    //m_vHealthText.enabled = true;
-    //    Debug.Log("Mouse On Player");
-    //}
-    //private void OnMouseExit()
-    //{
-    //    //m_vNickNameText.enabled = false;
-    //    //m_vHealthText.enabled = false;
-
-    //    Debug.Log("Mouse Out Player");
-    //}
 
     private void OnDestroy()
     {

@@ -17,7 +17,9 @@ public class ScoreBoardItemController : MonoBehaviour
     private int m_iKill;
     private int m_iDeath;
     private E_PlayerRole m_ePlayerRole;
+    public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } }
     private E_PlayerState m_ePlayerState;
+    public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } }
     private bool m_bIsMasterClient;
 
     void Start()
@@ -29,7 +31,7 @@ public class ScoreBoardItemController : MonoBehaviour
     {
         m_iActorNumber = _iActorNumber;
 
-        GameUIManager.I.CreateScoreBoardItem(m_iActorNumber, this);
+        ScoreBoardManager.I.CreateScoreBoardItem(m_iActorNumber, this);
 
         UpdateNameText(_strName);
         UpdatePingText(0);
@@ -87,11 +89,18 @@ public class ScoreBoardItemController : MonoBehaviour
         }
     }
 
+    // 플레이어 사망 확인 시 해당 플레이어의 진짜 직업(스코어보드 색깔) 공개
+    public void UpdatePlayerRealRole()
+    {
+        if(m_ePlayerRole==E_PlayerRole.Mafia)
+            m_vImage.color = new Color(UIColor.Red.r, UIColor.Red.g, UIColor.Red.b, 0.3f);
+    }
+
     public void UpdatePlayerState(E_PlayerState _ePlayerState)
     {
         m_ePlayerState = _ePlayerState;
 
 
-        GameUIManager.I.SetScoreBoardItemParent(m_iActorNumber, m_ePlayerState);
+        ScoreBoardManager.I.SetScoreBoardItemParent(m_iActorNumber, m_ePlayerState);
     }
 }
