@@ -256,10 +256,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         string strPlayerRoles = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(m_dicPlayerRoles);
         m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.All, strPlayerRoles, vSortedPlayers.Length - m_iPropertyNumberOfMafia, m_iPropertyNumberOfMafia);
 
-        for (int i = 0; i < vSortedPlayers.Length; i ++)
-        {
-            Debug.Log(vSortedPlayers[i].NickName + " : " + m_dicPlayerRoles[vSortedPlayers[i].ActorNumber].ToString());
-        }
+        //for (int i = 0; i < vSortedPlayers.Length; i ++)
+        //{
+        //    Debug.Log(vSortedPlayers[i].NickName + " : " + m_dicPlayerRoles[vSortedPlayers[i].ActorNumber].ToString());
+        //}
 
         m_bIsRoleSet = true;
     }

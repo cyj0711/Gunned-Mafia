@@ -68,6 +68,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         if(m_ePlayerState==E_PlayerState.Missing)
         {
             m_vScoreBoardItemController.UpdatePlayerRealRole(); // TODO: 원래는 죽고난 뒤 시체 확인까지 해야 직업공개해야됨. 시체조사 시스템 추가 후 해당 코드 옮기길 바람.
+
+            if(m_vPhotonView.IsMine)
+                ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
         }
 
         // 살아있는 플레이어는 유령 플레이어를 볼 수 없다.
@@ -77,6 +80,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             {
                 SetCharacterSprite(false);
             }
+        }
+        else
+        {
+            SetCharacterSprite(true);
         }
 
 
@@ -125,6 +132,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void Awake()
     {
+        GameManager.I.AddPlayerController(m_vPhotonView.OwnerActorNr, this);
+
         m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
 
         m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
@@ -142,7 +151,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     private void Start()
     {
-        GameManager.I.AddPlayerController(m_vPhotonView.OwnerActorNr, this);
+        //GameManager.I.AddPlayerController(m_vPhotonView.OwnerActorNr, this);
 
         if (m_vPhotonView.IsMine)
         {
@@ -224,7 +233,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
             m_vWeaponController.DropAllWeapons();
             a_ePlayerState = E_PlayerState.Missing;
-            ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
+            // ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
@@ -379,6 +388,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     private void OnDestroy()
     {
         GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
-        Destroy(m_vScoreBoardItemController.gameObject);
+        ScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
+        //Destroy(m_vScoreBoardItemController.gameObject);
     }
 }

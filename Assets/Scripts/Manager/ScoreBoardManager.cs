@@ -48,7 +48,9 @@ public class ScoreBoardManager : Singleton<ScoreBoardManager>
         {
             ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
             m_dicScoreBoardItems.Remove(_iActorNumber);
+            vScoreBoardItemController.gameObject.transform.parent = null;
             Destroy(vScoreBoardItemController.gameObject);
+            HideHeaderWithNoItem();
         }
     }
 
@@ -73,7 +75,8 @@ public class ScoreBoardManager : Singleton<ScoreBoardManager>
                 if ((GameManager.I.GetPlayerController().a_ePlayerState != E_PlayerState.Alive) || (GameManager.I.GetPlayerRole() == E_PlayerRole.Mafia))
                     m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
 
-                m_dicMissingPlayerItems.Add(_iActorNumber, m_dicScoreBoardItems[_iActorNumber]);
+                if (!m_dicMissingPlayerItems.ContainsKey(_iActorNumber))
+                    m_dicMissingPlayerItems.Add(_iActorNumber, m_dicScoreBoardItems[_iActorNumber]);
 
                 break;
             case E_PlayerState.Dead:
@@ -127,11 +130,13 @@ public class ScoreBoardManager : Singleton<ScoreBoardManager>
             _vPlayerScoreBoard.UpdatePlayerRealRole();
         }
 
-        foreach (KeyValuePair<int, ScoreBoardItemController> _dicScoreBoardItem in m_dicScoreBoardItems)
+        foreach (KeyValuePair<int, ScoreBoardItemController> _dicScoreBoardItem in m_dicMissingPlayerItems)
         {
-            ScoreBoardItemController _vPlayerScoreBoard = _dicScoreBoardItem.Value;
+            //ScoreBoardItemController _vMissingPlayerScoreBoard = _dicScoreBoardItem.Value;
 
-            _vPlayerScoreBoard.UpdatePlayerRealRole();
+            //_vMissingPlayerScoreBoard.UpdatePlayerRealRole();
+
+            SetScoreBoardItemParent(_dicScoreBoardItem.Key, _dicScoreBoardItem.Value.a_ePlayerState);
         }
     }
 }
