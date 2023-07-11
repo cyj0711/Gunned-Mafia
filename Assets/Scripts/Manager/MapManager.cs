@@ -15,7 +15,7 @@ public class MapManager : SingletonPunCallbacks<MapManager>
 
     [SerializeField] PhotonView m_vPhotonView;
 
-    private Dictionary<int, PlayerDead> m_dicPlayerDeadInfo = new Dictionary<int, PlayerDead>();
+    private Dictionary<int, PlayerDeadController> m_dicPlayerDeadInfo = new Dictionary<int, PlayerDeadController>();
 
     private bool m_bIsWeaponSpawned = false;
     public bool a_bIsWeaponSpawned { set { m_bIsWeaponSpawned = value; } }
@@ -59,7 +59,7 @@ public class MapManager : SingletonPunCallbacks<MapManager>
     [PunRPC]
     private void SpawnPlayerDeadBodyRPC(Vector3 _vPosition, int _iVictimActorNumber, int _iShooterActorNumber, int _iWeaponID, double _dTime)
     {
-        PlayerDead vPlayerDead = PhotonNetwork.InstantiateRoomObject("PlayerDeadBody", _vPosition, Quaternion.identity).GetComponent<PlayerDead>();
+        PlayerDeadController vPlayerDead = PhotonNetwork.InstantiateRoomObject("PlayerDeadBody", _vPosition, Quaternion.identity).GetComponent<PlayerDeadController>();
 
         vPlayerDead.InitData(_iVictimActorNumber, GameManager.I.GetPlayerRole(_iVictimActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
 

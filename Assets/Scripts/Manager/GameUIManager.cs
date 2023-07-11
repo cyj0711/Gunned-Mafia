@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,9 @@ public class GameUIManager : Singleton<GameUIManager>
     [SerializeField] private GameObject m_vAmmoArea;
     [SerializeField] private Text m_vAmmoText;
     [SerializeField] private Image m_vAmmoImage;
+
+    [SerializeField] private GameObject m_vSearchPanelObject;
+    [SerializeField] private Text m_vSearchText;
 
     //[SerializeField] private GameObject m_vScoreBoardPanelObject;
     //[SerializeField] private Scrollbar m_vScoreBoardScrollBar;
@@ -92,80 +96,31 @@ public class GameUIManager : Singleton<GameUIManager>
         m_vTimeText.text = (iTime / 60).ToString("D2") + ":" + (iTime % 60).ToString("D2");
     }
 
-    public void SetAmmo(int iAmmoCapacity, int iCurrentAmmo, int iRemainAmmo)
+    public void SetAmmo(int _iAmmoCapacity, int _iCurrentAmmo, int _iRemainAmmo)
     {
-        m_vAmmoImage.fillAmount = (float)(iCurrentAmmo / (float)iAmmoCapacity);
-        m_vAmmoText.text = iCurrentAmmo.ToString("D2") + " / " + iRemainAmmo.ToString("D2");
+        m_vAmmoImage.fillAmount = (float)(_iCurrentAmmo / (float)_iAmmoCapacity);
+        m_vAmmoText.text = _iCurrentAmmo.ToString("D2") + " / " + _iRemainAmmo.ToString("D2");
     }
 
-    public void SetAmmoActive(bool bActive)
+    public void SetAmmoActive(bool _bIsActive)
     {
-        m_vAmmoArea.SetActive(bActive);
+        m_vAmmoArea.SetActive(_bIsActive);
     }
 
-    //public void ShowScoreBoard(bool bActive)
-    //{
-    //    m_vScoreBoardPanelObject.SetActive(bActive);
-    //    //m_vScoreBoardScrollBar.value = 1.0f;
-    //}
+    public void SetSearchPanelActive(bool _bIsActive)
+    {
+        m_vSearchPanelObject.SetActive(_bIsActive);
+    }
 
-    //public void CreateScoreBoardItem(int _iActorNumber, ScoreBoardItemController _vScoreBoardItem)
-    //{
-    //    if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))
-    //    {
-    //        m_dicScoreBoardItems.Add(_iActorNumber, _vScoreBoardItem);
-    //    }
-    //    else
-    //    {
-    //        Debug.LogError("Tried to Add ScoreBoard, but player " + _iActorNumber + " alredy exist");
-    //        return;
-    //    }
-    //}
+    public void SetSearchText(int _iVictim, E_PlayerRole _eVictimRole, int _iWeapon, int _iDeadTime)
+    {
+        // string sText = "This is the body of ''. His role is ''! He was killed by a ''. It's been '' seconds since he died.";
+        string sText =
+            "This is the body of " + PhotonNetwork.CurrentRoom.GetPlayer(_iVictim).NickName +
+            "His role is " + _eVictimRole +
+            "He was killed by a " + DataManager.I.GetWeaponDataWithID(_iWeapon).a_strWeaponName +
+            "It's been " + _iDeadTime / 60 + " minutes and " + _iDeadTime % 60 + " seconds since he died.";
 
-    //public void RemoveScoreBoardItem(int _iActorNumber)
-    //{
-    //    if (m_dicScoreBoardItems.ContainsKey(_iActorNumber))
-    //    {
-    //        ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
-    //        m_dicScoreBoardItems.Remove(_iActorNumber);
-    //        Destroy(vScoreBoardItemController.gameObject);
-    //    }
-    //}
-
-    //public void SetScoreBoardItemParent(int _iActorNumber, E_PlayerState _ePlayerState)
-    //{
-    //    switch (_ePlayerState)
-    //    {
-    //        case E_PlayerState.Alive:
-    //            m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vAlivePlayerListTransform);
-    //            break;
-    //        case E_PlayerState.Missing: // 마피아와 사망자(관전자)만 현재 실종자가 누구인지 알 수 있다.
-    //            //m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
-    //            //if (GameManager.I.GetPlayerRole() == E_PlayerRole.Civil || GameManager.I.GetPlayerRole() == E_PlayerRole.Detective)
-    //            //{
-    //            //    if (GameManager.I.GetPlayerController().a_ePlayerState == E_PlayerState.Alive)
-    //            //        m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vAlivePlayerListTransform);
-    //            //}
-    //            if ((GameManager.I.GetPlayerController().a_ePlayerState != E_PlayerState.Alive) || (GameManager.I.GetPlayerRole() == E_PlayerRole.Mafia))
-    //                m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vMissingPlayerListTransform);
-    //            break;
-    //        case E_PlayerState.Dead:
-    //            m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vDeadPlayerListTransform);
-    //            break;
-    //        case E_PlayerState.Spectator:
-    //            m_dicScoreBoardItems[_iActorNumber].transform.SetParent(m_vSpectatorPlayerListTransform);
-    //            break;
-    //    }
-    //    m_dicScoreBoardItems[_iActorNumber].transform.localScale = new Vector3(1f, 1f, 1f);
-    //}
-
-    //public void UpdateAllPlayerRole()
-    //{
-    //    foreach (KeyValuePair<int, ScoreBoardItemController> _dicScoreBoardItem in m_dicScoreBoardItems)
-    //    {
-    //        ScoreBoardItemController _vPlayerScoreBoard = _dicScoreBoardItem.Value;
-
-    //        _vPlayerScoreBoard.UpdatePlayerRealRole();
-    //    }
-    //}
+        m_vSearchText.text = sText;
+    }
 }

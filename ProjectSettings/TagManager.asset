@@ -22,7 +22,7 @@ TagManager:
   - Weapon
   - Blockable
   - MouseEvent
-  - 
+  - DeadBody
   - 
   - 
   - 

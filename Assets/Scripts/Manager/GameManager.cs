@@ -125,6 +125,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
     }
 
+    // ActorNumber에 해당하는 PlayerController 반환
     public PlayerController GetPlayerController(int _iActorNumber)
     {
         if (m_dicPlayerController.ContainsKey(_iActorNumber))
@@ -133,6 +134,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         return null;
     }
 
+    // 로컬 플레이어의 PlayerController 반환
     public PlayerController GetPlayerController()
     {
         int _iActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;

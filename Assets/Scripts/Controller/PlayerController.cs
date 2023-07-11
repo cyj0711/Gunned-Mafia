@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             if (GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).m_ePlayerState == E_PlayerState.Alive)
             {
                 SetCharacterSprite(false);
+                m_vCharacterUIController.SetCanvasBodyActive(false);
             }
         }
         else
@@ -155,6 +156,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_vPhotonView.IsMine)
         {
+            m_vCharacterUIController.SetCanvasBodyActive(true);
+
             StartCoroutine(UpdatePingCoroutine());
 
             m_vTargetPosition = transform.position;
@@ -338,7 +341,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public void SetCharacterSprite(bool _bIsEnabled)
     {
         m_vCharacterObject.GetComponent<SpriteRenderer>().enabled = _bIsEnabled;
-        m_vCharacterUIController.SetCanvasBodyActive(_bIsEnabled);
+        // m_vCharacterUIController.SetCanvasBodyActive(_bIsEnabled);
     }
 
     [PunRPC]
