@@ -16,7 +16,8 @@ public class PlayerDeadController : MonoBehaviour
     int m_iKillerActorNumber;      // 범인의 플레이어 번호
     int m_iWeaponID;                // 범행 무기
     double m_dDeadTime;             // 사망 시각
-    int m_iFirstFinderActorNumber;                // 처음으로 시체를 찾은 플레이어
+    int m_iFirstWitnessActorNumber;                // 처음으로 시체를 찾은 플레이어
+    string m_iVictimName;           // 사망 플레이어 닉네임(사망 후 나가면 photon을 통한 닉네임 참조가 안되므로 미리저장함)
 
     /* 두 bool형 모두 충족해야 시체조사 가능 */
     bool m_bIsCollisionEntered;     // 플레이어의 시체 근접 여부
@@ -29,14 +30,14 @@ public class PlayerDeadController : MonoBehaviour
     public int a_iKillerActorNumber { get { return m_iKillerActorNumber; } set { m_iKillerActorNumber = value; } }
     public int a_iWeaponID { get { return m_iWeaponID; } set { m_iWeaponID = value; } }
     public double a_dDeadTime { get { return m_dDeadTime; } set { m_dDeadTime = value; } }
-    public int a_iFirstFinderActorNumber { get { return m_iFirstFinderActorNumber; } set { m_iFirstFinderActorNumber = value; } }
+    public int a_iFirstWitnessActorNumber { get { return m_iFirstWitnessActorNumber; } set { m_iFirstWitnessActorNumber = value; } }
 
     void Start()
     {
         m_bIsCollisionEntered = false;
         m_bIsMouseEntered = false;
         m_bIsSearchEnable = false;
-        a_iFirstFinderActorNumber = -1;
+        m_iFirstWitnessActorNumber = -1;
     }
 
     private void Update()
@@ -45,6 +46,11 @@ public class PlayerDeadController : MonoBehaviour
         {
             if (Input.GetKeyUp(KeyCode.E))
             {
+                if (m_iFirstWitnessActorNumber == -1)   // 최초 발견자인지 확인(알림 띄우는 용도)
+                {
+                    GameManager.I.CheckIsPlayerFirstWitness(m_iVictimActorNumber, PhotonNetwork.LocalPlayer.ActorNumber);
+                }
+
                 GameUIManager.I.SetSearchText(m_iVictimActorNumber, m_ePlayerRole, m_iWeaponID, (int)(PhotonNetwork.Time - m_dDeadTime));
                 GameUIManager.I.SetSearchPanelActive(true);
             }
@@ -53,11 +59,12 @@ public class PlayerDeadController : MonoBehaviour
 
     public void InitData(int _iVictimActorNumber, E_PlayerRole _ePlayerRole, int _iKillerActorNumber, int _iWeaponID, double _dDeadTime)
     {
-        a_iVictimActorNumber = _iVictimActorNumber;
-        a_ePlayerRole = _ePlayerRole;
-        a_iKillerActorNumber = _iKillerActorNumber;
-        a_iWeaponID = _iWeaponID;
-        a_dDeadTime = _dDeadTime;
+        m_iVictimActorNumber = _iVictimActorNumber;
+        m_ePlayerRole = _ePlayerRole;
+        m_iKillerActorNumber = _iKillerActorNumber;
+        m_iWeaponID = _iWeaponID;
+        m_dDeadTime = _dDeadTime;
+        m_iVictimName = PhotonNetwork.CurrentRoom.GetPlayer(_iVictimActorNumber).NickName;
 
         //Debug.Log(a_iVictimActorNumber + " is killed by " + a_iKillerActorNumber + " with " + DataManager.I.GetWeaponDataWithID(a_iWeaponID).a_strWeaponName + " at " + a_dDeadTime + ". He is a" + a_ePlayerRole);
     }
@@ -118,5 +125,10 @@ public class PlayerDeadController : MonoBehaviour
     {
         m_vCanvasBody.SetActive(_bIsEnable);
         m_bIsSearchEnable = _bIsEnable;
+    }
+
+    public void NotifyDead(int _iFirstWitness)
+    {
+        GameUIManager.I.CreateNotificationToAll(PhotonNetwork.CurrentRoom.GetPlayer(_iFirstWitness).NickName + " found the body of " + m_iVictimName + ". He was " + m_ePlayerRole + "!");
     }
 }

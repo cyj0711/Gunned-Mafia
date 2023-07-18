@@ -7,6 +7,9 @@ public class DataManager : Singleton<DataManager>
 {
     Dictionary<int, WeaponData> m_dicWeaponData = new Dictionary<int, WeaponData>();
 
+    [SerializeField] GameObject m_vPlayerDeadBodyPrefab;
+    public GameObject a_vPlayerDeadBodyPrefab { get { return m_vPlayerDeadBodyPrefab; } }
+
     void Start()
     {
         InitWeaponData();

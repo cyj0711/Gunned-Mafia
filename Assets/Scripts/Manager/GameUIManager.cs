@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class GameUIManager : Singleton<GameUIManager>
 {
+    [SerializeField] private PhotonView m_vPhotonView;
+
     [SerializeField] private Text m_vTimeText;
     [SerializeField] private Text m_vStatusText;
     [SerializeField] private Image m_vStatusImage;
@@ -33,6 +35,11 @@ public class GameUIManager : Singleton<GameUIManager>
 
     //private Dictionary<int, ScoreBoardItemController> m_dicScoreBoardItems = new Dictionary<int, ScoreBoardItemController>();
 
+    [SerializeField] private GameObject m_vNotificationItemPrefab;
+    [SerializeField] private Transform m_vNotificationContainerTransform;
+
+    bool m_bIsStartMessageSend = false; // 시작 알림 반복 호출 방지
+
     void Start()
     {
         SetGameState();
@@ -57,7 +64,7 @@ public class GameUIManager : Singleton<GameUIManager>
                 m_vTimeText.enabled = false;
                 break;
             case E_GAMESTATE.Play:
-                SetPlayingState();
+                SetRole();
                 m_vTimeText.enabled = true;
                 break;
             default:
@@ -68,7 +75,7 @@ public class GameUIManager : Singleton<GameUIManager>
         }
     }
 
-    private void SetPlayingState()
+    private void SetRole()
     {
         E_PlayerRole ePlayerRole = GameManager.I.GetPlayerRole();
 
@@ -88,6 +95,14 @@ public class GameUIManager : Singleton<GameUIManager>
                 break;
         }
         m_vStatusText.text = ePlayerRole.ToString();
+
+        if (!m_bIsStartMessageSend)
+        {
+            CreateNotification("The Game is Begined !!");
+            CreateNotification("You are " + ePlayerRole);
+
+            m_bIsStartMessageSend = true;
+        }
     }
 
     private void SetTimeText()
@@ -117,10 +132,33 @@ public class GameUIManager : Singleton<GameUIManager>
         // string sText = "This is the body of ''. His role is ''! He was killed by a ''. It's been '' seconds since he died.";
         string sText =
             "This is the body of " + PhotonNetwork.CurrentRoom.GetPlayer(_iVictim).NickName +
-            "His role is " + _eVictimRole +
-            "He was killed by a " + DataManager.I.GetWeaponDataWithID(_iWeapon).a_strWeaponName +
-            "It's been " + _iDeadTime / 60 + " minutes and " + _iDeadTime % 60 + " seconds since he died.";
+            ". His role is " + _eVictimRole +
+            ". He was killed by a " + DataManager.I.GetWeaponDataWithID(_iWeapon).a_strWeaponName +
+            ". It's been " + _iDeadTime / 60 + " minutes and " + _iDeadTime % 60 + " seconds since he died.";
 
         m_vSearchText.text = sText;
+    }
+
+    // 로컬 플레이어에게 알림 메세지 전송
+    public void CreateNotification(string _strText)
+    {
+        NotificationItemController vNotificationItem = Instantiate(m_vNotificationItemPrefab).GetComponent<NotificationItemController>();
+        vNotificationItem.SetText(_strText);
+
+        vNotificationItem.transform.SetParent(m_vNotificationContainerTransform);
+        vNotificationItem.transform.SetAsFirstSibling();    // 새 알림창은 항상 위에서부터 표시된다.
+        vNotificationItem.transform.localScale = new Vector3(1f, 1f, 1f);
+    }
+
+    // 모든 플레이어에게 알림 메세지 전송
+    public void CreateNotificationToAll(string _strText)
+    {
+        m_vPhotonView.RPC(nameof(CreateNotificationToAllRPC), RpcTarget.AllViaServer, _strText);
+    }
+
+    [PunRPC]
+    private void CreateNotificationToAllRPC(string _strText)
+    {
+        CreateNotification(_strText);
     }
 }

@@ -22,11 +22,6 @@ public class ScoreBoardItemController : MonoBehaviour
     public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } }
     private bool m_bIsMasterClient;
 
-    void Start()
-    {
-        
-    }
-
     public void InitData(int _iActorNumber, string _strName)
     {
         m_iActorNumber = _iActorNumber;

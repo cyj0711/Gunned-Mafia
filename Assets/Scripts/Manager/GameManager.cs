@@ -53,8 +53,8 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 2;
-        m_iPropertyNumberOfDetective = 1;
+        m_iPropertyNumberOfMafia = 1;
+        m_iPropertyNumberOfDetective = 0;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
 
@@ -438,14 +438,14 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     }
 
     // 플레이어가 무기에 닿으면 서버를 통해 해당 무기를 얻을 수 있는지 확인받는다.
-    public void CheckCanPlayerPickUpWeapon(int _iWeaponViewID, int _iPlayerActorNumber, int _iWeaponManagerViewID)
+    public void CheckCanPlayerPickUpWeapon(int _iWeaponViewID, int _iPlayerActorNumber)
     {
-        m_vPhotonView.RPC(nameof(CheckCanPlayerPickUpWeaponRPC), RpcTarget.MasterClient, _iWeaponViewID, _iPlayerActorNumber, _iWeaponManagerViewID);
+        m_vPhotonView.RPC(nameof(CheckCanPlayerPickUpWeaponRPC), RpcTarget.MasterClient, _iWeaponViewID, _iPlayerActorNumber);
     }
 
     // 하나의 무기를 여러 플레이어가 동시에 주울때 꼬이는걸 막기위해 서버가 한명에게만 무기를 줍도록 조절한다.
     [PunRPC]
-    private void CheckCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerActorNumber, int _iWeaponManagerViewID)
+    private void CheckCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerActorNumber)
     {
         if(!PhotonNetwork.LocalPlayer.IsMasterClient)
         {
@@ -464,18 +464,18 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         if (vWeaponBase.a_iOwnerPlayerActorNumber == -1)
         {
             vWeaponBase.a_iOwnerPlayerActorNumber = _iPlayerActorNumber;
-            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iWeaponManagerViewID, true);
+            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iPlayerActorNumber, true);
         }
         else
         {
-            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iWeaponManagerViewID, false);
+            m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iPlayerActorNumber, false);
         }
 
     }
 
     // 무기를 주우려는 플레이어에게 무기 획득 가능 여부를 알려준다.
     [PunRPC]
-    private void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iWeaponManagerViewID, bool _bCanPickUp)
+    private void ReturnCanPlayerPickUpWeaponRPC(int _iWeaponViewID, int _iPlayerActorNumber, bool _bCanPickUp)
     {
         if(!_bCanPickUp)
         {
@@ -483,15 +483,60 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             return;
         }
 
-        WeaponController vWeaponManager = PhotonView.Find(_iWeaponManagerViewID).gameObject.GetComponent<WeaponController>();
+        WeaponController vWeaponController = GetPlayerController(_iPlayerActorNumber).a_vWeaponController;
 
-        if (vWeaponManager == null)
+        if (vWeaponController == null)
         {
             Debug.LogError("Player(" + PhotonNetwork.LocalPlayer.NickName + ") tried to get weapon(" + _iWeaponViewID + "), But the weaponManager is null");
             return;
         }
 
-        vWeaponManager.PickUpWeapon(_iWeaponViewID);
+        vWeaponController.PickUpWeapon(_iWeaponViewID);
+
+    }
+
+    // 해당 플레이어가 시체의 첫번째 발견자인지 확인
+    public void CheckIsPlayerFirstWitness(int _iBodyActorNumber, int _iPlayerActorNumber)
+    {
+        m_vPhotonView.RPC(nameof(CheckIsPlayerFirstWitnessRPC), RpcTarget.MasterClient, _iBodyActorNumber, _iPlayerActorNumber);
+    }
+
+    // 하나의 무기를 여러 플레이어가 동시에 주울때 꼬이는걸 막기위해 서버가 한명에게만 무기를 줍도록 조절한다.
+    [PunRPC]
+    private void CheckIsPlayerFirstWitnessRPC(int _iBodyActorNumber, int _iPlayerActorNumber)
+    {
+        if (!PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            Debug.LogError(nameof(CheckCanPlayerPickUpWeaponRPC) + "must be called on the master client, BUT " + PhotonNetwork.LocalPlayer.NickName + " is not MASTER!!");
+            return;
+        }
+
+        PlayerDeadController vPlayerDeadController = MapManager.I.GetPlayerDead(_iBodyActorNumber);
+
+        if (vPlayerDeadController == null)
+        {
+            Debug.LogError("Player(" + _iPlayerActorNumber + ") tried to get weapon(" + _iBodyActorNumber + "), But the weaponBase is null");
+            return;
+        }
+
+        if (vPlayerDeadController.a_iFirstWitnessActorNumber == -1)
+        {
+            vPlayerDeadController.a_iFirstWitnessActorNumber = _iPlayerActorNumber;
+            m_vPhotonView.RPC(nameof(ReturnIsPlayerFirstWitnessRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iBodyActorNumber, _iPlayerActorNumber);
+        }
+    }
+
+    [PunRPC]
+    private void ReturnIsPlayerFirstWitnessRPC(int _iBodyActorNumber, int _iPlayerActorNumber)
+    {
+        PlayerDeadController vPlayerDeadController = MapManager.I.GetPlayerDead(_iBodyActorNumber);
+
+        if (vPlayerDeadController == null)
+        {
+            return;
+        }
+
+        vPlayerDeadController.NotifyDead(_iPlayerActorNumber);
 
     }
 }

@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     CharacterAnimationController m_vCharacterAnimationController;
     [SerializeField] WeaponController m_vWeaponController;
+    public WeaponController a_vWeaponController { get { return m_vWeaponController; } }
     [SerializeField] CharacterUIController m_vCharacterUIController;
     public CharacterUIController a_vCharacterUIController { get { return m_vCharacterUIController; } }
     [SerializeField] Collider2D m_vCharacterUIClickCollider;
@@ -192,15 +193,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         StartCoroutine(UpdatePingCoroutine());
     }
-
-    //[PunRPC]
-    //private void InitScoreBoardRPC()
-    //{
-    //    m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
-    //    m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName);
-    //    GameUIManager.I.CreateScoreBoardItem(m_vPhotonView.OwnerActorNr, m_vScoreBoardItemController);
-    //    GameUIManager.I.SetScoreBoardItemParent(m_vPhotonView.OwnerActorNr, m_ePlayerState);
-    //}
 
     private void InitialSetting()   // 처음에는 Serializefield를 통해 에디터에서 값을 줬으므로 Start에선 사용하지않는다.
     {

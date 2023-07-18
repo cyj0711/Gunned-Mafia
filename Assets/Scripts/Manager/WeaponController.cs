@@ -242,20 +242,8 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         {
             int iWeaponViewID = vWeaponObject.GetComponent<PhotonView>().ViewID;  // RPC엔 GameObject를 줄 수 없어서 해당 무기 object의 photon view ID를 대신 준다.
 
-            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber, m_vPhotonView.ViewID); // 서버의 GameManager가 무기 획득 여부를 확인한뒤 클라이언트의 PickUpWeapon을 호출
+            GameManager.I.CheckCanPlayerPickUpWeapon(iWeaponViewID, m_vPhotonView.Owner.ActorNumber); // 서버의 GameManager가 무기 획득 여부를 확인한뒤 클라이언트의 PickUpWeapon을 호출
 
-            //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
-
-            //m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, iWeaponViewID);
-
-            //// 현재 아무 무기도 들고있지 않은 상태면, 획득한 무기를 즉시 장착한다.
-            //if (m_vCurrentWeapon == null)
-            //{
-            //    //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
-            //    a_iCurrentWeaponViewID = iWeaponViewID;
-            //    vWeaponBase.SetAmmoUI();
-            //    GameUIManager.I.SetAmmoActive(true);
-            //}
         }
     }
 
@@ -275,6 +263,8 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             vWeaponBase.SetAmmoUI();
             GameUIManager.I.SetAmmoActive(true);
         }
+
+        GameUIManager.I.CreateNotification("You picked up " + vWeaponBase.a_vWeaponData.name);
     }
 
     // 땅에 떨어진 무기를 플레이어가 가져갔다는 정보를 모든 유저에게 알려준다.
