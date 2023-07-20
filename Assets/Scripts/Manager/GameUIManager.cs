@@ -40,10 +40,18 @@ public class GameUIManager : Singleton<GameUIManager>
 
     bool m_bIsStartMessageSend = false; // 시작 알림 반복 호출 방지
 
+    float m_fNotificationYMoveSize; // 알림 메시지가 새로 생길때마다 기존 메세지가 밑으로 가는 정도(알림메세지 프리팹의 height + vertical layout group의 spacing 의 합임
+    Vector3 m_vOriginPosition;
+
+    int m_iVictimActorNumber = -1;   // 시체 탐색 ui에서 해당 시체 주인이 누구인지 확인(call detective 버튼으로 탐정에게 위치를 보내는 용도)
+
     void Start()
     {
         SetGameState();
         SetTimeText();
+
+        m_fNotificationYMoveSize = m_vNotificationItemPrefab.GetComponent<RectTransform>().sizeDelta.y + m_vNotificationContainerTransform.gameObject.GetComponent<VerticalLayoutGroup>().spacing;
+        m_vOriginPosition = m_vNotificationContainerTransform.localPosition;
     }
 
     void Update()
@@ -127,27 +135,52 @@ public class GameUIManager : Singleton<GameUIManager>
         m_vSearchPanelObject.SetActive(_bIsActive);
     }
 
-    public void SetSearchText(int _iVictim, E_PlayerRole _eVictimRole, int _iWeapon, int _iDeadTime)
+    public void SetSearchText(int _iVictim,string _strVictimNickName, E_PlayerRole _eVictimRole, int _iWeapon, int _iDeadTime)
     {
         // string sText = "This is the body of ''. His role is ''! He was killed by a ''. It's been '' seconds since he died.";
         string sText =
-            "This is the body of " + PhotonNetwork.CurrentRoom.GetPlayer(_iVictim).NickName +
+            "This is the body of " + _strVictimNickName +
             ". His role is " + _eVictimRole +
             ". He was killed by a " + DataManager.I.GetWeaponDataWithID(_iWeapon).a_strWeaponName +
             ". It's been " + _iDeadTime / 60 + " minutes and " + _iDeadTime % 60 + " seconds since he died.";
 
         m_vSearchText.text = sText;
+        m_iVictimActorNumber = _iVictim;
     }
 
-    // 로컬 플레이어에게 알림 메세지 전송
     public void CreateNotification(string _strText)
     {
+        StartCoroutine(nameof(NotificationSmoothMoveCoroutine), _strText);
+    }
+
+    private IEnumerator NotificationSmoothMoveCoroutine(string _strText)
+    {
+        float elapsedTime = 0.0f;
+        float fMoveTime = 0.2f;
+
+        Vector3 vTargetPosition = m_vOriginPosition + new Vector3(0f, -m_fNotificationYMoveSize, 0f);
+
+        /* 전체 메세지들을 아래로 살짝 내리는 단계 */
+
+        while (elapsedTime < fMoveTime)
+        {
+            m_vNotificationContainerTransform.localPosition = Vector3.Lerp(m_vOriginPosition, vTargetPosition, elapsedTime / fMoveTime);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        /* 새 알림 메세지 생성 단계 */
+
+        m_vNotificationContainerTransform.localPosition = m_vOriginPosition;
+
         NotificationItemController vNotificationItem = Instantiate(m_vNotificationItemPrefab).GetComponent<NotificationItemController>();
         vNotificationItem.SetText(_strText);
 
         vNotificationItem.transform.SetParent(m_vNotificationContainerTransform);
-        vNotificationItem.transform.SetAsFirstSibling();    // 새 알림창은 항상 위에서부터 표시된다.
+        vNotificationItem.transform.SetAsFirstSibling();    // 새 알림 메세지는 항상 위에서부터 표시된다.
         vNotificationItem.transform.localScale = new Vector3(1f, 1f, 1f);
+
+
     }
 
     // 모든 플레이어에게 알림 메세지 전송
@@ -160,5 +193,42 @@ public class GameUIManager : Singleton<GameUIManager>
     private void CreateNotificationToAllRPC(string _strText)
     {
         CreateNotification(_strText);
+    }
+
+    public void CallDetective()
+    {
+        List<int>listDetectivePlayers = GameManager.I.GetDetectivePlayers();
+
+        PlayerDeadController vDeadPlayer = MapManager.I.GetPlayerDead(m_iVictimActorNumber);
+
+        if (vDeadPlayer == null)
+            return;
+
+        foreach (int indexDetectivePlayers in listDetectivePlayers)
+        {
+            DisplayLocation(indexDetectivePlayers, vDeadPlayer.transform.position, 30f);
+        }
+    }
+
+    // _iPlayerActorNumber 플레이어의 화면에 _vTargetPosition 의 위치를 _fDisplayTime 동안 표시한다.
+    public void DisplayLocation(int _iPlayerActorNumber, Vector3 _vTargetPosition, float _fDisplayTime)
+    {
+        m_vPhotonView.RPC(nameof(DisplayLocationRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _vTargetPosition, _fDisplayTime);
+    }
+
+    [PunRPC]
+    private void DisplayLocationRPC(Vector3 _vTargetPosition, float _fDisplayTime)
+    {
+        GameObject vLocationPingObject = Instantiate(DataManager.I.a_vLocationPingPrefab);
+        LocationPingController vLocationPingController = vLocationPingObject.GetComponent<LocationPingController>();
+
+        if(vLocationPingObject==null)
+        {
+            Destroy(vLocationPingObject);
+            return;
+        }
+        vLocationPingObject.transform.position = _vTargetPosition;
+
+        vLocationPingController.InitData(GameManager.I.GetPlayerController().transform, _fDisplayTime);
     }
 }

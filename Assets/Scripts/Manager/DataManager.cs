@@ -10,6 +10,9 @@ public class DataManager : Singleton<DataManager>
     [SerializeField] GameObject m_vPlayerDeadBodyPrefab;
     public GameObject a_vPlayerDeadBodyPrefab { get { return m_vPlayerDeadBodyPrefab; } }
 
+    [SerializeField] GameObject m_vLocationPingPrefab;
+    public GameObject a_vLocationPingPrefab { get { return m_vLocationPingPrefab; } }
+
     void Start()
     {
         InitWeaponData();

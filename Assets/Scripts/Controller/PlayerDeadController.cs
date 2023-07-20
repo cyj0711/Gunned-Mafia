@@ -17,7 +17,7 @@ public class PlayerDeadController : MonoBehaviour
     int m_iWeaponID;                // 범행 무기
     double m_dDeadTime;             // 사망 시각
     int m_iFirstWitnessActorNumber;                // 처음으로 시체를 찾은 플레이어
-    string m_iVictimName;           // 사망 플레이어 닉네임(사망 후 나가면 photon을 통한 닉네임 참조가 안되므로 미리저장함)
+    string m_strVictimNickName;           // 사망 플레이어 닉네임(사망 후 나가면 photon을 통한 닉네임 참조가 안되므로 미리저장함)
 
     /* 두 bool형 모두 충족해야 시체조사 가능 */
     bool m_bIsCollisionEntered;     // 플레이어의 시체 근접 여부
@@ -48,10 +48,10 @@ public class PlayerDeadController : MonoBehaviour
             {
                 if (m_iFirstWitnessActorNumber == -1)   // 최초 발견자인지 확인(알림 띄우는 용도)
                 {
-                    GameManager.I.CheckIsPlayerFirstWitness(m_iVictimActorNumber, PhotonNetwork.LocalPlayer.ActorNumber);
+                    GameManager.I.CheckIsPlayerFirstWitness(m_iVictimActorNumber, PhotonNetwork.LocalPlayer.ActorNumber);   // 최초 발견자가 맞다면 PlayerDeadController.cs의 NotifyDead 함수 호출
                 }
 
-                GameUIManager.I.SetSearchText(m_iVictimActorNumber, m_ePlayerRole, m_iWeaponID, (int)(PhotonNetwork.Time - m_dDeadTime));
+                GameUIManager.I.SetSearchText(m_iVictimActorNumber, m_strVictimNickName, m_ePlayerRole, m_iWeaponID, (int)(PhotonNetwork.Time - m_dDeadTime));
                 GameUIManager.I.SetSearchPanelActive(true);
             }
         }
@@ -64,7 +64,7 @@ public class PlayerDeadController : MonoBehaviour
         m_iKillerActorNumber = _iKillerActorNumber;
         m_iWeaponID = _iWeaponID;
         m_dDeadTime = _dDeadTime;
-        m_iVictimName = PhotonNetwork.CurrentRoom.GetPlayer(_iVictimActorNumber).NickName;
+        m_strVictimNickName = PhotonNetwork.CurrentRoom.GetPlayer(_iVictimActorNumber).NickName;
 
         //Debug.Log(a_iVictimActorNumber + " is killed by " + a_iKillerActorNumber + " with " + DataManager.I.GetWeaponDataWithID(a_iWeaponID).a_strWeaponName + " at " + a_dDeadTime + ". He is a" + a_ePlayerRole);
     }
@@ -129,6 +129,13 @@ public class PlayerDeadController : MonoBehaviour
 
     public void NotifyDead(int _iFirstWitness)
     {
-        GameUIManager.I.CreateNotificationToAll(PhotonNetwork.CurrentRoom.GetPlayer(_iFirstWitness).NickName + " found the body of " + m_iVictimName + ". He was " + m_ePlayerRole + "!");
+        GameUIManager.I.CreateNotificationToAll(PhotonNetwork.CurrentRoom.GetPlayer(_iFirstWitness).NickName + " found the body of " + m_strVictimNickName + ". He was " + m_ePlayerRole + "!");
+
+        PlayerController vPlayerController = GameManager.I.GetPlayerController(a_iVictimActorNumber);
+
+        if (vPlayerController == null)
+            return;
+
+        vPlayerController.a_ePlayerState = E_PlayerState.Dead;
     }
 }

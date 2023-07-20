@@ -25,8 +25,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     [SerializeField] GameObject m_vCharacterObject;
 
     CharacterAnimationController m_vCharacterAnimationController;
+
     [SerializeField] WeaponController m_vWeaponController;
     public WeaponController a_vWeaponController { get { return m_vWeaponController; } }
+
     [SerializeField] CharacterUIController m_vCharacterUIController;
     public CharacterUIController a_vCharacterUIController { get { return m_vCharacterUIController; } }
     [SerializeField] Collider2D m_vCharacterUIClickCollider;
@@ -68,10 +70,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if(m_ePlayerState==E_PlayerState.Missing)
         {
-            m_vScoreBoardItemController.UpdatePlayerRealRole(); // TODO: 원래는 죽고난 뒤 시체 확인까지 해야 직업공개해야됨. 시체조사 시스템 추가 후 해당 코드 옮기길 바람.
-
             if(m_vPhotonView.IsMine)
                 ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
+        }
+        else if(m_ePlayerState == E_PlayerState.Dead)
+        {
+            m_vScoreBoardItemController.UpdatePlayerRealRole(); // 사망이 확인 된 플레이어의 진짜 직업 공개
         }
 
         // 살아있는 플레이어는 유령 플레이어를 볼 수 없다.
@@ -170,6 +174,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             if (GameManager.I.a_eGameState == E_GAMESTATE.Play || GameManager.I.a_eGameState == E_GAMESTATE.Cooling)
             {
                 a_ePlayerState = E_PlayerState.Spectator;
+                GameManager.I.DisplayGhosts();
+                GameManager.I.PlayerNameColorUpdate();
             }
             else
             {
