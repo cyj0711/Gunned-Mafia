@@ -195,6 +195,7 @@ public class GameUIManager : Singleton<GameUIManager>
         CreateNotification(_strText);
     }
 
+    // 시체 조사 창에서 call detective 버튼을 누르면 해당 함수를 호출하여 탐정 플레이어들에게 시체의 위치를 알려준다.
     public void CallDetective()
     {
         List<int>listDetectivePlayers = GameManager.I.GetDetectivePlayers();

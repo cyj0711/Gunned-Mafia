@@ -12,18 +12,27 @@ public class LocationPingController : MonoBehaviour
     float m_fTimer = 0f;
     float m_fDistance;
 
+    Vector3 m_vOriginalPosition;
+
+    [SerializeField] Canvas m_vCanvas;
+    [SerializeField] TargetIndicator m_vTargetIndicator;
+
 
     public void InitData(Transform _vPlayerTransform, float _fLifeTime)
     {
         m_vPlayerTransform = _vPlayerTransform;
         m_fLifeTime = _fLifeTime;
+        m_vOriginalPosition = transform.position;
+
+        m_vCanvas.worldCamera = Camera.main;
+        m_vTargetIndicator.SetTarget(m_vOriginalPosition);
     }
     void Update()
     {
         if (m_fTimer >= m_fLifeTime)
             Destroy(gameObject);
 
-        m_fDistance = Vector2.Distance(m_vPlayerTransform.position, transform.position);
+        m_fDistance = Vector2.Distance(m_vPlayerTransform.position, m_vOriginalPosition);
         m_vDistanceText.text = ((int)(m_fDistance * 10)).ToString();
 
         m_fTimer += Time.deltaTime;

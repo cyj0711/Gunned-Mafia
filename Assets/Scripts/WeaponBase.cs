@@ -198,6 +198,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
             SetPosition();
         }
 
+        GameUIManager.I.DisplayLocation(PhotonNetwork.LocalPlayer.ActorNumber, transform.position, 30f);    // TODO: indicator 테스트용 코드, 테스트 완료시 반드시 해당 줄 삭제바람
     }
 
     public int GetPhotonViewID()

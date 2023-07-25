@@ -53,7 +53,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 2;
+        m_iPropertyNumberOfMafia = 0;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();

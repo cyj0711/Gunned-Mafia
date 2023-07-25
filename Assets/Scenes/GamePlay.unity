@@ -885,7 +885,7 @@ MonoBehaviour:
   dontDestroyOnLoad: 0
   m_vPlayerDeadBodyPrefab: {fileID: 3944763437625881276, guid: 48d00dccabfc7474492f50ba6682df60,
     type: 3}
-  m_vLocationPingPrefab: {fileID: 5475788005542617114, guid: 2bdea5c481db0104a82c141bd02acedc,
+  m_vLocationPingPrefab: {fileID: 5437162072597174776, guid: 2bdea5c481db0104a82c141bd02acedc,
     type: 3}
 --- !u!1 &89159464
 GameObject:
@@ -8669,6 +8669,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
+  m_vCameraMain: {fileID: 1499631965}
 --- !u!1 &969085673
 GameObject:
   m_ObjectHideFlags: 0
