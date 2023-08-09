@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf785cfa74acbbb41942cac4c8c6dabf, type: 3}
+  m_Name: HeartAttack
+  m_EditorClassIdentifier: 
+  m_iWeaponID: 0
+  m_strWeaponName: Sudden Heart Attack
+  m_iDamage: 9999
+  m_iCriticalDamage: 0
+  m_fCriticalChance: 0
+  m_iMaxAmmo: 0
+  m_iAmmoCapacity: 0
+  m_fReloadTime: 0
+  m_bAutoFire: 0
+  m_fRateOfFire: 0
+  m_eWeaponType: 0
+  m_eBulleyType: 0
+  m_vWeaponPrefab: {fileID: 0}
+  m_vBulletPrefab: {fileID: 0}

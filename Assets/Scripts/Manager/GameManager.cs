@@ -27,6 +27,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     int m_iCurrentNumberOfCivil;
 
     private Dictionary<int, PlayerController> m_dicPlayerController = new Dictionary<int, PlayerController>();
+    private Dictionary<int, string> m_dicPlayerNickName = new Dictionary<int, string>();
 
     /* 방 속성(유저(방장)가 설정 가능) */
     double m_dPropertyTimeForPrepare;   // 준비 시간
@@ -114,6 +115,8 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_dicPlayerController.Add(_iActorNumber, _vPlayerController);
         }
 
+        AddPlayerNickName(_iActorNumber, _vPlayerController.a_vPhotonView.Owner.NickName);
+
     }
 
     public void RemovePlayerController(int _iActorNumber)
@@ -141,6 +144,26 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         if (m_dicPlayerController.ContainsKey(_iActorNumber))
             return m_dicPlayerController[_iActorNumber];
+
+        return null;
+    }
+
+    public void AddPlayerNickName(int _iActorNumber, string _strNickName)
+    {
+        if (m_dicPlayerNickName.ContainsKey(_iActorNumber))
+        {
+            m_dicPlayerNickName[_iActorNumber] = _strNickName;
+        }
+        else
+        {
+            m_dicPlayerNickName.Add(_iActorNumber, _strNickName);
+        }
+    }
+
+    public string GetPlayerNickName(int _iActorNumber)
+    {
+        if (m_dicPlayerNickName.ContainsKey(_iActorNumber))
+            return m_dicPlayerNickName[_iActorNumber];
 
         return null;
     }

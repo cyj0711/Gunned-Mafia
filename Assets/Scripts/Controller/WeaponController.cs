@@ -124,6 +124,36 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         UIGameManager.I.SetAmmoActive(false);
     }
 
+    // 플레이어가 게임을 종료할 경우 모든 무기를 버린다 (게임을 종료하면 photon view 가 없어지기에 DropAllWeapons() 대신 해당 메소드 사용)
+    public void DropAllWeaponsOnLeft()
+    {
+        int i = 0;
+        float fDropRotation = 360f / m_dicWeaponInventory.Count;
+
+        foreach (KeyValuePair<E_WeaponType, WeaponBase> _dicWeaponInventory in m_dicWeaponInventory)
+        {
+            WeaponBase vCurrentWeapon = _dicWeaponInventory.Value;
+
+            vCurrentWeapon.InitWeaponData(vCurrentWeapon.a_iCurrentAmmo, vCurrentWeapon.a_iRemainAmmo);
+
+            vCurrentWeapon.transform.parent = MapManager.I.a_vDroppedItem;
+            vCurrentWeapon.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            if (vCurrentWeapon.gameObject.transform.localScale.y < 0)
+                vCurrentWeapon.gameObject.transform.localScale = new Vector3
+                    (vCurrentWeapon.gameObject.transform.localScale.x, vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+
+            vCurrentWeapon.gameObject.SetActive(true);
+
+            vCurrentWeapon.DropWeapon(Quaternion.Euler(new Vector3(0f, 0f, i * fDropRotation))); 
+            
+            i++;
+        }
+
+        m_dicWeaponInventory.Clear();
+        m_iCurrentWeaponViewID = -1;
+    }
+
+
     // 키보드 g를 누르면 현재 들고있는 무기를 땅에 버린다.
     public void DropWeapon()
     {
@@ -251,7 +281,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         WeaponBase vWeaponBase = PhotonView.Find(_iWeaponViewID).gameObject.GetComponent<WeaponBase>();
 
-        m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+        //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
 
         m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, _iWeaponViewID);
 
@@ -282,6 +312,8 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         vWeaponObject.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
 
         vWeaponObject.SetActive(false);
+
+        m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

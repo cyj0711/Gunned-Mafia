@@ -398,5 +398,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
         UIScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
         //Destroy(m_vScoreBoardItemController.gameObject);
+
+        if (PhotonNetwork.IsMasterClient)  // 살아있는 플레이어가 나가면 해당 플레이어의 시체를 소환한다.
+        {
+            if (!MapManager.I.a_dicPlayerDead.ContainsKey(m_vPhotonView.OwnerActorNr) && m_ePlayerState==E_PlayerState.Alive)
+            {
+                // 시스템상의 자살이나 게임종료로 인한 사망은 ShooterActorNumber, WeaponID, killerDistance 를 전부 0으로 표시한다.
+                MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, 0, 0, PhotonNetwork.Time, 0f);    
+                // a_ePlayerState = E_PlayerState.Missing;
+                GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
+            }
+        }
+        m_vWeaponController.DropAllWeaponsOnLeft();
     }
 }

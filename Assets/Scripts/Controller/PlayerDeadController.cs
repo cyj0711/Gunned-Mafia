@@ -75,7 +75,11 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
         m_dDeadTime = _dDeadTime;
         m_strVictimNickName = _strVictimNickName;
 
-        m_iRemainTimeDNA = SetRemainTimeDNA(_fKillerDistance);
+        // m_iKillerActorNumber 와 m_iWeaponID 가 0 이라면 시스템으로 인한 사망으로, DNA 가 따로 남지 않는다.
+        if (m_iKillerActorNumber == 0 && m_iWeaponID == 0)
+            m_iRemainTimeDNA = 0;
+        else
+            m_iRemainTimeDNA = SetRemainTimeDNA(_fKillerDistance);
 
         //Debug.Log(a_iVictimActorNumber + " is killed by " + a_iKillerActorNumber + " with " + DataManager.I.GetWeaponDataWithID(a_iWeaponID).a_strWeaponName + " at " + a_dDeadTime + ". He is a" + a_ePlayerRole);
     }

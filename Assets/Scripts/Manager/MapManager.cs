@@ -15,7 +15,8 @@ public class MapManager : SingletonPunCallbacks<MapManager>
 
     [SerializeField] PhotonView m_vPhotonView;
 
-    private Dictionary<int, PlayerDeadController> m_dicPlayerDeadInfo = new Dictionary<int, PlayerDeadController>();
+    private Dictionary<int, PlayerDeadController> m_dicPlayerDead = new Dictionary<int, PlayerDeadController>();
+    public IReadOnlyDictionary<int, PlayerDeadController> a_dicPlayerDead => m_dicPlayerDead;
 
     private bool m_bIsWeaponSpawned = false;
     public bool a_bIsWeaponSpawned { set { m_bIsWeaponSpawned = value; } }
@@ -65,7 +66,7 @@ public class MapManager : SingletonPunCallbacks<MapManager>
         vPhotonDataBody[2] = _iWeaponID;
         vPhotonDataBody[3] = _dTime;
         vPhotonDataBody[4] = _fKillerDistance;
-        vPhotonDataBody[5] = PhotonNetwork.CurrentRoom.GetPlayer(_iVictimActorNumber).NickName;
+        vPhotonDataBody[5] = GameManager.I.GetPlayerNickName(_iVictimActorNumber);
         // m_vPhotonView.RPC(nameof(SpawnPlayerDeadBodyRPC), RpcTarget.AllBuffered, _vPosition, _iVictimActorNumber, _iShooterActorNumber, _iWeaponID, _dTime, _fKillerDistance);
         PhotonNetwork.InstantiateRoomObject("PlayerDeadBody", _vPosition, Quaternion.identity, 0, vPhotonDataBody);
     }
@@ -85,15 +86,15 @@ public class MapManager : SingletonPunCallbacks<MapManager>
     // ActorNumber에 해당하는 유저의 PlayerDeadController 를 가져온다.
     public PlayerDeadController GetPlayerDead(int _iActorNumber)
     {
-        if (m_dicPlayerDeadInfo.ContainsKey(_iActorNumber))
-            return m_dicPlayerDeadInfo[_iActorNumber];
+        if (m_dicPlayerDead.ContainsKey(_iActorNumber))
+            return m_dicPlayerDead[_iActorNumber];
         else
             return null;
     }
 
     public void AddPlayerDeadInfo(int _iVictimActorNumber, PlayerDeadController vPlayerDead)
     {
-        m_dicPlayerDeadInfo.Add(_iVictimActorNumber, vPlayerDead);
+        m_dicPlayerDead.Add(_iVictimActorNumber, vPlayerDead);
     }
 
     //[PunRPC]
