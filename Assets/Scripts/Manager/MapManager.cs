@@ -40,10 +40,10 @@ public class MapManager : SingletonPunCallbacks<MapManager>
 
             if (vWeaponData != null)
             {
-                object[] vPhotonData = new object[1];
-                vPhotonData[0] = vWeaponData.a_iWeaponId;
+                object[] vPhotonDataWeapon = new object[1];
+                vPhotonDataWeapon[0] = vWeaponData.a_iWeaponId;
 
-                PhotonNetwork.InstantiateRoomObject("WeaponPrefab/WeaponBaseObject", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonData);
+                PhotonNetwork.InstantiateRoomObject("WeaponPrefab/WeaponBaseObject", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonDataWeapon);
             }
         }
 
@@ -51,29 +51,49 @@ public class MapManager : SingletonPunCallbacks<MapManager>
     }
 
     // 플레이어가 사망하면 해당 클라이언트가 MapManager를 호출하고, 호출된 매니저는 서버(마스터클라이언트)를 통해 시체를 생성한다.
-    public void SpawnPlayerDeadBody(Vector3 _vPosition, int _iVictimActorNumber, int _iShooterActorNumber, int _iWeaponID, double _dTime)
+    public void SpawnPlayerDeadBody(Vector3 _vPosition, int _iVictimActorNumber, int _iShooterActorNumber, int _iWeaponID, double _dTime, float _fKillerDistance)
     {
-        m_vPhotonView.RPC(nameof(SpawnPlayerDeadBodyRPC), RpcTarget.AllBuffered, _vPosition, _iVictimActorNumber, _iShooterActorNumber, _iWeaponID, _dTime);
+        m_vPhotonView.RPC(nameof(SpawnPlayerDeadBodyRPC), RpcTarget.MasterClient, _vPosition, _iVictimActorNumber, _iShooterActorNumber, _iWeaponID, _dTime, _fKillerDistance);
     }
 
     [PunRPC]
-    private void SpawnPlayerDeadBodyRPC(Vector3 _vPosition, int _iVictimActorNumber, int _iShooterActorNumber, int _iWeaponID, double _dTime)
+    public void SpawnPlayerDeadBodyRPC(Vector3 _vPosition, int _iVictimActorNumber, int _iShooterActorNumber, int _iWeaponID, double _dTime, float _fKillerDistance)
     {
-        // PlayerDeadController vPlayerDead = PhotonNetwork.InstantiateRoomObject("PlayerDeadBody", _vPosition, Quaternion.identity).GetComponent<PlayerDeadController>();
-
-        PlayerDeadController vPlayerDead = Instantiate(DataManager.I.a_vPlayerDeadBodyPrefab, _vPosition, Quaternion.identity).GetComponent<PlayerDeadController>();
-
-        vPlayerDead.InitData(_iVictimActorNumber, GameManager.I.GetPlayerRole(_iVictimActorNumber), _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
-
-        m_dicPlayerDeadInfo.Add(_iVictimActorNumber, vPlayerDead);
+        object[] vPhotonDataBody = new object[6];
+        vPhotonDataBody[0] = _iVictimActorNumber;
+        vPhotonDataBody[1] = _iShooterActorNumber;
+        vPhotonDataBody[2] = _iWeaponID;
+        vPhotonDataBody[3] = _dTime;
+        vPhotonDataBody[4] = _fKillerDistance;
+        vPhotonDataBody[5] = PhotonNetwork.CurrentRoom.GetPlayer(_iVictimActorNumber).NickName;
+        // m_vPhotonView.RPC(nameof(SpawnPlayerDeadBodyRPC), RpcTarget.AllBuffered, _vPosition, _iVictimActorNumber, _iShooterActorNumber, _iWeaponID, _dTime, _fKillerDistance);
+        PhotonNetwork.InstantiateRoomObject("PlayerDeadBody", _vPosition, Quaternion.identity, 0, vPhotonDataBody);
     }
 
+    //[PunRPC]
+    //private void SpawnPlayerDeadBodyRPC(Vector3 _vPosition, int _iVictimActorNumber, int _iShooterActorNumber, int _iWeaponID, double _dTime, float _fKillerDistance)
+    //{
+    //    // PlayerDeadController vPlayerDead = PhotonNetwork.InstantiateRoomObject("PlayerDeadBody", _vPosition, Quaternion.identity).GetComponent<PlayerDeadController>();
+
+    //    PlayerDeadController vPlayerDead = Instantiate(DataManager.I.a_vPlayerDeadBodyPrefab, _vPosition, Quaternion.identity).GetComponent<PlayerDeadController>();
+
+    //    vPlayerDead.InitData(_iVictimActorNumber, GameManager.I.GetPlayerRole(_iVictimActorNumber), _iShooterActorNumber, _iWeaponID, _dTime, _fKillerDistance, PhotonNetwork.CurrentRoom.GetPlayer(_iVictimActorNumber).NickName);
+
+    //    m_dicPlayerDeadInfo.Add(_iVictimActorNumber, vPlayerDead);
+    //}
+
+    // ActorNumber에 해당하는 유저의 PlayerDeadController 를 가져온다.
     public PlayerDeadController GetPlayerDead(int _iActorNumber)
     {
         if (m_dicPlayerDeadInfo.ContainsKey(_iActorNumber))
             return m_dicPlayerDeadInfo[_iActorNumber];
         else
             return null;
+    }
+
+    public void AddPlayerDeadInfo(int _iVictimActorNumber, PlayerDeadController vPlayerDead)
+    {
+        m_dicPlayerDeadInfo.Add(_iVictimActorNumber, vPlayerDead);
     }
 
     //[PunRPC]

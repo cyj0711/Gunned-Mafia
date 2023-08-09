@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         if(m_ePlayerState==E_PlayerState.Missing)
         {
             if(m_vPhotonView.IsMine)
-                ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
+                UIScoreBoardManager.I.UpdateAllPlayerScoreBoard();
         }
         else if(m_ePlayerState == E_PlayerState.Dead)
         {
@@ -231,16 +231,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_iCurrentHealth <= 0)  // 플레이어 사망
         {
-            MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time);
+            float fKillerDistance = GetKillerDistance(_iShooterActorNumber);
+            MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time, fKillerDistance);
             m_vWeaponController.DropAllWeapons();
             a_ePlayerState = E_PlayerState.Missing;
-            // ScoreBoardManager.I.UpdateAllPlayerScoreBoard();
+            // UIScoreBoardManager.I.UpdateAllPlayerScoreBoard();
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
 
         }
     }
+
+    private float GetKillerDistance(int _iKillerActorNumber)
+    {
+        return Vector2.Distance(transform.position, GameManager.I.GetPlayerController(_iKillerActorNumber).transform.position);
+    }
+
 
     void WeaponRotation(float _fAngle)
     {
@@ -287,11 +294,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         else if(Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기
         {
-            ScoreBoardManager.I.ShowScoreBoard(true);
+            UIScoreBoardManager.I.ShowScoreBoard(true);
         }
         else if (Input.GetKeyUp(KeyCode.Tab))   // 점수창 닫기
         {
-            ScoreBoardManager.I.ShowScoreBoard(false);
+            UIScoreBoardManager.I.ShowScoreBoard(false);
         }
     }
 
@@ -389,7 +396,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     private void OnDestroy()
     {
         GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
-        ScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
+        UIScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
         //Destroy(m_vScoreBoardItemController.gameObject);
     }
 }

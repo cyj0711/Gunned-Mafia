@@ -53,7 +53,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 0;
+        m_iPropertyNumberOfMafia = 1;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
@@ -77,7 +77,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_dStartTime = (double)m_htCustomValue["StartTime"];
             m_dEndTime = (double)m_htCustomValue["EndTime"];
         }
-        GameUIManager.I.SetGameState();
+        UIGameManager.I.SetGameState();
     }
 
     void Update()
@@ -434,7 +434,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         m_dStartTime = (double)m_htCustomValue["StartTime"];
         m_dEndTime = (double)m_htCustomValue["EndTime"];
 
-        GameUIManager.I.SetGameState();
+        UIGameManager.I.SetGameState();
     }
 
     //[PunRPC]
@@ -528,13 +528,13 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         if (vPlayerDeadController == null)
         {
-            Debug.LogError("Player(" + _iPlayerActorNumber + ") tried to get weapon(" + _iBodyActorNumber + "), But the weaponBase is null");
+            Debug.LogError("Player(" + _iPlayerActorNumber + ") tried to search body (" + _iBodyActorNumber + "), But the body data is null");
             return;
         }
 
         if (vPlayerDeadController.a_iFirstWitnessActorNumber == -1)
         {
-            vPlayerDeadController.a_iFirstWitnessActorNumber = _iPlayerActorNumber;
+            vPlayerDeadController.SetFirstWitnessActorNumber(_iPlayerActorNumber);
             m_vPhotonView.RPC(nameof(ReturnIsPlayerFirstWitnessRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iBodyActorNumber, _iPlayerActorNumber);
         }
     }

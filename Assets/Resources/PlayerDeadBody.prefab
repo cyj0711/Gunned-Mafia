@@ -231,6 +231,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_vNickNameText: {fileID: 4954249738543555742}
   m_vCanvasBody: {fileID: 4451981335790068623}
+  m_vPhotonView: {fileID: 5435397128927759686}
 --- !u!114 &5435397128927759686
 MonoBehaviour:
   m_ObjectHideFlags: 0

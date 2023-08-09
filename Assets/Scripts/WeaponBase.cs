@@ -119,7 +119,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
 
     public void SetAmmoUI()
     {
-        GameUIManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
+        UIGameManager.I.SetAmmo(m_vWeaponData.a_iAmmoCapacity, m_iCurrentAmmo, m_iRemainAmmo);
     }
 
     public void DropWeapon(Quaternion _WeaponRoration)
@@ -190,7 +190,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     {
         object[] vInstantiationData = info.photonView.InstantiationData;
 
-        if (vInstantiationData != null && vInstantiationData.Length == 1)
+        if (vInstantiationData != null && vInstantiationData.Length == 1)   // vInstantiationData 에는 weaponID 밖에 들어있지 않으므로 Length==1이다.
         {
             m_vWeaponData = DataManager.I.GetWeaponDataWithID((int)vInstantiationData[0]);
             InitWeaponData();
@@ -198,7 +198,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
             SetPosition();
         }
 
-        GameUIManager.I.DisplayLocation(PhotonNetwork.LocalPlayer.ActorNumber, transform.position, 30f);    // TODO: indicator 테스트용 코드, 테스트 완료시 반드시 해당 줄 삭제바람
+      //  UIGameManager.I.DisplayLocation(transform.position, 30f);    // TODO: indicator 테스트용 코드, 테스트 완료시 반드시 해당 줄 삭제바람
     }
 
     public int GetPhotonViewID()

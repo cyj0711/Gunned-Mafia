@@ -121,7 +121,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         }
         m_dicWeaponInventory.Clear();
         a_iCurrentWeaponViewID = -1;
-        GameUIManager.I.SetAmmoActive(false);
+        UIGameManager.I.SetAmmoActive(false);
     }
 
     // 키보드 g를 누르면 현재 들고있는 무기를 땅에 버린다.
@@ -136,7 +136,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
 
         a_iCurrentWeaponViewID = -1;
-        GameUIManager.I.SetAmmoActive(false);
+        UIGameManager.I.SetAmmoActive(false);
     }
 
     [PunRPC]
@@ -178,7 +178,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GameUIManager.I.SetAmmoActive(true);
+                    UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
             case 2:
@@ -186,7 +186,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GameUIManager.I.SetAmmoActive(true);
+                    UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
             case 3:
@@ -194,7 +194,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GameUIManager.I.SetAmmoActive(true);
+                    UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
             case 4:
@@ -202,7 +202,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 {
                     a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
-                    GameUIManager.I.SetAmmoActive(true);
+                    UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
         }
@@ -261,10 +261,10 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             //pView.RPC(nameof(SetCurrentWeaponRPC), RpcTarget.AllBuffered, weaponViewID);
             a_iCurrentWeaponViewID = _iWeaponViewID;
             vWeaponBase.SetAmmoUI();
-            GameUIManager.I.SetAmmoActive(true);
+            UIGameManager.I.SetAmmoActive(true);
         }
 
-        GameUIManager.I.CreateNotification("You picked up " + vWeaponBase.a_vWeaponData.name);
+        UIGameManager.I.CreateNotification("You picked up " + vWeaponBase.a_vWeaponData.name);
     }
 
     // 땅에 떨어진 무기를 플레이어가 가져갔다는 정보를 모든 유저에게 알려준다.

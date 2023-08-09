@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ScoreBoardManager : Singleton<ScoreBoardManager>
+public class UIScoreBoardManager : Singleton<UIScoreBoardManager>
 {
 
     [SerializeField] private GameObject m_vScoreBoardPanelObject;
@@ -48,6 +48,10 @@ public class ScoreBoardManager : Singleton<ScoreBoardManager>
         {
             ScoreBoardItemController vScoreBoardItemController = m_dicScoreBoardItems[_iActorNumber];
             m_dicScoreBoardItems.Remove(_iActorNumber);
+
+            if (m_dicMissingPlayerItems.ContainsKey(_iActorNumber))
+                m_dicMissingPlayerItems.Remove(_iActorNumber);
+
             vScoreBoardItemController.gameObject.transform.parent = null;
             Destroy(vScoreBoardItemController.gameObject);
             HideHeaderWithNoItem();

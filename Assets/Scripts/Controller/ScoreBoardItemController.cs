@@ -26,7 +26,7 @@ public class ScoreBoardItemController : MonoBehaviour
     {
         m_iActorNumber = _iActorNumber;
 
-        ScoreBoardManager.I.CreateScoreBoardItem(m_iActorNumber, this);
+        UIScoreBoardManager.I.CreateScoreBoardItem(m_iActorNumber, this);
 
         UpdateNameText(_strName);
         UpdatePingText(0);
@@ -96,6 +96,6 @@ public class ScoreBoardItemController : MonoBehaviour
         m_ePlayerState = _ePlayerState;
 
 
-        ScoreBoardManager.I.SetScoreBoardItemParent(m_iActorNumber, m_ePlayerState);
+        UIScoreBoardManager.I.SetScoreBoardItemParent(m_iActorNumber, m_ePlayerState);
     }
 }
