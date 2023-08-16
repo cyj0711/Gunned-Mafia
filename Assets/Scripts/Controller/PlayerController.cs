@@ -90,6 +90,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         else
         {
             SetCharacterSprite(true);
+            if(!m_vPhotonView.IsMine)
+            {
+                m_vCharacterUIController.SetCanvasBodyActive(false);
+            }
         }
 
 
@@ -217,7 +221,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
         // IsMine이 아닌 것들은 부드럽게 위치 동기화
-        else if ((transform.position - m_vCurrentPosition).sqrMagnitude >= 100) // 너무 멀리 떨어져있으면 바로 순간이동
+        else if ((transform.position - m_vCurrentPosition).sqrMagnitude >= 1) // 너무 멀리 떨어져있으면 바로 순간이동
             transform.position = m_vCurrentPosition;
         else
             transform.position = Vector3.Lerp(transform.position, m_vCurrentPosition, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
@@ -325,6 +329,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         SetDirection(fAngle);
 
         WeaponRotation(fAngle);
+    }
+
+    public void TeleportPlayer(float _fPositionX, float _fPositionY)
+    {
+        m_vPhotonView.RPC(nameof(TeleportPlayerRPC), RpcTarget.AllViaServer, _fPositionX, _fPositionY);
+    }
+
+    [PunRPC]
+    private void TeleportPlayerRPC(float _fPositionX, float _fPositionY)
+    {
+        transform.position = new Vector3(_fPositionX, _fPositionY);
     }
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인

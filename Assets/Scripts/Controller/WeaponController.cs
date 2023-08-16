@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Linq;
 
 public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 {
@@ -58,12 +59,18 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     void Start()
     {
-        //InitWeaponManager();
+        //InitWeaponController();
     }
 
-    public void InitWeaponManager()
+    public void InitWeaponController()
     {
+        m_vPhotonView.RPC(nameof(InitWeaponControllerRPC),RpcTarget.AllBuffered);
         a_iCurrentWeaponViewID = -1;
+    }
+
+    [PunRPC]
+    private void InitWeaponControllerRPC()
+    {
         m_dicWeaponInventory.Clear();
     }
 
@@ -111,20 +118,20 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         int i = 0;
         float fDropRotation = 360f / m_dicWeaponInventory.Count;
-        foreach (KeyValuePair<E_WeaponType,WeaponBase> _dicWeaponInventory in m_dicWeaponInventory)
+        foreach (var _dicWeaponInventory in m_dicWeaponInventory.Keys.ToList()) // foreach 문에서 Dictionary.remove를 진행하기 때문에(DropWeaponRPC에서) in m_dicWeaponInventory가 아닌 in m_dicWeaponInventory.Keys.ToList()로 진행
         {
-            WeaponBase _vCurrentWeapon = _dicWeaponInventory.Value;
-
-            m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.All,
-                _vCurrentWeapon.GetPhotonViewID(), _vCurrentWeapon.a_iCurrentAmmo, _vCurrentWeapon.a_iRemainAmmo, _vCurrentWeapon.transform.position, Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0f, 0f, i * fDropRotation)));
-            i++;
+            if (m_dicWeaponInventory.TryGetValue(_dicWeaponInventory, out WeaponBase _vCurrentWeapon))
+            {
+                m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.All,
+                    _vCurrentWeapon.GetPhotonViewID(), _vCurrentWeapon.a_iCurrentAmmo, _vCurrentWeapon.a_iRemainAmmo, _vCurrentWeapon.transform.position, Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0f, 0f, i * fDropRotation)));
+                i++;
+            }
         }
-        m_dicWeaponInventory.Clear();
-        a_iCurrentWeaponViewID = -1;
+        InitWeaponController();
         UIGameManager.I.SetAmmoActive(false);
     }
 
-    // 플레이어가 게임을 종료할 경우 모든 무기를 버린다 (게임을 종료하면 photon view 가 없어지기에 DropAllWeapons() 대신 해당 메소드 사용)
+    // 플레이어가 게임을 종료할 경우 모든 무기를 버린다 (게임을 종료하면 photon view 가 없어져 RPC를 못쓰기에 DropAllWeapons() 대신 해당 메소드 사용)
     public void DropAllWeaponsOnLeft()
     {
         int i = 0;
@@ -149,8 +156,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             i++;
         }
 
-        m_dicWeaponInventory.Clear();
-        m_iCurrentWeaponViewID = -1;
+        InitWeaponController();
     }
 
 
@@ -160,9 +166,9 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         if (m_vCurrentWeapon == null)
             return;
 
-        m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
+        // m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
 
-        m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.All, 
+        m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.AllBuffered, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
 
         a_iCurrentWeaponViewID = -1;
@@ -172,7 +178,13 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     [PunRPC]
     private void DropWeaponRPC(int _iCurrentWeaponViewID, int _iCurrentAmmo, int _iRemainAmmo, Vector3 _vWeaponPosition, Quaternion _qPlayerAimRotation)
     {
-        WeaponBase vCurrentWeapon = PhotonView.Find(_iCurrentWeaponViewID).gameObject.GetComponent<WeaponBase>();
+        PhotonView vWeaponPhotonView = PhotonView.Find(_iCurrentWeaponViewID);
+        if (vWeaponPhotonView == null || vWeaponPhotonView.gameObject == null) { return; }
+
+        WeaponBase vCurrentWeapon = vWeaponPhotonView.GetComponent<WeaponBase>();
+
+        // TODO: DropAllWeapons 를 통해 RPC를 호출할 시, 해당 Remove 때문에 dictionary 서순에 이상이 생겨서 DropAllWeapons 의 foreach 문에 에러발생.
+        m_dicWeaponInventory.Remove(vCurrentWeapon.a_vWeaponData.a_eWeaponType);
 
         //m_vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
 
@@ -294,24 +306,28 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             UIGameManager.I.SetAmmoActive(true);
         }
 
-        UIGameManager.I.CreateNotification("You picked up " + vWeaponBase.a_vWeaponData.name);
+        UIGameManager.I.SendNotification("You picked up " + vWeaponBase.a_vWeaponData.name);
     }
 
     // 땅에 떨어진 무기를 플레이어가 가져갔다는 정보를 모든 유저에게 알려준다.
     [PunRPC]
     private void PuckUpWeaponRPC(int iWeaponViewID)
     {
-        GameObject vWeaponObject = PhotonView.Find(iWeaponViewID).gameObject;
-        WeaponBase vWeaponBase = vWeaponObject.GetComponent<WeaponBase>();
+        // GameObject vWeaponObject = PhotonView.Find(iWeaponViewID).gameObject;
+        PhotonView vWeaponPhotonView = PhotonView.Find(iWeaponViewID);
+
+        if (vWeaponPhotonView == null || vWeaponPhotonView.gameObject == null) { return; }
+
+        WeaponBase vWeaponBase = vWeaponPhotonView.GetComponent<WeaponBase>();
 
         vWeaponBase.a_iOwnerPlayerActorNumber = m_vPhotonView.OwnerActorNr;
         vWeaponBase.SetWeaponCollider(false);
 
-        vWeaponObject.transform.parent = gameObject.transform;
-        vWeaponObject.transform.localPosition = new Vector3(0f, 0f, 0f);
-        vWeaponObject.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        vWeaponBase.transform.parent = gameObject.transform;
+        vWeaponBase.transform.localPosition = new Vector3(0f, 0f, 0f);
+        vWeaponBase.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
 
-        vWeaponObject.SetActive(false);
+        vWeaponBase.gameObject.SetActive(false);
 
         m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
     }

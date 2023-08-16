@@ -44,6 +44,11 @@ public class UIGameManager : Singleton<UIGameManager>
         SetTimeText();
     }
 
+    public void InitVariable()
+    {
+        m_bIsStartMessageSend = false;
+    }
+
     public void SetGameState()
     {
         E_GAMESTATE eGameState = GameManager.I.a_eGameState;
@@ -90,8 +95,15 @@ public class UIGameManager : Singleton<UIGameManager>
 
         if (!m_bIsStartMessageSend)
         {
-            CreateNotification("The Game is Begined !!");
-            CreateNotification("You are " + ePlayerRole);
+            if (ePlayerRole != E_PlayerRole.None)
+            {
+                SendNotification("The Game is Begined !!");
+                SendNotification("You are " + ePlayerRole);
+            }
+            else
+            {
+                SendNotification("You joined as a spectator.");
+            }
 
             m_bIsStartMessageSend = true;
         }
@@ -123,7 +135,7 @@ public class UIGameManager : Singleton<UIGameManager>
         m_vAmmoArea.SetActive(_bIsActive);
     }
 
-    public void CreateNotification(string _strText)
+    public void SendNotification(string _strText)
     {
         StartCoroutine(nameof(NotificationSmoothMoveCoroutine), _strText);
     }
@@ -159,14 +171,14 @@ public class UIGameManager : Singleton<UIGameManager>
     }
 
     // 모든 플레이어에게 알림 메세지 전송
-    public void CreateNotificationToAll(string _strText)
+    public void SendNotificationToAll(string _strText)
     {
-        m_vPhotonView.RPC(nameof(CreateNotificationToAllRPC), RpcTarget.AllViaServer, _strText);
+        m_vPhotonView.RPC(nameof(SendNotificationToAllRPC), RpcTarget.AllViaServer, _strText);
     }
 
     [PunRPC]
-    private void CreateNotificationToAllRPC(string _strText)
+    private void SendNotificationToAllRPC(string _strText)
     {
-        CreateNotification(_strText);
+        SendNotification(_strText);
     }
 }

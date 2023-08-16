@@ -19,17 +19,16 @@ public class MapManager : SingletonPunCallbacks<MapManager>
     public IReadOnlyDictionary<int, PlayerDeadController> a_dicPlayerDead => m_dicPlayerDead;
 
     private bool m_bIsWeaponSpawned = false;
-    public bool a_bIsWeaponSpawned { set { m_bIsWeaponSpawned = value; } }
 
-    private List<GameObject> m_lSpawnedWeaponObject = new List<GameObject>();
-    private List<GameObject> m_lSpawnedBodyObject = new List<GameObject>();
+    private List<WeaponBase> m_listSpawnedWeaponBase = new List<WeaponBase>();
+    private List<GameObject> m_listSpawnedBodyObject = new List<GameObject>();
 
-    public void InitObjectList()
+    public void InitVariable()
     {
-        m_lSpawnedWeaponObject.Clear();
-        m_lSpawnedBodyObject.Clear();
+        m_bIsWeaponSpawned = false;
     }
 
+    // 게임이 prepare 상태가 되면 맵에 무기들을 스폰한다.
     public void SpawnWeapons()
     {
         if (m_bIsWeaponSpawned)     // 서버 시간차이로 인한 SpawnWeapons 중복 호출을 방지한다.
@@ -49,6 +48,33 @@ public class MapManager : SingletonPunCallbacks<MapManager>
         }
 
         m_bIsWeaponSpawned = true;
+    }
+
+    public void AddListWeapon(WeaponBase _vWeaponBase)
+    {
+        m_listSpawnedWeaponBase.Add(_vWeaponBase);
+    }
+
+    // 게임이 waiting 상태가 되면 이때까지 생성된 모든 무기를 없앤다.
+    public void RemoveAllWeapons()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            foreach (WeaponBase _vWeaponBase in m_listSpawnedWeaponBase)
+                PhotonNetwork.Destroy(_vWeaponBase.gameObject);
+        }
+        m_listSpawnedWeaponBase.Clear();
+    }
+
+    // 게임이 waiting 상태가 되면 이때까지 생성된 모든 시체를 없앤다.
+    public void RemoveAllBodies()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            foreach (KeyValuePair<int,PlayerDeadController>kvPair  in m_dicPlayerDead)
+                PhotonNetwork.Destroy(kvPair.Value.gameObject);
+        }
+        m_dicPlayerDead.Clear();
     }
 
     // 플레이어가 사망하면 해당 클라이언트가 MapManager를 호출하고, 호출된 매니저는 서버(마스터클라이언트)를 통해 시체를 생성한다.
@@ -92,7 +118,7 @@ public class MapManager : SingletonPunCallbacks<MapManager>
             return null;
     }
 
-    public void AddPlayerDeadInfo(int _iVictimActorNumber, PlayerDeadController vPlayerDead)
+    public void AddDictionaryPlayerDead(int _iVictimActorNumber, PlayerDeadController vPlayerDead)
     {
         m_dicPlayerDead.Add(_iVictimActorNumber, vPlayerDead);
     }

@@ -24,7 +24,6 @@ public class LocationPingController : MonoBehaviour
     [SerializeField] Canvas m_vCanvas;
     [SerializeField] TargetIndicator m_vTargetIndicator;
 
-
     public void InitData(Transform _vPlayerTransform, Transform _vTargetTransform, float _fLifeTime, bool _bIsUpdatingPing = false)
     {
         m_vPlayerTransform = _vPlayerTransform;

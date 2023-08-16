@@ -104,6 +104,15 @@ public class GameManager : SingletonPunCallbacks<GameManager>
         // Debug.Log(gameState + " " + timer);
     }
 
+    // 게임을 재시작하기전에 기존 변수들 초기화
+    private void InitVariable()
+    {
+        m_bIsRoleSet = false;
+        MapManager.I.InitVariable();
+        UIGameManager.I.InitVariable();
+        UISearchManager.I.SetSearchPanelActive(false);
+    }
+
     public void AddPlayerController(int _iActorNumber, PlayerController _vPlayerController)
     {
         if (m_dicPlayerController.ContainsKey(_iActorNumber))
@@ -111,7 +120,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_dicPlayerController[_iActorNumber] = _vPlayerController;
         }
         else
-        { 
+        {
             m_dicPlayerController.Add(_iActorNumber, _vPlayerController);
         }
 
@@ -200,8 +209,8 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             if (PhotonNetwork.IsMasterClient)
             {
                 //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
-                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
                 MapManager.I.SpawnWeapons();
+                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
             }
         }
     }
@@ -302,29 +311,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             E_PlayerRole ePlayerRole = (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value);
             //m_dicPlayerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
             m_dicPlayerRoles.Add(iActorNumber, ePlayerRole);
-
-            //PlayerController vPlayerController = GetPlayerController(iActorNumber);
-            //if(vPlayerController!=null)
-            //{
-            //    // TODO: 플레이어 역할 UI 갱신
-            //    vPlayerController.a_vCharacterUIController.a_ePlayerRole = ePlayerRole;
-            //}
-            //CharacterUIController vCharacterUIManager = PhotonView.Find(int.Parse(kvPair.Key)).gameObject.GetComponentInChildren<CharacterUIController>();
-            //vCharacterUIManager.a_ePlayerRole=
         }
 
         m_iCurrentNumberOfCivil = _iCurrentNumberOfCivil;
         m_iCurrentNumberOfMafia = _iCurrentNumberOfMafia;
-
-        //// 각 플레이어의 역할에 따라 이름에 색깔을 부여한다.
-        //foreach (KeyValuePair<int, E_PlayerRole> _dicPlayerRoles in m_dicPlayerRoles)
-        //{
-        //    PlayerController vPlayerController = GetPlayerController(_dicPlayerRoles.Key);
-        //    if (vPlayerController != null)
-        //    {
-        //        vPlayerController.a_ePlayerRole = _dicPlayerRoles.Value;
-        //    }
-        //}
 
         int iLocalPlayerActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
         PlayerController vPlayerController = GetPlayerController(iLocalPlayerActorNumber);
@@ -341,6 +331,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         return eRoleToGet;
     }
+
     public E_PlayerRole GetPlayerRole() // 자기자신의 역할 받기
     {
         m_dicPlayerRoles.TryGetValue(PhotonNetwork.LocalPlayer.ActorNumber, out E_PlayerRole roleToGet);
@@ -382,7 +373,10 @@ public class GameManager : SingletonPunCallbacks<GameManager>
     // 플레이어가 죽거나 나갔을때 게임이 끝나는지 확인
     public void CheckGameOver(int _iPlayerActorNumber)
     {
-        m_vPhotonView.RPC(nameof(CheckGameOverRPC), RpcTarget.AllViaServer, _iPlayerActorNumber);
+        if (m_eGameState == E_GAMESTATE.Play)
+        {
+            m_vPhotonView.RPC(nameof(CheckGameOverRPC), RpcTarget.AllViaServer, _iPlayerActorNumber);
+        }
     }
 
     [PunRPC]
@@ -398,7 +392,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
             if (m_iCurrentNumberOfMafia <= 0 && PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                Debug.Log("CIVIL WIN !!");
+                UIGameManager.I.SendNotificationToAll("Civil Team Win !!");
 
                 SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
             }
@@ -408,7 +402,7 @@ public class GameManager : SingletonPunCallbacks<GameManager>
             m_iCurrentNumberOfCivil -= 1;
             if (m_iCurrentNumberOfCivil <= 0 && PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                Debug.Log("MAFIA WIN !!");
+                UIGameManager.I.SendNotificationToAll("Mafia Team Win !!");
 
                 SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
             }
@@ -421,21 +415,32 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         if (m_dProcessTimer >= m_dPropertyTimeForCooling)
         {
-            //gameState = E_GAMESTATE.Wait;
+            MapManager.I.RemoveAllWeapons();
+            MapManager.I.RemoveAllBodies();
+            GetPlayerController().a_vWeaponController.InitWeaponController();
+            UISearchManager.I.RemoveDicPlayerLocationPingAll();
+
+            InitVariable();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
-
+                // TODO: 라운드 초기화할 때 플레이어 무기 dictionary도 초기화하고, 위치 핑도 전부 없애야됨.
+                RespawnAllPlayers();
                 SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
             }
         }
     }
 
-    // 게임을 재시작하기전에 기존 변수들 초기화
-    public void InitGameEnvironment()
+    private void RespawnAllPlayers()
     {
-        m_bIsRoleSet = false;
-        MapManager.I.a_bIsWeaponSpawned = false;
+        foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
+        {
+            // _kvPair.Value.transform.position = new Vector3(UnityEngine.Random.Range(-0.5f, 1f), UnityEngine.Random.Range(-1f, 0f));
+            _kvPair.Value.TeleportPlayer(UnityEngine.Random.Range(-0.5f, 1f), UnityEngine.Random.Range(-1f, 0f));
+            _kvPair.Value.a_ePlayerState = E_PlayerState.Alive;
+            _kvPair.Value.a_ePlayerRole = E_PlayerRole.None;
+            _kvPair.Value.a_iCurrentHealth = 100;
+        }
     }
 
     void SetGameState(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
@@ -459,14 +464,6 @@ public class GameManager : SingletonPunCallbacks<GameManager>
 
         UIGameManager.I.SetGameState();
     }
-
-    //[PunRPC]
-    //void SetGameStateRPC(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
-    //{
-    //    m_dStartTime = _dStartTime;
-    //    m_dEndTime = _dEndTime;
-    //    m_eGameState = _eGameState;
-    //}
 
     public double GetTime()
     {

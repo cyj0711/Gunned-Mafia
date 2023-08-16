@@ -112,7 +112,7 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
 
         if (vPlayerController == null)
         {
-            Debug.LogError("Body " + m_iVictimActorNumber + " is touched, but " + collision + "is null");
+            //Debug.LogError("Body " + m_iVictimActorNumber + " is touched, but " + collision + "is null");
             return;
         }
 
@@ -132,7 +132,7 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
 
         if (vPlayerController == null)
         {
-            Debug.LogError("Body " + m_iVictimActorNumber + " is touched, but " + collision + "is null");
+            //Debug.LogError("Body " + m_iVictimActorNumber + " is touched, but " + collision + "is null");
             return;
         }
 
@@ -152,7 +152,7 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
 
     public void NotifyDead(int _iFirstWitness)
     {
-        UIGameManager.I.CreateNotificationToAll(PhotonNetwork.CurrentRoom.GetPlayer(_iFirstWitness).NickName + " found the body of " + m_strVictimNickName + ". He was " + m_ePlayerRole + "!");
+        UIGameManager.I.SendNotificationToAll(PhotonNetwork.CurrentRoom.GetPlayer(_iFirstWitness).NickName + " found the body of " + m_strVictimNickName + ". He was " + m_ePlayerRole + "!");
 
         m_vPhotonView.RPC(nameof(SetBodyNameRPC), RpcTarget.AllBuffered, _iFirstWitness);
 
@@ -181,7 +181,7 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
             InitData((int)vInstantiationData[0], GameManager.I.GetPlayerRole((int)vInstantiationData[0]), (int)vInstantiationData[1],
                 (int)vInstantiationData[2], (double)vInstantiationData[3], (float)vInstantiationData[4], (string)vInstantiationData[5]);
 
-            MapManager.I.AddPlayerDeadInfo((int)vInstantiationData[0], this);
+            MapManager.I.AddDictionaryPlayerDead((int)vInstantiationData[0], this);
 
             // 사망한 유저의 위치가 탐정에게 표시중이었다면, 표시 위치를 해당 유저의 시체로 바꾼다.
             if(UISearchManager.I.a_dicPlayerLocationPing.ContainsKey(m_iVictimActorNumber))

@@ -97,7 +97,7 @@ public class UISearchManager : Singleton<UISearchManager>
 
             if (vKillerPlayerBody == null)  // 범인의 시체마저 존재하지않으면 추적할 방법이 없으므로 return
             {
-                UIGameManager.I.CreateNotification("Can't find the killer...");
+                UIGameManager.I.SendNotification("Can't track the killer...");
                 return;
             }
             vKillerTransform = vKillerPlayerBody.transform;
@@ -135,6 +135,7 @@ public class UISearchManager : Singleton<UISearchManager>
 
         int iActorNumber = -1;
 
+        // 추적 핑이 시체를 추적하는지 살아있는 플레이어를 추적하는지 확인
         if (vPlayerDeadController != null)
         {
             iActorNumber = vPlayerDeadController.a_iVictimActorNumber;
@@ -166,6 +167,7 @@ public class UISearchManager : Singleton<UISearchManager>
         DisplayLocation(PhotonView.Find(_iTargetViewID).transform, _fDisplayTime);
     }
 
+    // 위치 추적 핑이 시간이 사라지면 dictionary 에서도 제거한다.
     public void RemoveDicPlayerLocationPing(int _iKey)
     {
         if (!m_dicPlayerLocationPing.ContainsKey(_iKey))
@@ -179,7 +181,17 @@ public class UISearchManager : Singleton<UISearchManager>
         Destroy(vLocationPingController.gameObject);
     }
 
-    // dna 추적 중에 추적당한 플레이어가 사망하면 해당 플레이어의 시체를 대신 표시한다
+    public void RemoveDicPlayerLocationPingAll()
+    {
+        foreach(KeyValuePair<int, LocationPingController>kvPair in m_dicPlayerLocationPing)
+        {
+            kvPair.Value.SetTargetPlayerActorNumber(-1);
+            Destroy(kvPair.Value.gameObject);
+        }
+        m_dicPlayerLocationPing.Clear();
+    }
+
+    // dna 추적 중에 추적당한 플레이어가 사망하면 해당 플레이어의 시체를 대신 표시한다.
     public void ChangeTrackedPlayerToBody(int _iDeadPlayerActorNumber)
     {
         if (!m_dicPlayerLocationPing.ContainsKey(_iDeadPlayerActorNumber))
@@ -191,6 +203,10 @@ public class UISearchManager : Singleton<UISearchManager>
         if (vLocationPingController != null && vPlayerDeadController != null)
         {
             vLocationPingController.SetTargetTransform(vPlayerDeadController.transform);
+        }
+        else
+        {
+            RemoveDicPlayerLocationPing(_iDeadPlayerActorNumber);
         }
     }
 }

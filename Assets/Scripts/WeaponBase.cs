@@ -48,6 +48,8 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
         m_iCurrentAmmo = m_vWeaponData.a_iAmmoCapacity;
         m_iRemainAmmo = m_vWeaponData.a_iMaxAmmo;
     }
+
+    // 남이 사용하고 버린 무기를 주울 경우 탄창을 동기화한다.
     public void InitWeaponData(int _iCurrentAmmo, int _iRemainAmmo)
     {
         InitCommonData();
@@ -172,7 +174,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     [PunRPC]
     public void ReturnPositionRPC(int _iOwnerPlayerActorNumber, Vector3 _vPosition)
     {
-        if(_iOwnerPlayerActorNumber==-1)
+        if (_iOwnerPlayerActorNumber == -1)
         {
             transform.parent = MapManager.I.a_vDroppedItem;
             transform.position = _vPosition;
@@ -196,9 +198,13 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
             InitWeaponData();
 
             SetPosition();
-        }
 
-      //  UIGameManager.I.DisplayLocation(transform.position, 30f);    // TODO: indicator 테스트용 코드, 테스트 완료시 반드시 해당 줄 삭제바람
+            MapManager.I.AddListWeapon(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public int GetPhotonViewID()
