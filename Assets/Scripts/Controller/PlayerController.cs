@@ -410,6 +410,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     private void OnDestroy()
     {
+        if (m_vPhotonView == null || m_vPhotonView.IsMine) 
+            return;
+
         GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
         UIScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
         //Destroy(m_vScoreBoardItemController.gameObject);

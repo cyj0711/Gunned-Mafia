@@ -8,13 +8,9 @@ using UnityEngine.UI;
 //public class NetworkManager : MonoBehaviourPunCallbacks
 public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 {
-    public InputField NickNameInput;
-    public GameObject DisconnectPanel;
-    public GameObject RespawnPanel;
-
     private void Start()    // singleton 적용하기전엔 Awake 함수였슴
     {
-        Screen.SetResolution(960, 540, false);
+        //Screen.SetResolution(960, 540, false);
 
         // 이거 쓰면 더 빨라진다는데 정확힌 모름
         PhotonNetwork.SendRate = 60;
@@ -82,6 +78,6 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     public override void OnDisconnected(DisconnectCause cause)
     {
         //DisconnectPanel.SetActive(true);
-        RespawnPanel.SetActive(false);
+        //RespawnPanel.SetActive(false);
     }
 }

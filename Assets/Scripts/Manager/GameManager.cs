@@ -14,7 +14,7 @@ public enum E_GAMESTATE  // 현재 게임 방의 진행 상태
     Cooling     // 모든 게임이 끝나고 새 라운드를 기다리는 상태(카운트다운)
 }
 
-public class GameManager : SingletonPunCallbacks<GameManager>
+public class GameManager : Singleton<GameManager>
 {
     private E_GAMESTATE m_eGameState;
     public E_GAMESTATE a_eGameState { get { return m_eGameState; } }

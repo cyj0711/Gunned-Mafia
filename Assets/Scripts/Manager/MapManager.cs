@@ -6,7 +6,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using System;
 
-public class MapManager : SingletonPunCallbacks<MapManager>
+public class MapManager : Singleton<MapManager>
 {
     public List<WeaponSpawn> weaponSpawnPoints = new List<WeaponSpawn>();
 

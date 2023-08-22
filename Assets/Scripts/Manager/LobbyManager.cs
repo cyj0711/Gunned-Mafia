@@ -1,72 +1,94 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine.UI;
 
-public class LobbyManager : MonoBehaviourPunCallbacks
+public class LobbyManager : SingletonPunCallbacks<LobbyManager>
 {
-    public Text connectionInfoText;
-    public Button joinButton;
-    public InputField NickNameInput;
+    [SerializeField] GameObject m_vCreateRoomPanelObject;
+    [SerializeField] GameObject m_vRoomListScrollViewObject;
 
-    private void Start()
+    [SerializeField] TMP_InputField m_vNickNameInputField;
+
+    [SerializeField] TMP_InputField m_vRoomNameInputField;
+    [SerializeField] TMP_InputField m_vMaxPlayerInputField;
+    [SerializeField] TMP_InputField m_vRoomPasswordInputField;
+
+    private Dictionary<string, RoomData> m_dicRoomData = new Dictionary<string, RoomData>();
+
+    [SerializeField] GameObject m_vRoomEntityPrefab;
+    [SerializeField] Transform m_vRoomListContent;
+
+    void Start()
     {
-        //Screen.SetResolution(960, 540, false);
-
-        // 이거 쓰면 더 빨라진다는데 정확힌 모름
-        PhotonNetwork.SendRate = 60;
-        PhotonNetwork.SerializationRate = 30;
-
-        PhotonNetwork.ConnectUsingSettings();   // 여기서 connect가 완료되면 OnConnectedToMaster() 함수가 자동으로 호출된다.
-
-        joinButton.interactable = false;
-        connectionInfoText.text = "Connecting to Master Server...";
+        PhotonNetwork.JoinLobby();
+        m_vMaxPlayerInputField.onEndEdit.AddListener(CheckValidMaxPlayer);
     }
 
-    public override void OnConnectedToMaster()
+    public override void OnJoinedLobby()
     {
-        joinButton.interactable = true;
-        connectionInfoText.text = "Online : Connected to Master Server";
+        m_vRoomListScrollViewObject.SetActive(true);
     }
 
-    public override void OnDisconnected(DisconnectCause cause)
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        joinButton.interactable = false;
-        connectionInfoText.text = $"Offline : Connection Disabled {cause.ToString()} - Try reconnecting...";
-
-        PhotonNetwork.ConnectUsingSettings();   // 접속에 실패해도 재접속 시도
-    }
-
-    public void Connect()
-    {
-        joinButton.interactable = false;    // 중복 접속 시도 차단
-
-        if (PhotonNetwork.IsConnected)
+        foreach (RoomInfo _room in roomList)
         {
-            connectionInfoText.text = "Connecting to Random Room...";
-            PhotonNetwork.JoinRandomRoom(); // 빈 방을 찾는데 실패하면 OnJoinRandomFailed() 함수 자동 호출
-        }
-        else
-        {
-            connectionInfoText.text = "Offline : Connection Disabled - Try reconnecting...";
-
-            PhotonNetwork.ConnectUsingSettings();   // 접속에 실패해도 재접속 시도
+            // 방이 삭제됨
+            if (_room.RemovedFromList == true)
+            {
+                Destroy(m_dicRoomData[_room.Name].gameObject);
+            }
+            else if(m_dicRoomData.ContainsKey(_room.Name)==false)
+            {
+                RoomData vRoomData = Instantiate(m_vRoomEntityPrefab, m_vRoomListContent).GetComponent<RoomData>();
+                vRoomData.SetRoomInfo(_room);
+                m_dicRoomData.Add(_room.Name, vRoomData);
+            }
+            else
+            {
+                m_dicRoomData[_room.Name].SetRoomInfo(_room);
+            }
         }
     }
 
-    public override void OnJoinRandomFailed(short returnCode, string message)
+    // Activate by Create Room Button
+    public void OpenCreateRoomPanel()
     {
-        connectionInfoText.text = "There is no empty room, Creating new Room.";
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 8 });
+        m_vCreateRoomPanelObject.SetActive(true);
+    }
+
+    // Activate by Cancel Button
+    public void CloseCreateRoomPanel()
+    {
+        m_vCreateRoomPanelObject.SetActive(false);
+    }
+
+    // Activate by Create Button
+    public void CreateRoom()
+    {
+        PhotonNetwork.LocalPlayer.NickName = m_vNickNameInputField.text;
+
+        RoomOptions roomOption = new RoomOptions();
+        roomOption.MaxPlayers = byte.Parse(m_vMaxPlayerInputField.text);
+        roomOption.IsOpen = true; //방이 열려있는지 닫혀있는지 설정
+        roomOption.IsVisible = true; //비공개 방 여부
+
+        PhotonNetwork.CreateRoom(m_vRoomNameInputField.text, roomOption, null);
     }
 
     public override void OnJoinedRoom()
     {
-        PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
-        connectionInfoText.text = "Connected with Room.";
         PhotonNetwork.LoadLevel("GamePlay");    // SceneManager.LoadScene을 사용하면 각 유저가 개별의 씬을 로드하기때문에(동기화가 안됨) 사용하면안됨
 
+    }
+
+    // Activate by Max Player TMP Input
+    public void CheckValidMaxPlayer(string _strInput)
+    {
+        m_vMaxPlayerInputField.text = Mathf.Clamp(int.Parse(_strInput), 2, 16).ToString();
     }
 }

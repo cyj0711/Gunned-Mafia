@@ -15,7 +15,7 @@ MonoBehaviour:
   AppSettings:
     AppIdRealtime: 3e915270-38e4-4dce-97db-8d0beafbb633
     AppIdFusion: 
-    AppIdChat: 
+    AppIdChat: bfd8b4ed-10be-41a1-b17e-bc2400125c25
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
@@ -74,5 +74,5 @@ MonoBehaviour:
   - InitWeaponControllerRPC
   - TeleportPlayerRPC
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1
