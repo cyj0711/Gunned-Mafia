@@ -18,6 +18,12 @@ public class RoomData : MonoBehaviour
 
     public void JoinRoom()
     {
+        if(LobbyManager.I.a_vNickNameInputField.text=="")
+        {
+            LobbyManager.I.SetActiveNickNameInvalidMessage(true);
+            return;
+        }
+
         if (m_vRoomInfo == null) return;
 
         PhotonNetwork.JoinRoom(m_vRoomInfo.Name);

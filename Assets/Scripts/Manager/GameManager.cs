@@ -169,6 +169,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    // 나간 플레이어의 닉네임을 받기 위해 이때까지 참여한 모든 유저의 닉네임을 저장해둔다.
     public string GetPlayerNickName(int _iActorNumber)
     {
         if (m_dicPlayerNickName.ContainsKey(_iActorNumber))
@@ -376,6 +377,15 @@ public class GameManager : Singleton<GameManager>
         if (m_eGameState == E_GAMESTATE.Play)
         {
             m_vPhotonView.RPC(nameof(CheckGameOverRPC), RpcTarget.AllViaServer, _iPlayerActorNumber);
+        }
+        // 게임 준비 도중 인원수가 적어지면 다시 대기상태로 변경
+        else if(m_eGameState==E_GAMESTATE.Prepare)
+        {
+            if(PhotonNetwork.IsMasterClient)
+            {
+                if(PhotonNetwork.CurrentRoom.PlayerCount< m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective)
+                    SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
+            }
         }
     }
 

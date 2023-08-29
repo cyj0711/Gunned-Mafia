@@ -118,7 +118,9 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         int i = 0;
         float fDropRotation = 360f / m_dicWeaponInventory.Count;
-        foreach (var _dicWeaponInventory in m_dicWeaponInventory.Keys.ToList()) // foreach 문에서 Dictionary.remove를 진행하기 때문에(DropWeaponRPC에서) in m_dicWeaponInventory가 아닌 in m_dicWeaponInventory.Keys.ToList()로 진행
+
+        // foreach 문에서 Dictionary.remove를 진행(RPC 함수에서 진행함)하기 때문에(DropWeaponRPC에서) in m_dicWeaponInventory가 아닌 in m_dicWeaponInventory.Keys.ToList()로 진행
+        foreach (var _dicWeaponInventory in m_dicWeaponInventory.Keys.ToList())
         {
             if (m_dicWeaponInventory.TryGetValue(_dicWeaponInventory, out WeaponBase _vCurrentWeapon))
             {
@@ -183,18 +185,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         WeaponBase vCurrentWeapon = vWeaponPhotonView.GetComponent<WeaponBase>();
 
-        // TODO: DropAllWeapons 를 통해 RPC를 호출할 시, 해당 Remove 때문에 dictionary 서순에 이상이 생겨서 DropAllWeapons 의 foreach 문에 에러발생.
         m_dicWeaponInventory.Remove(vCurrentWeapon.a_vWeaponData.a_eWeaponType);
-
-        //m_vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
-
-        //m_vCurrentWeapon.transform.parent = MapManager.I.a_vDroppedItem;
-        //m_vCurrentWeapon.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        //if (m_vCurrentWeapon.gameObject.transform.localScale.y < 0)
-        //    m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
-        //        (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
-
-        //m_vCurrentWeapon.DropWeapon();
 
         vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
 
