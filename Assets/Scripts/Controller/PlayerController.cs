@@ -213,7 +213,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         if(m_vPhotonView.IsMine)
         {
-            if (!ChatManagerWithoutPhotonChat.I.a_vInputField.isFocused)
+            if (!ChatManager.I.a_vInputField.isFocused)
             {
                 UpdateWalkingProcess();
                 UpdateWeaponAimProcess();
@@ -246,7 +246,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
-
+            ChatManager.I.ToggleTeamChat(false);
         }
     }
 
@@ -422,7 +422,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (PhotonNetwork.IsMasterClient) 
         {
-            ChatManagerWithoutPhotonChat.I.SendChat(E_ChatType.System, GameManager.I.GetPlayerNickName(m_vPhotonView.OwnerActorNr) + " left the game.");
+            ChatManager.I.SendChat(E_ChatType.System, GameManager.I.GetPlayerNickName(m_vPhotonView.OwnerActorNr) + " left the game.");
             // 살아있는 플레이어가 나가면 해당 플레이어의 시체를 소환한다.
             if (!MapManager.I.a_dicPlayerDead.ContainsKey(m_vPhotonView.OwnerActorNr) && m_ePlayerState==E_PlayerState.Alive)
             {

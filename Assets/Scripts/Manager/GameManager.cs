@@ -54,7 +54,7 @@ public class GameManager : Singleton<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 1;
+        m_iPropertyNumberOfMafia = 2;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
@@ -429,12 +429,12 @@ public class GameManager : Singleton<GameManager>
             MapManager.I.RemoveAllBodies();
             GetPlayerController().a_vWeaponController.InitWeaponController();
             UISearchManager.I.RemoveDicPlayerLocationPingAll();
+            ChatManager.I.ToggleTeamChat(false);
 
             InitVariable();
 
             if (PhotonNetwork.IsMasterClient)
             {
-                // TODO: 라운드 초기화할 때 플레이어 무기 dictionary도 초기화하고, 위치 핑도 전부 없애야됨.
                 RespawnAllPlayers();
                 SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
             }
