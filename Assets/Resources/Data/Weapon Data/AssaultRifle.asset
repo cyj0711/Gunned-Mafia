@@ -22,6 +22,8 @@ MonoBehaviour:
   m_fReloadTime: 0
   m_bAutoFire: 1
   m_fRateOfFire: 0.2
+  m_fShootRecoil: 0
+  m_fZoomFactor: 2
   m_eWeaponType: 0
   m_eBulleyType: 0
   m_vWeaponPrefab: {fileID: 261346361453317896, guid: f9ffde3cdea2494468cc37e9c77837db,

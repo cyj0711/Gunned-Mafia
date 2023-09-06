@@ -15,6 +15,11 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     private WeaponBase m_vCurrentWeapon;
 
     private bool m_bSeeingRight = true;
+    private bool m_bIsShooting = false;
+    private bool m_bIsAiming = false;
+
+    private Coroutine m_coToggleAim;
+    //private Vector3 m_vLastMousePosition;
 
     //*************** Synchronization Properties *******************
     [SerializeField] int m_iCurrentWeaponViewID;   // 아무것도 안들었을땐 -1 로 설정해주자.
@@ -66,6 +71,8 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         m_vPhotonView.RPC(nameof(InitWeaponControllerRPC),RpcTarget.AllBuffered);
         a_iCurrentWeaponViewID = -1;
+        m_bIsShooting = false;
+        m_bIsAiming = false;
     }
 
     [PunRPC]
@@ -79,7 +86,79 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         if(m_vCurrentWeapon!=null)
         {
-            m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z, PhotonNetwork.LocalPlayer.ActorNumber);
+            if (m_vCurrentWeapon.a_vWeaponData.a_bAutoFire || !m_bIsShooting)
+            {
+                m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z, PhotonNetwork.LocalPlayer.ActorNumber);
+                m_bIsShooting = true;
+            }
+        }
+    }
+    public void StopShooting()
+    {
+        m_bIsShooting = false;
+    }
+
+    public void ToggleAim()
+    {
+        ToggleAim(!m_bIsAiming);
+    }
+
+    // 무기의 조준을 on off한다.
+    public void ToggleAim(bool _bIsAiming)
+    {
+        if (m_vCurrentWeapon == null) return;
+
+        m_bIsAiming = _bIsAiming;
+
+        // 조준
+        if (m_bIsAiming)
+        {
+            if (m_coToggleAim == null)
+            {
+                m_coToggleAim = StartCoroutine(AimCoroutine());
+            }
+        }
+        // 조준 해제
+        else
+        {
+            if (m_coToggleAim != null)
+            {
+                StopCoroutine(m_coToggleAim);
+                m_coToggleAim = null;
+            }
+
+            CameraManager.I.SetCameraFollowerPosition(Vector3.zero);
+        }
+    }
+
+    private IEnumerator AimCoroutine()
+    {
+        Vector3 m_vLastMousePosition = Input.mousePosition;
+        bool bIsClickedFrame = true;    // AimCoroutine 이 호출된 바로 그 프레임인지 확인(우클릭 누르자마자 바로 조준하는 용도)
+
+        while (m_bIsAiming)
+        {
+            Vector3 vCurrentMousePosition = Input.mousePosition;
+
+            // if (Vector3.Distance(m_vLastMousePosition, vCurrentMousePosition) > 0.2f 의  0.2f 는 보정값임.
+            if (Vector3.Distance(m_vLastMousePosition, vCurrentMousePosition) > 0.2f || bIsClickedFrame)
+            {
+                Vector3 vAimPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,
+            Input.mousePosition.y, -Camera.main.transform.position.z)) - transform.parent.transform.position;
+
+                // 조준하고자 하는 마우스 위치와 플레이어의 거리는 무기의 조준 임계치를 넘을 수 없다.
+                if (vAimPosition.magnitude > m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor)
+                {
+                    vAimPosition = vAimPosition.normalized * m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor;
+                }
+
+                CameraManager.I.SetCameraFollowerPosition(vAimPosition);
+
+            }
+            m_vLastMousePosition = vCurrentMousePosition;
+            bIsClickedFrame = false;
+
+            yield return null;
         }
     }
 
@@ -90,6 +169,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             m_vCurrentWeapon.Reload();
         }
     }
+
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인
     public void SetDirection(bool playerSeeingRight)
@@ -114,6 +194,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     }
 
+    // 플레이어가 사망하면 모든 무기를 떨어트린다.
     public void DropAllWeapons()
     {
         int i = 0;
@@ -169,6 +250,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
             return;
 
         // m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
+        ToggleAim(false);
 
         m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.AllBuffered, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
@@ -202,9 +284,16 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     }
 
     // 숫자키를 입력받으면 그에 해당하는 무기로 변경
-    public void ChangeCurrentWeapon(int iInputKeyNumber)
+    public void ChangeCurrentWeapon(int _iInputKeyNumber)
     {
-        switch(iInputKeyNumber)
+        // 교체하려는 무기가 현재 들고있으면 무시함
+        if (m_vCurrentWeapon != null && _iInputKeyNumber == ((int)m_vCurrentWeapon.a_vWeaponData.a_eWeaponType + 1))
+            return;
+
+        StopShooting();
+        ToggleAim(false);
+
+        switch(_iInputKeyNumber)
         {
             case 1:
                 if(CheckCanEquipWeaponType(E_WeaponType.Primary))

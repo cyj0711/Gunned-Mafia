@@ -152,9 +152,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         if (m_vPhotonView.IsMine)
         {
             // 2D 카메라
-            var vCinemachineCamera = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
-            vCinemachineCamera.Follow = transform;
-            vCinemachineCamera.LookAt = transform;
+            CameraManager.I.SetCinemachineCameraFollowAt(transform);
         }
 
     }
@@ -238,6 +236,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_iCurrentHealth <= 0)  // 플레이어 사망
         {
+            m_vWeaponController.ToggleAim(false);
             float fKillerDistance = GetKillerDistance(_iShooterActorNumber);
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time, fKillerDistance);
             m_vWeaponController.DropAllWeapons();
@@ -263,10 +262,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void UpdateWeaponShotProcess()
     {
+        // 총 발사
         if(Input.GetMouseButton(0))
         {
             m_vWeaponController.Shoot();
 
+        }
+        // 발사 중지
+        else if(Input.GetMouseButtonUp(0))
+        {
+            m_vWeaponController.StopShooting();
+        }
+
+        // 무기 조준
+        if(Input.GetMouseButtonDown(1))
+        {
+            m_vWeaponController.ToggleAim();
         }
     }
 

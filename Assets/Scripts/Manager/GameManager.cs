@@ -54,7 +54,7 @@ public class GameManager : Singleton<GameManager>
         m_dPropertyTimeForPlay = 300f;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 2;
+        m_iPropertyNumberOfMafia = 1;
         m_iPropertyNumberOfDetective = 1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
@@ -204,9 +204,6 @@ public class GameManager : Singleton<GameManager>
     {
         if (PhotonNetwork.CurrentRoom.PlayerCount >= (m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective))
         {
-            //startTime = PhotonNetwork.Time;
-            //endTime = timeForPrepare;
-            //gameState = E_GAMESTATE.Prepare;
             if (PhotonNetwork.IsMasterClient)
             {
                 //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPrepare, E_GAMESTATE.Prepare);
@@ -222,13 +219,7 @@ public class GameManager : Singleton<GameManager>
 
         if (m_dProcessTimer >= m_dPropertyTimeForPrepare)
         {
-            //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-            //{
-            //    Debug.Log(player.NickName);
-            //}
-            //startTime = PhotonNetwork.Time;
-            //endTime = timeForPlay;
-            //gameState = E_GAMESTATE.Play;
+
             if (PhotonNetwork.IsMasterClient)
             {
                 SetPlayerRole();
@@ -236,16 +227,6 @@ public class GameManager : Singleton<GameManager>
 
                 SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
             }
-            ////else
-            //{
-            //    //.Parse(PhotonNetwork.CurrentRoom.CustomProperties["PlayerRoles"].ToString());
-
-            //    //playerRoles.Clear();
-            //    //Hashtable ht = PhotonNetwork.CurrentRoom.CustomProperties;
-            //    //ht.TryGetValue("PlayerRoles", out var pr);
-            //    //playerRoles = (Dictionary<int, E_PlayerRole>)pr;
-            //    //playerRoles = (Dictionary<int, E_PlayerRole>)PhotonNetwork.CurrentRoom.CustomProperties["PlayerRoles"];
-            //}
         }
     }
 
@@ -291,11 +272,6 @@ public class GameManager : Singleton<GameManager>
         string strPlayerRoles = StringConverter.I.ConvertDictionaryToString<int, E_PlayerRole>(m_dicPlayerRoles);
         m_vPhotonView.RPC(nameof(SetPlayerRoleRPC), RpcTarget.All, strPlayerRoles, vSortedPlayers.Length - m_iPropertyNumberOfMafia, m_iPropertyNumberOfMafia);
 
-        //for (int i = 0; i < vSortedPlayers.Length; i ++)
-        //{
-        //    Debug.Log(vSortedPlayers[i].NickName + " : " + m_dicPlayerRoles[vSortedPlayers[i].ActorNumber].ToString());
-        //}
-
         m_bIsRoleSet = true;
     }
 
@@ -310,7 +286,6 @@ public class GameManager : Singleton<GameManager>
         {
             int iActorNumber = int.Parse(kvPair.Key);
             E_PlayerRole ePlayerRole = (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value);
-            //m_dicPlayerRoles.Add(int.Parse(kvPair.Key), (E_PlayerRole)Enum.Parse(typeof(E_PlayerRole), kvPair.Value));
             m_dicPlayerRoles.Add(iActorNumber, ePlayerRole);
         }
 
@@ -359,13 +334,9 @@ public class GameManager : Singleton<GameManager>
 
         if (m_dProcessTimer >= m_dPropertyTimeForPlay)
         {
-            //startTime = PhotonNetwork.Time;
-            //endTime = timeForCooling;
-            //gameState = E_GAMESTATE.Cooling;
+
             if (PhotonNetwork.IsMasterClient)
             {
-                //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
-
                 SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Cooling);
             }
         }
@@ -392,8 +363,6 @@ public class GameManager : Singleton<GameManager>
     [PunRPC]
     private void CheckGameOverRPC(int _iPlayerActorNumber)
     {
-       // m_dicLivingPlayerRoles.Remove(_iPlayerActorNumber);
-
         E_PlayerRole eDeadPlayerRole = GetPlayerRole(_iPlayerActorNumber);
 
         if (eDeadPlayerRole == E_PlayerRole.Mafia)
@@ -445,7 +414,6 @@ public class GameManager : Singleton<GameManager>
     {
         foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
         {
-            // _kvPair.Value.transform.position = new Vector3(UnityEngine.Random.Range(-0.5f, 1f), UnityEngine.Random.Range(-1f, 0f));
             _kvPair.Value.TeleportPlayer(UnityEngine.Random.Range(-0.5f, 1f), UnityEngine.Random.Range(-1f, 0f));
             _kvPair.Value.a_ePlayerState = E_PlayerState.Alive;
             _kvPair.Value.a_ePlayerRole = E_PlayerRole.None;

@@ -745,6 +745,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 48742444}
   m_CullTransparentMesh: 0
+--- !u!1 &69035688
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 69035689}
+  m_Layer: 0
+  m_Name: Camera Follower
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &69035689
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69035688}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &69867524
 GameObject:
   m_ObjectHideFlags: 0
@@ -3430,7 +3460,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponsToSpawn:
   - {fileID: 11400000, guid: 4307d5b12e36bc446bd0a5315263dc03, type: 2}
-  - {fileID: 11400000, guid: 7315993ea81b33340bad58c6176aff75, type: 2}
 --- !u!1 &391170171
 GameObject:
   m_ObjectHideFlags: 0
@@ -9515,6 +9544,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   m_vCameraMain: {fileID: 1499631965}
+  m_vCinemachineCamera: {fileID: 371021240}
+  m_vCameraFollower: {fileID: 69035689}
 --- !u!1 &969085673
 GameObject:
   m_ObjectHideFlags: 0

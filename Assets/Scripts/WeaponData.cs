@@ -64,6 +64,14 @@ public class WeaponData : ScriptableObject
     public float a_fRateOfFire { get { return m_fRateOfFire; } }
 
     [SerializeField]
+    private float m_fShootRecoil;    // 발사 시 반동
+    public float a_fShootRecoil { get { return m_fShootRecoil; } }
+
+    [SerializeField]
+    private float m_fZoomFactor;    // 조준 했을때 줌의 정도(0f ~ 3f가 최대)
+    public float a_fZoomFactor { get { return m_fZoomFactor; } }
+
+    [SerializeField]
     private E_WeaponType m_eWeaponType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)
     public E_WeaponType a_eWeaponType { get { return m_eWeaponType; } }
 
