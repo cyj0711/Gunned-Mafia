@@ -236,10 +236,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_iCurrentHealth <= 0)  // 플레이어 사망
         {
-            m_vWeaponController.ToggleAim(false);
+            m_vWeaponController.PlayerDeadProcess();
             float fKillerDistance = GetKillerDistance(_iShooterActorNumber);
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time, fKillerDistance);
-            m_vWeaponController.DropAllWeapons();
             a_ePlayerState = E_PlayerState.Missing;
             // UIScoreBoardManager.I.UpdateAllPlayerScoreBoard();
             GameManager.I.PlayerNameColorUpdate();

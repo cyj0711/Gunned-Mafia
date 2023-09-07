@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
+using UnityEngine.UI;
 
 public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 {
@@ -17,8 +18,11 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     private bool m_bSeeingRight = true;
     private bool m_bIsShooting = false;
     private bool m_bIsAiming = false;
+    private bool m_bIsReloading = false;
 
     private Coroutine m_coToggleAim;
+
+    [SerializeField] Image m_vReloadUIImage;
     //private Vector3 m_vLastMousePosition;
 
     //*************** Synchronization Properties *******************
@@ -73,6 +77,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         a_iCurrentWeaponViewID = -1;
         m_bIsShooting = false;
         m_bIsAiming = false;
+        m_bIsReloading = false;
     }
 
     [PunRPC]
@@ -84,9 +89,9 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     // 플레이어가 마우스를 누르면 이 함수가 호출되어 총알 발사
     public void Shoot()
     {
-        if(m_vCurrentWeapon!=null)
+        if (m_vCurrentWeapon != null)
         {
-            if (m_vCurrentWeapon.a_vWeaponData.a_bAutoFire || !m_bIsShooting)
+            if ((m_vCurrentWeapon.a_vWeaponData.a_bAutoFire || !m_bIsShooting) && !m_bIsReloading)
             {
                 m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z, PhotonNetwork.LocalPlayer.ActorNumber);
                 m_bIsShooting = true;
@@ -106,7 +111,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     // 무기의 조준을 on off한다.
     public void ToggleAim(bool _bIsAiming)
     {
-        if (m_vCurrentWeapon == null) return;
+        if (m_vCurrentWeapon == null || m_bIsReloading) return;
 
         m_bIsAiming = _bIsAiming;
 
@@ -164,12 +169,41 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     public void Reload()
     {
-        if (m_vCurrentWeapon != null)
+        if (m_vCurrentWeapon != null && !m_bIsReloading && m_vCurrentWeapon.a_iCurrentAmmo< m_vCurrentWeapon.a_vWeaponData.a_iAmmoCapacity)
         {
-            m_vCurrentWeapon.Reload();
+            ToggleAim(false);
+            StartCoroutine(ReloadCoroutine(m_vCurrentWeapon.a_vWeaponData.a_fReloadTime));
         }
     }
 
+    private IEnumerator ReloadCoroutine(float _fReloadTime)
+    {
+        m_bIsReloading = true;
+        m_vReloadUIImage.gameObject.SetActive(true);
+
+        float timer = 0f;
+
+        while (timer < _fReloadTime && m_bIsReloading)
+        {
+            // 쿨타임 UI 업데이트
+            float fillAmount = timer / _fReloadTime;
+            m_vReloadUIImage.fillAmount = fillAmount;
+
+            // 프레임마다 대기
+            yield return null;
+
+            timer += Time.deltaTime;
+        }
+
+        // 장전이 완료된 후에 총알 UI를 최종적으로 업데이트합니다.
+        if (m_bIsReloading)
+        {
+            m_vCurrentWeapon.Reload();
+        }
+
+        m_vReloadUIImage.gameObject.SetActive(false);
+        m_bIsReloading = false;
+    }
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인
     public void SetDirection(bool playerSeeingRight)
@@ -183,12 +217,18 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 if (m_vCurrentWeapon.gameObject.transform.localScale.y < 0)
                     m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
                         (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+
+                m_vReloadUIImage.transform.localPosition = new Vector3(Mathf.Max(m_vReloadUIImage.transform.localPosition.x, m_vReloadUIImage.transform.localPosition.x * -1), 
+                    m_vReloadUIImage.transform.localPosition.y, m_vReloadUIImage.transform.localPosition.z);
             }
             else
             {
                 if (m_vCurrentWeapon.gameObject.transform.localScale.y > 0)
                     m_vCurrentWeapon.gameObject.transform.localScale = new Vector3
                         (m_vCurrentWeapon.gameObject.transform.localScale.x, m_vCurrentWeapon.gameObject.transform.localScale.y * -1, 1);
+
+                m_vReloadUIImage.transform.localPosition = new Vector3(Mathf.Min(m_vReloadUIImage.transform.localPosition.x, m_vReloadUIImage.transform.localPosition.x * -1), 
+                    m_vReloadUIImage.transform.localPosition.y, m_vReloadUIImage.transform.localPosition.z);
             }
         }
 
@@ -251,6 +291,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         // m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
         ToggleAim(false);
+        m_bIsReloading = false;
 
         m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.AllBuffered, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
@@ -292,6 +333,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         StopShooting();
         ToggleAim(false);
+        m_bIsReloading = false;
 
         switch(_iInputKeyNumber)
         {
@@ -410,6 +452,13 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         vWeaponBase.gameObject.SetActive(false);
 
         m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+    }
+
+    public void PlayerDeadProcess()
+    {
+        ToggleAim(false);
+        DropAllWeapons();
+        m_bIsReloading = false;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

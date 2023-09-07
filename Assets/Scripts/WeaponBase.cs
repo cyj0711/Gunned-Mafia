@@ -152,13 +152,6 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
         SetWeaponCollider(true);
     }
 
-    //private IEnumerator ColliderOnCoroutine()
-    //{
-    //    yield return new WaitForSeconds(1.5f);
-
-    //    SetWeaponCollider(true);
-    //}
-
     // 게임 도중 관전자 플레이어가 들어왔을 때 게임 내 무기들의 위치를 바로잡는다.
     private void SetPosition()
     {

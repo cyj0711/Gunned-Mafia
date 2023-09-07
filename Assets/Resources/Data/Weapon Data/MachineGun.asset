@@ -19,7 +19,7 @@ MonoBehaviour:
   m_fCriticalChance: 0
   m_iMaxAmmo: 75
   m_iAmmoCapacity: 75
-  m_fReloadTime: 0
+  m_fReloadTime: 3
   m_bAutoFire: 1
   m_fRateOfFire: 0.15
   m_fShootRecoil: 0
