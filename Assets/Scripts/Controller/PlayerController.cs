@@ -234,16 +234,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         a_iLastAttackerActorNumber = _iShooterActorNumber;
         a_iLastDamagedWeaponID = _iWeaponID;
 
-        if (m_iCurrentHealth <= 0)  // 플레이어 사망
+        if (m_iCurrentHealth <= 0 && m_ePlayerState == E_PlayerState.Alive)  // 플레이어 사망
         {
+            m_ePlayerState = E_PlayerState.Missing;
+            a_ePlayerState = E_PlayerState.Missing;
+
             m_vWeaponController.PlayerDeadProcess();
+
             float fKillerDistance = GetKillerDistance(_iShooterActorNumber);
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time, fKillerDistance);
-            a_ePlayerState = E_PlayerState.Missing;
+
             // UIScoreBoardManager.I.UpdateAllPlayerScoreBoard();
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
+
             ChatManager.I.ToggleTeamChat(false);
         }
     }

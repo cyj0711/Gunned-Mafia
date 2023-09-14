@@ -24,8 +24,8 @@ MonoBehaviour:
   m_fRateOfFire: 0.1
   m_fShootRecoil: 0
   m_fZoomFactor: 1
-  m_eWeaponType: 0
-  m_eBulleyType: 2
+  m_eEquipType: 0
+  m_eWeaponType: 3
   m_vWeaponPrefab: {fileID: 4221162209586976023, guid: 7c09cc8bd481d7e4184ec55bbdfdaaa0,
     type: 3}
   m_vBulletPrefab: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,

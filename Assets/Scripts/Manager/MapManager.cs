@@ -43,7 +43,15 @@ public class MapManager : Singleton<MapManager>
                 object[] vPhotonDataWeapon = new object[1];
                 vPhotonDataWeapon[0] = vWeaponData.a_iWeaponId;
 
-                PhotonNetwork.InstantiateRoomObject("WeaponPrefab/WeaponBaseObject", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonDataWeapon);
+                switch (vWeaponData.a_eWeaponType)
+                {
+                    case E_WeaponType.Shotgun:
+                        PhotonNetwork.InstantiateRoomObject("WeaponPrefab/Weapon Shotgun", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonDataWeapon);
+                        break;
+                    default:
+                        PhotonNetwork.InstantiateRoomObject("WeaponPrefab/Weapon Normal", weaponSpawnPoint.transform.position, Quaternion.identity, 0, vPhotonDataWeapon);
+                        break;
+                }
             }
         }
 
@@ -120,7 +128,8 @@ public class MapManager : Singleton<MapManager>
 
     public void AddDictionaryPlayerDead(int _iVictimActorNumber, PlayerDeadController vPlayerDead)
     {
-        m_dicPlayerDead.Add(_iVictimActorNumber, vPlayerDead);
+        if (!m_dicPlayerDead.ContainsKey(_iVictimActorNumber))
+            m_dicPlayerDead.Add(_iVictimActorNumber, vPlayerDead);
     }
 
     //[PunRPC]

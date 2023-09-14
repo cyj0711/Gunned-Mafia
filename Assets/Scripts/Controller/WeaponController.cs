@@ -11,18 +11,19 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     [SerializeField]
     private PhotonView m_vPhotonView;
 
-    private Dictionary<E_WeaponType, WeaponBase> m_dicWeaponInventory = new Dictionary<E_WeaponType, WeaponBase>();
+    private Dictionary<E_EquipType, WeaponBase> m_dicWeaponInventory = new Dictionary<E_EquipType, WeaponBase>();
 
     private WeaponBase m_vCurrentWeapon;
 
     private bool m_bSeeingRight = true;
-    private bool m_bIsShooting = false;
-    private bool m_bIsAiming = false;
-    private bool m_bIsReloading = false;
+    private bool m_bIsShooting = false; public bool a_bIsShooting { get => m_bIsShooting; }
+    private bool m_bIsAiming = false;   public bool a_bIsAiming { get => m_bIsAiming; }
+    private bool m_bIsReloading = false;    public bool a_bIsReloading { get => m_bIsReloading; } public void SetBoolIsReloading(bool value) { m_bIsReloading = value; }
 
     private Coroutine m_coToggleAim;
 
     [SerializeField] Image m_vReloadUIImage;
+    public Image a_vReloadUIImage { get => m_vReloadUIImage; }
     //private Vector3 m_vLastMousePosition;
 
     //*************** Synchronization Properties *******************
@@ -73,6 +74,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     public void InitWeaponController()
     {
+        ToggleAim(false);
         m_vPhotonView.RPC(nameof(InitWeaponControllerRPC),RpcTarget.AllBuffered);
         a_iCurrentWeaponViewID = -1;
         m_bIsShooting = false;
@@ -120,7 +122,8 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         {
             if (m_coToggleAim == null)
             {
-                m_coToggleAim = StartCoroutine(AimCoroutine());
+                if(m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor>0)
+                    m_coToggleAim = StartCoroutine(AimCoroutine());
             }
         }
         // 조준 해제
@@ -169,14 +172,15 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     public void Reload()
     {
-        if (m_vCurrentWeapon != null && !m_bIsReloading && m_vCurrentWeapon.a_iCurrentAmmo< m_vCurrentWeapon.a_vWeaponData.a_iAmmoCapacity)
+        if (m_vCurrentWeapon != null && !m_bIsReloading && m_vCurrentWeapon.a_iCurrentAmmo < m_vCurrentWeapon.a_vWeaponData.a_iAmmoCapacity && m_vCurrentWeapon.a_iRemainAmmo > 0)
         {
             ToggleAim(false);
-            StartCoroutine(ReloadCoroutine(m_vCurrentWeapon.a_vWeaponData.a_fReloadTime));
+            //StartCoroutine(ReloadCoroutine(m_vCurrentWeapon.a_vWeaponData.a_fReloadTime));
+            m_vCurrentWeapon.Reload(this);
         }
     }
 
-    private IEnumerator ReloadCoroutine(float _fReloadTime)
+    public IEnumerator ReloadCoroutine(float _fReloadTime)
     {
         m_bIsReloading = true;
         m_vReloadUIImage.gameObject.SetActive(true);
@@ -198,7 +202,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         // 장전이 완료된 후에 총알 UI를 최종적으로 업데이트합니다.
         if (m_bIsReloading)
         {
-            m_vCurrentWeapon.Reload();
+            m_vCurrentWeapon.SetReloadAmmo();
         }
 
         m_vReloadUIImage.gameObject.SetActive(false);
@@ -260,7 +264,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         int i = 0;
         float fDropRotation = 360f / m_dicWeaponInventory.Count;
 
-        foreach (KeyValuePair<E_WeaponType, WeaponBase> _dicWeaponInventory in m_dicWeaponInventory)
+        foreach (KeyValuePair<E_EquipType, WeaponBase> _dicWeaponInventory in m_dicWeaponInventory)
         {
             WeaponBase vCurrentWeapon = _dicWeaponInventory.Value;
 
@@ -289,9 +293,10 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         if (m_vCurrentWeapon == null)
             return;
 
-        // m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eWeaponType);
+        // m_dicWeaponInventory.Remove(m_vCurrentWeapon.a_vWeaponData.a_eEquipType);
         ToggleAim(false);
         m_bIsReloading = false;
+        m_vCurrentWeapon.StopReload();
 
         m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.AllBuffered, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
@@ -308,7 +313,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         WeaponBase vCurrentWeapon = vWeaponPhotonView.GetComponent<WeaponBase>();
 
-        m_dicWeaponInventory.Remove(vCurrentWeapon.a_vWeaponData.a_eWeaponType);
+        m_dicWeaponInventory.Remove(vCurrentWeapon.a_vWeaponData.a_eEquipType);
 
         vCurrentWeapon.InitWeaponData(_iCurrentAmmo, _iRemainAmmo);
 
@@ -328,7 +333,10 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     public void ChangeCurrentWeapon(int _iInputKeyNumber)
     {
         // 교체하려는 무기가 현재 들고있으면 무시함
-        if (m_vCurrentWeapon != null && _iInputKeyNumber == ((int)m_vCurrentWeapon.a_vWeaponData.a_eWeaponType + 1))
+        if (m_vCurrentWeapon != null && _iInputKeyNumber == ((int)m_vCurrentWeapon.a_vWeaponData.a_eEquipType + 1))
+            return;
+        // 교체하려는 무기가 없는 무기면 무시함
+        if (!CheckCanEquipWeaponType((E_EquipType)(_iInputKeyNumber - 1)))
             return;
 
         StopShooting();
@@ -338,33 +346,33 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         switch(_iInputKeyNumber)
         {
             case 1:
-                if(CheckCanEquipWeaponType(E_WeaponType.Primary))
+                if(CheckCanEquipWeaponType(E_EquipType.Primary))
                 {
-                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
                     UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
             case 2:
-                if (CheckCanEquipWeaponType(E_WeaponType.Secondary))
+                if (CheckCanEquipWeaponType(E_EquipType.Secondary))
                 {
-                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
                     UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
             case 3:
-                if (CheckCanEquipWeaponType(E_WeaponType.Melee))
+                if (CheckCanEquipWeaponType(E_EquipType.Melee))
                 {
-                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
                     UIGameManager.I.SetAmmoActive(true);
                 }
                 break;
             case 4:
-                if (CheckCanEquipWeaponType(E_WeaponType.Grenade))
+                if (CheckCanEquipWeaponType(E_EquipType.Grenade))
                 {
-                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_WeaponType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
                     m_vCurrentWeapon.SetAmmoUI();
                     UIGameManager.I.SetAmmoActive(true);
                 }
@@ -373,11 +381,11 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     }
 
     // 들고자 하는 무기가 들 수 있는 상태인지 확인
-    private bool CheckCanEquipWeaponType(E_WeaponType eWeaponType)
+    private bool CheckCanEquipWeaponType(E_EquipType eWeaponType)
     {
         if (m_vCurrentWeapon != null)
         {
-            if (m_vCurrentWeapon.a_vWeaponData.a_eWeaponType == eWeaponType)
+            if (m_vCurrentWeapon.a_vWeaponData.a_eEquipType == eWeaponType)
                 return false;  // 지금 들고있는 무기라면 바꿀 필요가 없으니 false
         }
 
@@ -398,9 +406,9 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         }
 
         // 만약 닿은 무기의 타입을 이미 가지고 있는 경우, 해당 무기를 획득하지 않는다.
-        if(m_dicWeaponInventory.ContainsKey(vWeaponBase.a_vWeaponData.a_eWeaponType))
+        if(m_dicWeaponInventory.ContainsKey(vWeaponBase.a_vWeaponData.a_eEquipType))
         {
-            Debug.Log("Tried to pick up [" + vWeaponBase.a_vWeaponData.a_strWeaponName + "], But [" + vWeaponBase.a_vWeaponData.a_eWeaponType + "] type is already equiped!");
+            Debug.Log("Tried to pick up [" + vWeaponBase.a_vWeaponData.a_strWeaponName + "], But [" + vWeaponBase.a_vWeaponData.a_eEquipType + "] type is already equiped!");
         }
         else
         {
@@ -415,7 +423,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         WeaponBase vWeaponBase = PhotonView.Find(_iWeaponViewID).gameObject.GetComponent<WeaponBase>();
 
-        //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+        //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eEquipType, vWeaponBase);
 
         m_vPhotonView.RPC(nameof(PuckUpWeaponRPC), RpcTarget.AllBuffered, _iWeaponViewID);
 
@@ -451,7 +459,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         vWeaponBase.gameObject.SetActive(false);
 
-        m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eWeaponType, vWeaponBase);
+        m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eEquipType, vWeaponBase);
     }
 
     public void PlayerDeadProcess()

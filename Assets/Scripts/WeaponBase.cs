@@ -4,18 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
+public abstract class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
 {
     [SerializeField]
-    private WeaponData m_vWeaponData;
+    protected WeaponData m_vWeaponData;
     public WeaponData a_vWeaponData { get { return m_vWeaponData; } }
 
     [SerializeField]
-    private PhotonView m_vPhotonView;
+    protected PhotonView m_vPhotonView;
     [SerializeField]
-    private Transform m_vMuzzlePosition;
+    protected Transform m_vMuzzlePosition;
     [SerializeField]
-    private GameObject m_vBulletObject;
+    protected GameObject m_vBulletObject;
     [SerializeField]
     private GameObject m_vWeaponSkinObject;
     [SerializeField]
@@ -23,8 +23,8 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
 
     private Collider2D m_vWeaponSkinCollider;
 
-    int m_iCurrentAmmo;    // 현재 장전된 총알
-    int m_iRemainAmmo;     // 남은 총알
+    protected int m_iCurrentAmmo;    // 현재 장전된 총알
+    protected int m_iRemainAmmo;     // 남은 총알
     public int a_iCurrentAmmo { get { return m_iCurrentAmmo; } }
     public int a_iRemainAmmo { get { return m_iRemainAmmo; } }
 
@@ -34,7 +34,7 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     int m_iWeaponID;
     public int a_iWeaponID { get { return m_iWeaponID; } set { m_iWeaponID = value; } }
 
-    DateTime m_vLastShootTime = DateTime.MinValue;
+    protected DateTime m_vLastShootTime = DateTime.MinValue;
 
     private void Awake()    // Start로 하면 RPC의 allbuffered로 호출된 함수가 먼저 발동돼서 초기화가 제대로 안되므로 awake를 사용
     {
@@ -79,35 +79,19 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
         }
     }
 
-    public void Shoot(float fAngle, int iShooterActorNumber)
-    {
-        if (m_iCurrentAmmo <= 0) return;
+    public abstract void Shoot(float _fAngle, int _iShooterActorNumber);
 
-        if (DateTime.Now.Subtract(m_vLastShootTime).TotalSeconds >= m_vWeaponData.a_fRateOfFire)
-        {
-            m_vLastShootTime = DateTime.Now;
+    //[PunRPC]
+    //public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
+    //{
+    //    Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID);
+    //}
 
-            //PhotonNetwork.Instantiate("Bullet", muzzlePosition.position, Quaternion.Euler(0f, 0f, angle));
-            /* 꿀팁 
-            PhotonNetwork.Instantiate("Bullet", muzzlePosition.position, Quaternion.Euler(0f, 0f, angle))
-                .GetComponent<PhotonView>().RPC("RPCfunction",RpcTarget,RPCparameter)
-            를 쓰면 instantiate 한 오브젝트의 rpc를 호출할 수 있다.
-            */
+    public abstract void Reload(WeaponController _vLocalPlayerWeaponController);
 
-            m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, fAngle), iShooterActorNumber, m_vWeaponData.a_iWeaponId);
+    public virtual void StopReload() { }
 
-            m_iCurrentAmmo -= 1;
-            SetAmmoUI();
-        }
-    }
-
-    [PunRPC]
-    public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
-    {
-        Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID);
-    }
-
-    public void Reload()
+    public virtual void SetReloadAmmo()
     {
         if (m_iCurrentAmmo >= m_vWeaponData.a_iAmmoCapacity || m_iRemainAmmo <= 0) return;
 
@@ -204,4 +188,5 @@ public class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     {
         return m_vPhotonView.ViewID;
     }
+
 }

@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum E_BulletType
+public enum E_WeaponType
 {
+    AssaultRifle,
     Pistol,
     SniperRifle,
     SMG,
     MachineGun,
-    Shotgun,
-    Magnum
+    Shotgun
 }
 
-public enum E_WeaponType
+public enum E_EquipType
 {
     Primary,
     Secondary,
@@ -72,12 +72,12 @@ public class WeaponData : ScriptableObject
     public float a_fZoomFactor { get { return m_fZoomFactor; } }
 
     [SerializeField]
-    private E_WeaponType m_eWeaponType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)
-    public E_WeaponType a_eWeaponType { get { return m_eWeaponType; } }
+    private E_EquipType m_eEquipType;     // 무기를 꺼낼 숫자 키패드.(1 = 주무기, 2 = 보조무기, 3 = 근접무기, 4 = 수류탄)
+    public E_EquipType a_eEquipType { get { return m_eEquipType; } }
 
     [SerializeField]
-    private E_BulletType m_eBulleyType;
-    public E_BulletType a_eBulleyType { get { return m_eBulleyType; } }
+    private E_WeaponType m_eWeaponType;
+    public E_WeaponType a_eWeaponType { get { return m_eWeaponType; } }
 
     [SerializeField]
     private GameObject m_vWeaponPrefab;
