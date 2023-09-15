@@ -79,7 +79,8 @@ public abstract class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
         }
     }
 
-    public abstract void Shoot(float _fAngle, int _iShooterActorNumber);
+    // return weapon's recoil (0f if don't shoot)
+    public abstract float Shoot(float _fAngle, int _iShooterActorNumber);
 
     //[PunRPC]
     //public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)

@@ -7,9 +7,9 @@ using UnityEngine;
 public class WeaponShotgun : WeaponBase
 {
     Coroutine m_coReload;
-    public override void Shoot(float _fAngle, int _iShooterActorNumber)
+    public override float Shoot(float _fAngle, int _iShooterActorNumber)
     {
-        if (m_iCurrentAmmo <= 0) return;
+        if (m_iCurrentAmmo <= 0) return 0f;
 
         if (DateTime.Now.Subtract(m_vLastShootTime).TotalSeconds >= m_vWeaponData.a_fRateOfFire)
         {
@@ -29,7 +29,11 @@ public class WeaponShotgun : WeaponBase
 
             m_iCurrentAmmo -= 1;
             SetAmmoUI();
+
+            return m_vWeaponData.a_fRecoilIncreaseRate;
         }
+
+        return 0f;
     }
 
     [PunRPC]

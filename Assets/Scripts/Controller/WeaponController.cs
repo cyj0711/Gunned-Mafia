@@ -20,7 +20,10 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     private bool m_bIsAiming = false;   public bool a_bIsAiming { get => m_bIsAiming; }
     private bool m_bIsReloading = false;    public bool a_bIsReloading { get => m_bIsReloading; } public void SetBoolIsReloading(bool value) { m_bIsReloading = value; }
 
+    private float m_fCurrentRecoil = 0f;    // 무기의 반동 수치
+
     private Coroutine m_coToggleAim;
+    private Coroutine m_coDecreaseRecoil;
 
     [SerializeField] Image m_vReloadUIImage;
     public Image a_vReloadUIImage { get => m_vReloadUIImage; }
@@ -95,11 +98,33 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         {
             if ((m_vCurrentWeapon.a_vWeaponData.a_bAutoFire || !m_bIsShooting) && !m_bIsReloading)
             {
-                m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z, PhotonNetwork.LocalPlayer.ActorNumber);
+                // 총기 발사 및 반동
+                float fWeaponRecoil = m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z + Random.Range(-m_fCurrentRecoil, m_fCurrentRecoil), PhotonNetwork.LocalPlayer.ActorNumber);
+                m_fCurrentRecoil = Mathf.Min(m_fCurrentRecoil + fWeaponRecoil, m_vCurrentWeapon.a_vWeaponData.a_fMaxRecoilAmount);
+
+                // 반동 안정화
+                if (m_fCurrentRecoil > 0f && m_coDecreaseRecoil == null)
+                {
+                    m_coDecreaseRecoil = StartCoroutine(DecreaseRecoilCoroutine());
+                }
+
                 m_bIsShooting = true;
             }
         }
     }
+
+    // 1초마다 현재 무기의 a_fRecoilDecreaseRate 만큼 반동을 감소한다.
+    private IEnumerator DecreaseRecoilCoroutine()
+    {
+        while (m_fCurrentRecoil > 0f)
+        {
+            m_fCurrentRecoil -= m_vCurrentWeapon.a_vWeaponData.a_fRecoilDecreaseRate * Time.deltaTime;
+            yield return null;
+        }
+        m_fCurrentRecoil = 0f;
+        m_coDecreaseRecoil = null;
+    }
+
     public void StopShooting()
     {
         m_bIsShooting = false;
@@ -203,6 +228,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         if (m_bIsReloading)
         {
             m_vCurrentWeapon.SetReloadAmmo();
+            m_fCurrentRecoil = 0f;
         }
 
         m_vReloadUIImage.gameObject.SetActive(false);
@@ -297,6 +323,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         ToggleAim(false);
         m_bIsReloading = false;
         m_vCurrentWeapon.StopReload();
+        m_fCurrentRecoil = 0f;
 
         m_vPhotonView.RPC(nameof(DropWeaponRPC), RpcTarget.AllBuffered, 
             m_iCurrentWeaponViewID, m_vCurrentWeapon.a_iCurrentAmmo, m_vCurrentWeapon.a_iRemainAmmo, m_vCurrentWeapon.transform.position, transform.rotation);
@@ -342,8 +369,9 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         StopShooting();
         ToggleAim(false);
         m_bIsReloading = false;
+        m_fCurrentRecoil = 0f;
 
-        switch(_iInputKeyNumber)
+        switch (_iInputKeyNumber)
         {
             case 1:
                 if(CheckCanEquipWeaponType(E_EquipType.Primary))

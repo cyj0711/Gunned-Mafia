@@ -22,7 +22,9 @@ MonoBehaviour:
   m_fReloadTime: 1
   m_bAutoFire: 0
   m_fRateOfFire: 0.7
-  m_fShootRecoil: 0
+  m_fMaxRecoilAmount: 10
+  m_fRecoilIncreaseRate: 4
+  m_fRecoilDecreaseRate: 1
   m_fZoomFactor: 0
   m_eEquipType: 1
   m_eWeaponType: 1

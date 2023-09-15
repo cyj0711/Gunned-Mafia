@@ -30,18 +30,6 @@ public class BulletController : MonoBehaviourPunCallbacks
 
     private void OnTriggerEnter2D(Collider2D col)   // col을 RPC의 매개변수로 줄 수 없다.
     {
-        //if (col.tag == "Blockable")
-        //{
-        //     pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
-        //}
-
-        //if (!pView.IsMine && col.tag == "Player" && col.GetComponent<PhotonView>().IsMine)    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
-        //{
-        //    PlayerController ps = col.GetComponentInParent<PlayerController>();
-        //    ps.Hit(30);
-        //    pView.RPC("DestroyRPC", RpcTarget.AllBuffered);
-        //}
-
         if (col.gameObject.layer == LayerMask.NameToLayer("Blockable"))
         {
             Destroy(gameObject);
@@ -49,14 +37,17 @@ public class BulletController : MonoBehaviourPunCallbacks
 
         if (col.gameObject.layer == LayerMask.NameToLayer("Player"))    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
         {
-            if(col.GetComponent<PhotonView>().IsMine)
-            {
-                if (col.GetComponent<PhotonView>().Owner.ActorNumber == m_iShooterActorNumber) return;
+            PhotonView vTargetPhotonView = col.GetComponent<PhotonView>();
 
-                PlayerController vPlayer = col.GetComponentInParent<PlayerController>();
-                vPlayer.Hit(m_vWeaponData.a_iDamage, m_iShooterActorNumber, m_vWeaponData.a_iWeaponId);
+            if (vTargetPhotonView.Owner.ActorNumber != m_iShooterActorNumber)
+            {
+                if (vTargetPhotonView.IsMine)
+                {
+                    PlayerController vTargetPlayer = col.GetComponentInParent<PlayerController>();
+                    vTargetPlayer.Hit(m_vWeaponData.a_iDamage, m_iShooterActorNumber, m_vWeaponData.a_iWeaponId);
+                }
+                Destroy(gameObject);
             }
-            Destroy(gameObject);
         }
     }
 

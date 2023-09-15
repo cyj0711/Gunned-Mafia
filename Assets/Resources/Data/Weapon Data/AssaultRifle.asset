@@ -22,10 +22,12 @@ MonoBehaviour:
   m_fReloadTime: 2
   m_bAutoFire: 1
   m_fRateOfFire: 0.2
-  m_fShootRecoil: 0
+  m_fMaxRecoilAmount: 10
+  m_fRecoilIncreaseRate: 1
+  m_fRecoilDecreaseRate: 1
   m_fZoomFactor: 2
+  m_eEquipType: 0
   m_eWeaponType: 0
-  m_eBulleyType: 0
   m_vWeaponPrefab: {fileID: 261346361453317896, guid: f9ffde3cdea2494468cc37e9c77837db,
     type: 3}
   m_vBulletPrefab: {fileID: 4134786016387921403, guid: 3fe84a997fe5645478555b09abacd45e,

@@ -64,8 +64,16 @@ public class WeaponData : ScriptableObject
     public float a_fRateOfFire { get { return m_fRateOfFire; } }
 
     [SerializeField]
-    private float m_fShootRecoil;    // 발사 시 반동
-    public float a_fShootRecoil { get { return m_fShootRecoil; } }
+    private float m_fMaxRecoilAmount;    // 반동의 최대값 (아무리 반동이 심해도 해당 값을 넘길 수 없슴)
+    public float a_fMaxRecoilAmount { get { return m_fMaxRecoilAmount; } }
+
+    [SerializeField]
+    private float m_fRecoilIncreaseRate;    // 발사 시 반동 증가 수치 (m_fRecoilIncreaseRate 값의 범위만큼 총알의 방향이 랜덤으로 휘어짐)
+    public float a_fRecoilIncreaseRate { get { return m_fRecoilIncreaseRate; } }
+
+    [SerializeField]
+    private float m_fRecoilDecreaseRate;    // 초당 반동 감소 수치 (1초당 m_fRecoilDecreaseRate 값 만큼 반동을 낮춤)
+    public float a_fRecoilDecreaseRate { get { return m_fRecoilDecreaseRate; } }
 
     [SerializeField]
     private float m_fZoomFactor;    // 조준 했을때 줌의 정도(0f ~ 3f가 최대)
