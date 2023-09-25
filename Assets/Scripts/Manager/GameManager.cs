@@ -51,7 +51,7 @@ public class GameManager : Singleton<GameManager>
     {
         m_eGameState = E_GAMESTATE.Wait;
         m_dPropertyTimeForPrepare = 5f;
-        m_dPropertyTimeForPlay = 300f;
+        m_dPropertyTimeForPlay = 300;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
         m_iPropertyNumberOfMafia = 1;
@@ -78,6 +78,7 @@ public class GameManager : Singleton<GameManager>
             m_dStartTime = (double)m_htCustomValue["StartTime"];
             m_dEndTime = (double)m_htCustomValue["EndTime"];
         }
+
         UIGameManager.I.SetGameState();
     }
 
@@ -217,6 +218,12 @@ public class GameManager : Singleton<GameManager>
     {
         m_dProcessTimer = PhotonNetwork.Time - m_dStartTime;
 
+        // prepare 도중 플레이어가 나가서 인원이 부족해지면 다시 wait 단계로 돌아감
+        if(PhotonNetwork.CurrentRoom.PlayerCount < (m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective))
+        {
+            SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
+        }
+
         if (m_dProcessTimer >= m_dPropertyTimeForPrepare)
         {
 
@@ -230,11 +237,31 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    public void InitPlayerRole(E_PlayerRole _ePlayerRoleToInit)
+    {
+        m_dicPlayerRoles.Clear();
+
+        //Player[] vSortedPlayers = PhotonNetwork.PlayerList;
+
+        //for (int i = 0; i < vSortedPlayers.Length; i++)   // 전부 시민으로 초기화
+        //{
+        //    m_dicPlayerRoles.Add(vSortedPlayers[i].ActorNumber, _ePlayerRoleToInit);
+        //}
+
+        foreach(KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
+        {
+            m_dicPlayerRoles.Add(_kvPair.Key, _ePlayerRoleToInit);
+        }
+
+    }
+
     // 마스터 클라이언트가 모든 플레이어의 역할을 정해주고 나머지 클라이언트에게 알려준다
     void SetPlayerRole()
     {
         if (m_bIsRoleSet)   // 서버 시간차이로 인한 SetPlayerRole 중복 호출을 방지한다.
             return;
+
+        // TODO: vSortedPlayers 대신 InitPlayerRole를 활용해서 시민으로 초기화하기
 
         m_dicPlayerRoles.Clear();
         Player[] vSortedPlayers = PhotonNetwork.PlayerList;
@@ -401,6 +428,7 @@ public class GameManager : Singleton<GameManager>
             ChatManager.I.ToggleTeamChat(false);
 
             InitVariable();
+            InitPlayerRole(E_PlayerRole.None);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -423,6 +451,8 @@ public class GameManager : Singleton<GameManager>
 
     void SetGameState(double _dStartTime, double _dEndTime, E_GAMESTATE _eGameState)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         m_htCustomValue["GameState"] = (int)_eGameState;
         m_htCustomValue["StartTime"] = _dStartTime;
         m_htCustomValue["EndTime"] =  _dEndTime;

@@ -31,6 +31,7 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
 
     void Start()
     {
+        //m_dicRoomData.Clear();
         PhotonNetwork.JoinLobby();
         // m_vMaxPlayerInputField.onEndEdit.AddListener(CheckValidMaxPlayer);
     }
@@ -47,7 +48,11 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
             // 방이 삭제됨
             if (_room.RemovedFromList == true)
             {
-                Destroy(m_dicRoomData[_room.Name].gameObject);
+                if (m_dicRoomData.ContainsKey(_room.Name))
+                {
+                    Destroy(m_dicRoomData[_room.Name].gameObject);
+                    m_dicRoomData.Remove(_room.Name);
+                }
             }
             else if(m_dicRoomData.ContainsKey(_room.Name)==false)   // 새 방 추가됨
             {
@@ -61,7 +66,7 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
             }
         }
 
-        if(roomList.Count>0)
+        if(m_dicRoomData.Count>0)
         {
             m_vNoRoomTextObject.SetActive(false);
         }

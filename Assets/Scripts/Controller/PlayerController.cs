@@ -44,12 +44,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     //*************** Synchronization Properties *******************
     [SerializeField] private int m_iCurrentHealth;
     public int a_iCurrentHealth { get => m_iCurrentHealth; set => SetPropertyRPC(nameof(SetCurrentHealthRPC), value); }
-    [PunRPC] void SetCurrentHealthRPC(int _iHealth)
-    { 
-        m_iCurrentHealth = _iHealth; 
-        m_vCharacterUIController.a_iHealth = m_iCurrentHealth; 
+    [PunRPC]
+    void SetCurrentHealthRPC(int _iHealth)
+    {
+        m_iCurrentHealth = _iHealth;
+        m_vCharacterUIController.a_iHealth = m_iCurrentHealth;
     }
-    //===============================================================
+    //******************************* Player State ********************************
     [SerializeField] private E_PlayerState m_ePlayerState;
     public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } set { SetPropertyRPC(nameof(SetPlayerStateRPC), (int)value); } }
     [PunRPC]
@@ -68,12 +69,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         a_vCharacterUIController.a_ePlayerState = m_ePlayerState;
         m_vScoreBoardItemController.UpdatePlayerState(m_ePlayerState);
 
-        if(m_ePlayerState==E_PlayerState.Missing)
+        if (m_ePlayerState == E_PlayerState.Missing)
         {
-            if(m_vPhotonView.IsMine)
+            if (m_vPhotonView.IsMine)
                 UIScoreBoardManager.I.UpdateAllPlayerScoreBoard();
         }
-        else if(m_ePlayerState == E_PlayerState.Dead)
+        else if (m_ePlayerState == E_PlayerState.Dead)
         {
             m_vScoreBoardItemController.UpdatePlayerRealRole(); // 사망이 확인 된 플레이어의 진짜 직업 공개
         }
@@ -90,7 +91,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         else
         {
             SetCharacterSprite(true);
-            if(!m_vPhotonView.IsMine)
+            if (!m_vPhotonView.IsMine)
             {
                 m_vCharacterUIController.SetCanvasBodyActive(false);
             }
@@ -98,10 +99,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
 
     }
-    //================================================================
+    //******************************* Player Role ********************************
     [SerializeField] private E_PlayerRole m_ePlayerRole;
     public E_PlayerRole a_ePlayerRole { get { return m_ePlayerRole; } set { SetPropertyRPC(nameof(SetPlayerRoleRPC), (int)value); } }
-    [PunRPC] private void SetPlayerRoleRPC(int _iPlayerRole)
+    [PunRPC]
+    private void SetPlayerRoleRPC(int _iPlayerRole)
     {
         m_ePlayerRole = (E_PlayerRole)_iPlayerRole;
 
@@ -110,10 +112,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         m_vScoreBoardItemController.UpdatePlayerRole(m_ePlayerRole);
     }
-    //===============================================================
+    //******************************* Player Ping ********************************
     [SerializeField] private int m_iPlayerPing;
-    public int a_iPlayerPing { get { return m_iPlayerPing; } set { SetPropertyRPC(nameof(SetPlayerPingRPC),(int)value); } }
-    [PunRPC] public void SetPlayerPingRPC(int _iPlayerPing)
+    public int a_iPlayerPing { get { return m_iPlayerPing; } set { SetPropertyRPC(nameof(SetPlayerPingRPC), (int)value); } }
+    [PunRPC]
+    public void SetPlayerPingRPC(int _iPlayerPing)
     {
         m_iPlayerPing = _iPlayerPing;
         m_vScoreBoardItemController.UpdatePingText(_iPlayerPing);
@@ -197,7 +200,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         a_iPlayerPing = PhotonNetwork.GetPing();
 
-       yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(4f);
 
         StartCoroutine(UpdatePingCoroutine());
     }
@@ -209,7 +212,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void Update()
     {
-        if(m_vPhotonView.IsMine)
+        if (m_vPhotonView.IsMine)
         {
             if (!ChatManager.I.a_vInputField.isFocused)
             {
@@ -267,19 +270,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     void UpdateWeaponShotProcess()
     {
         // 총 발사
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
             m_vWeaponController.Shoot();
 
         }
         // 발사 중지
-        else if(Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0))
         {
             m_vWeaponController.StopShooting();
         }
 
         // 무기 조준
-        if(Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))
         {
             m_vWeaponController.ToggleAim();
         }
@@ -287,12 +290,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void UpdateKeyboardInputProcess()
     {
-        if(Input.GetKeyDown(KeyCode.R)) // 장전
+        if (Input.GetKeyDown(KeyCode.R)) // 장전
         {
             m_vWeaponController.Reload();
         }
 
-        else if(Input.GetKeyDown(KeyCode.Alpha1))   // 주무기
+        else if (Input.GetKeyDown(KeyCode.Alpha1))   // 주무기
         {
             m_vWeaponController.ChangeCurrentWeapon(1);
         }
@@ -309,12 +312,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             m_vWeaponController.ChangeCurrentWeapon(4);
         }
 
-        else if(Input.GetKeyDown(KeyCode.G))    // 무기 버리기
+        else if (Input.GetKeyDown(KeyCode.G))    // 무기 버리기
         {
             m_vWeaponController.DropWeapon();
         }
 
-        else if(Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기
+        else if (Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기
         {
             UIScoreBoardManager.I.ShowScoreBoard(true);
         }
@@ -429,24 +432,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     // Player Discoonected
     private void OnDestroy()
     {
-        if (m_vPhotonView == null || m_vPhotonView.IsMine) 
-            return;
+        //if (!NetworkManager.I.a_bActiveState || m_vPhotonView == null || m_vPhotonView.IsMine)
+        //    return;
 
-        GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
-        UIScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
+        //GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
+        //UIScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
 
-        if (PhotonNetwork.IsMasterClient) 
-        {
-            ChatManager.I.SendChat(E_ChatType.System, GameManager.I.GetPlayerNickName(m_vPhotonView.OwnerActorNr) + " left the game.");
-            // 살아있는 플레이어가 나가면 해당 플레이어의 시체를 소환한다.
-            if (!MapManager.I.a_dicPlayerDead.ContainsKey(m_vPhotonView.OwnerActorNr) && m_ePlayerState==E_PlayerState.Alive)
-            {
-                // 시스템상의 자살이나 게임종료로 인한 사망은 ShooterActorNumber, WeaponID, killerDistance 를 전부 0으로 표시한다.
-                MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, 0, 0, PhotonNetwork.Time, 0f);    
-                // a_ePlayerState = E_PlayerState.Missing;
-                GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
-            }
-        }
-        m_vWeaponController.DropAllWeaponsOnLeft();
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+        //    ChatManager.I.SendChat(E_ChatType.System, GameManager.I.GetPlayerNickName(m_vPhotonView.OwnerActorNr) + " left the game.");
+        //    // 살아있는 플레이어가 나가면 해당 플레이어의 시체를 소환한다.
+        //    if (!MapManager.I.a_dicPlayerDead.ContainsKey(m_vPhotonView.OwnerActorNr) && m_ePlayerState == E_PlayerState.Alive)
+        //    {
+        //        // 시스템상의 자살이나 게임종료로 인한 사망은 ShooterActorNumber, WeaponID, killerDistance 를 전부 0으로 표시한다.
+        //        MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, 0, 0, PhotonNetwork.Time, 0f);
+        //        // a_ePlayerState = E_PlayerState.Missing;
+        //        GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
+        //    }
+        //}
+        //if (m_vWeaponController != null)
+        //    m_vWeaponController.DropAllWeaponsOnLeft();
+
     }
 }

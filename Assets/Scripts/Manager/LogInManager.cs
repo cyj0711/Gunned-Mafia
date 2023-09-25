@@ -41,34 +41,34 @@ public class LogInManager : SingletonPunCallbacks<LogInManager>
         PhotonNetwork.ConnectUsingSettings();   // 접속에 실패해도 재접속 시도
     }
 
-    public void Connect()
-    {
-        joinButton.interactable = false;    // 중복 접속 시도 차단
+    //public void Connect()
+    //{
+    //    joinButton.interactable = false;    // 중복 접속 시도 차단
 
-        if (PhotonNetwork.IsConnected)
-        {
-            connectionInfoText.text = "Connecting to Random Room...";
-            PhotonNetwork.JoinRandomRoom(); // 빈 방을 찾는데 실패하면 OnJoinRandomFailed() 함수 자동 호출
-        }
-        else
-        {
-            connectionInfoText.text = "Offline : Connection Disabled - Try reconnecting...";
+    //    if (PhotonNetwork.IsConnected)
+    //    {
+    //        connectionInfoText.text = "Connecting to Random Room...";
+    //        PhotonNetwork.JoinRandomRoom(); // 빈 방을 찾는데 실패하면 OnJoinRandomFailed() 함수 자동 호출
+    //    }
+    //    else
+    //    {
+    //        connectionInfoText.text = "Offline : Connection Disabled - Try reconnecting...";
 
-            PhotonNetwork.ConnectUsingSettings();   // 접속에 실패해도 재접속 시도
-        }
-    }
+    //        PhotonNetwork.ConnectUsingSettings();   // 접속에 실패해도 재접속 시도
+    //    }
+    //}
 
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        connectionInfoText.text = "There is no empty room, Creating new Room.";
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 8 });
-    }
+    //public override void OnJoinRandomFailed(short returnCode, string message)
+    //{
+    //    connectionInfoText.text = "There is no empty room, Creating new Room.";
+    //    PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 8 });
+    //}
 
-    public override void OnJoinedRoom()
-    {
-        PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
-        connectionInfoText.text = "Connected with Room.";
-        PhotonNetwork.LoadLevel("GamePlay");    // SceneManager.LoadScene을 사용하면 각 유저가 개별의 씬을 로드하기때문에(동기화가 안됨) 사용하면안됨
+    //public override void OnJoinedRoom()
+    //{
+    //    PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
+    //    connectionInfoText.text = "Connected with Room.";
+    //    PhotonNetwork.LoadLevel("GamePlay");    // SceneManager.LoadScene을 사용하면 각 유저가 개별의 씬을 로드하기때문에(동기화가 안됨) 사용하면안됨
 
-    }
+    //}
 }

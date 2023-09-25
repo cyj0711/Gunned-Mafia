@@ -18,7 +18,7 @@ public class ChatManager : Singleton<ChatManager>
 
     [SerializeField] private InputField m_vInputField;
     public InputField a_vInputField { get => m_vInputField; }
-    [SerializeField] private Text m_vChatText;
+    [SerializeField] private TMP_Text m_vChatText;
     [SerializeField] private ScrollRect m_vScrollRect;
     [SerializeField] private Scrollbar m_vScrollBar;
     [SerializeField] private Image m_vChatScrollViewImage;
@@ -60,7 +60,7 @@ public class ChatManager : Singleton<ChatManager>
         // 채팅창 활성화
         if (m_vInputField.isFocused)
         {
-            m_vChatScrollViewImage.color = new Color(1f, 1f, 1f, 0.4f);
+            m_vChatScrollViewImage.color = new Color(0.2f, 0.2f, 0.2f, 0.6f);
             m_vScrollRect.verticalScrollbar = m_vScrollBar;
 
             m_vTargetToChatButton.gameObject.SetActive(true);
@@ -150,7 +150,7 @@ public class ChatManager : Singleton<ChatManager>
                 else
                 {
                     m_vChatText.text += "\r\n" + "<b><color=#" + (GameManager.I.GetPlayerRole(_iSenderActorNumber) == E_PlayerRole.Detective ? ColorUtility.ToHtmlStringRGB(UIColor.TextBlue) : ColorUtility.ToHtmlStringRGB(UIColor.TextGreen)) + ">"
-                        + GameManager.I.GetPlayerNickName(_iSenderActorNumber) + "</color></b>" + ": " + _strChatMessage;
+                        + GameManager.I.GetPlayerNickName(_iSenderActorNumber) + _iSenderActorNumber + "</color></b>" + ": " + _strChatMessage;
                 }
                 break;
             case E_ChatType.Game:

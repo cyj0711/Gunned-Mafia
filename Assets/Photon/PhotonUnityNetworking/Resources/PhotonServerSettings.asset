@@ -74,6 +74,7 @@ MonoBehaviour:
   - InitWeaponControllerRPC
   - TeleportPlayerRPC
   - ChatRPC
+  - PlayerLeftRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

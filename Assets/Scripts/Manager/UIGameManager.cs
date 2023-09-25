@@ -40,7 +40,6 @@ public class UIGameManager : Singleton<UIGameManager>
 
     void Update()
     {
-        //SetGameState();
         SetTimeText();
     }
 
@@ -52,6 +51,9 @@ public class UIGameManager : Singleton<UIGameManager>
     public void SetGameState()
     {
         E_GAMESTATE eGameState = GameManager.I.a_eGameState;
+
+        if(m_vStatusImage==null)
+            Debug.Log(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
 
         switch (eGameState)
         {
@@ -121,6 +123,10 @@ public class UIGameManager : Singleton<UIGameManager>
     private void SetTimeText()
     {
         int iTime = (int)GameManager.I.GetTime();
+
+        if (m_vTimeText == null)
+            Debug.Log(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
         m_vTimeText.text = (iTime / 60).ToString("D2") + ":" + (iTime % 60).ToString("D2");
     }
 

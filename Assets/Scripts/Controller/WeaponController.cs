@@ -116,7 +116,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     // 1초마다 현재 무기의 a_fRecoilDecreaseRate 만큼 반동을 감소한다.
     private IEnumerator DecreaseRecoilCoroutine()
     {
-        while (m_fCurrentRecoil > 0f)
+        while (m_fCurrentRecoil > 0f && m_vCurrentWeapon != null)
         {
             m_fCurrentRecoil -= m_vCurrentWeapon.a_vWeaponData.a_fRecoilDecreaseRate * Time.deltaTime;
             yield return null;
@@ -280,8 +280,14 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 i++;
             }
         }
-        InitWeaponController();
-        UIGameManager.I.SetAmmoActive(false);
+
+        // 자기 자신이 DropAllWeapons()를 호출 하는 경우 : 죽은 플레이어 본인이 호출했으므로, InitWeaponController(), UIGameManager.I.SetAmmoActive() 호출.
+        // 다른 사람이 DropAllWeapons()을 호출 한 경우 : MasterClient가 호출함. 해당 플레이어가 게임에서 나갔을때 호출됨.
+        if (PhotonNetwork.LocalPlayer.ActorNumber == m_vPhotonView.OwnerActorNr)
+        {
+            InitWeaponController();
+            UIGameManager.I.SetAmmoActive(false);
+        }
     }
 
     // 플레이어가 게임을 종료할 경우 모든 무기를 버린다 (게임을 종료하면 photon view 가 없어져 RPC를 못쓰기에 DropAllWeapons() 대신 해당 메소드 사용)
@@ -495,6 +501,30 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         ToggleAim(false);
         DropAllWeapons();
         m_bIsReloading = false;
+    }
+
+    //public List<int> GetOwnedWeaponPhotonViewID()
+    //{
+    //    List<int> listOwnedWeaponPhotonViewID = new List<int>();
+
+    //    foreach (KeyValuePair<E_EquipType, WeaponBase> _kvPair in m_dicWeaponInventory)
+    //    {
+    //        listOwnedWeaponPhotonViewID.Add(_kvPair.Value.GetPhotonViewID());
+    //    }
+
+    //    return listOwnedWeaponPhotonViewID;
+    //}
+
+    public int[] GetOwnedWeaponPhotonViewID()
+    {
+        List<int> listOwnedWeaponPhotonViewID = new List<int>();
+
+        foreach (KeyValuePair<E_EquipType, WeaponBase> _kvPair in m_dicWeaponInventory)
+        {
+            listOwnedWeaponPhotonViewID.Add(_kvPair.Value.GetPhotonViewID());
+        }
+
+        return listOwnedWeaponPhotonViewID.ToArray();
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
