@@ -10,6 +10,7 @@ public class ScoreBoardItemController : MonoBehaviour
     [SerializeField] private Text m_vKillText;
     [SerializeField] private Text m_vDeathText;
     [SerializeField] private Image m_vImage;
+    [SerializeField] private GameObject m_vHostIconObject;
 
     private int m_iActorNumber;
     private int m_iPing;
@@ -22,7 +23,7 @@ public class ScoreBoardItemController : MonoBehaviour
     public E_PlayerState a_ePlayerState { get { return m_ePlayerState; } }
     private bool m_bIsMasterClient;
 
-    public void InitData(int _iActorNumber, string _strName)
+    public void InitData(int _iActorNumber, string _strName, bool _bIsMasterClient)
     {
         m_iActorNumber = _iActorNumber;
 
@@ -34,7 +35,7 @@ public class ScoreBoardItemController : MonoBehaviour
         UpdateDeathText(0);
         UpdatePlayerRole(E_PlayerRole.None);
         UpdatePlayerState(E_PlayerState.Spectator);
-
+        SetHostIcon(_bIsMasterClient);
     }
 
     void UpdateNameText(string _strName)
@@ -97,5 +98,10 @@ public class ScoreBoardItemController : MonoBehaviour
 
 
         UIScoreBoardManager.I.SetScoreBoardItemParent(m_iActorNumber, m_ePlayerState);
+    }
+
+    public void SetHostIcon(bool _bIsActive)
+    {
+        m_vHostIconObject.SetActive(_bIsActive);
     }
 }

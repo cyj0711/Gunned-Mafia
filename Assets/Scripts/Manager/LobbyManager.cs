@@ -17,6 +17,10 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
     [SerializeField] TMP_InputField m_vRoomNameInputField;
     [SerializeField] TMP_InputField m_vMaxPlayerInputField;
     [SerializeField] TMP_InputField m_vRoomPasswordInputField;
+    [SerializeField] TMP_InputField m_vNumberOfMafiaInputField;
+    [SerializeField] TMP_InputField m_vNumberOfDetectiveInputField;
+
+    [SerializeField] Toggle m_vAutoRoleToggle;
 
     [SerializeField] Button m_vCreateButton;
 
@@ -28,6 +32,10 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
     [SerializeField] GameObject m_vNickNameInvalidMessageObject;
 
     [SerializeField] GameObject m_vNoRoomTextObject;
+
+    int m_iMaxPlayer = -1;
+    int m_iNumberOfMafia = -1;
+    int m_iNumberOfDetective = -1;
 
     void Start()
     {
@@ -101,6 +109,7 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
         roomOption.MaxPlayers = byte.Parse(m_vMaxPlayerInputField.text);
         roomOption.IsOpen = true; //방이 열려있는지 닫혀있는지 설정
         roomOption.IsVisible = true; //비공개 방 여부
+        roomOption.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "IsAutoRole", m_vAutoRoleToggle.isOn }, { "NumberOfMafia", m_iNumberOfMafia }, { "NumberOfDetective", m_iNumberOfDetective } };
 
         PhotonNetwork.CreateRoom(m_vRoomNameInputField.text, roomOption, null);
     }
@@ -114,17 +123,71 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
     }
 
     // Max Player TMP Input 에서 숫자 입력이 끝났을 때, 해당 숫자가 게임 가용 인원(2~16)에 맞는지 확인
-    public void CheckValidMaxPlayer(string _strInput)
+    public void OnEndEditMaxPlayer(string _strInput)
+    {
+        if (_strInput == "")
+        {
+            ((TMP_Text)m_vNumberOfMafiaInputField.placeholder).text = "Need the max player";
+            ((TMP_Text)m_vNumberOfDetectiveInputField.placeholder).text = "Need the max player";
+            return;
+        }
+
+        m_iMaxPlayer= Mathf.Clamp(int.Parse(_strInput), 2, 16);
+        m_vMaxPlayerInputField.text = m_iMaxPlayer.ToString();
+
+        ((TMP_Text)m_vNumberOfMafiaInputField.placeholder).text = "1 ~ " + (m_iMaxPlayer - 1);
+        ((TMP_Text)m_vNumberOfDetectiveInputField.placeholder).text = "0 ~ " + (m_iMaxPlayer - 1);
+    }
+
+
+    public void EndEditMafiaInputField(string _strInput)
     {
         if (_strInput == "") return;
 
-        m_vMaxPlayerInputField.text = Mathf.Clamp(int.Parse(_strInput), 2, 16).ToString();
+        m_iNumberOfMafia = Mathf.Clamp(int.Parse(_strInput), 1, m_iMaxPlayer - 1);
+        m_vNumberOfMafiaInputField.text = m_iNumberOfMafia.ToString();
+
+        // 만약 마피아 수 + 탐정 수가 최대 인원을 넘어서면 넘어선만큼 탐정 수를 조정한다.
+        if (m_vNumberOfDetectiveInputField.text != "")
+        {
+            if (m_iNumberOfMafia + m_iNumberOfDetective > m_iMaxPlayer)
+            {
+                m_vNumberOfDetectiveInputField.text = (m_iMaxPlayer - m_iNumberOfMafia).ToString();
+            }
+        }
     }
+
+    public void EndEditDetectiveInputField(string _strInput)
+    {
+        if (_strInput == "") return;
+
+        m_iNumberOfDetective = Mathf.Clamp(int.Parse(_strInput), 0, m_iMaxPlayer - 1);
+        m_vNumberOfDetectiveInputField.text = m_iNumberOfDetective.ToString();
+
+        // 만약 탐정 수 + 마피아 수가 최대 인원을 넘어서면 넘어선만큼 마피아 수를 조정한다.
+        if (m_vNumberOfMafiaInputField.text != "")
+        {
+            if (m_iNumberOfDetective + m_iNumberOfMafia > m_iMaxPlayer)
+            {
+                m_vNumberOfMafiaInputField.text = (m_iMaxPlayer - m_iNumberOfDetective).ToString();
+            }
+        }
+    }
+
+    public void OnValueChangedAutoRoleSetting(bool _bValue)
+    {
+        m_vNumberOfMafiaInputField.interactable = !_bValue;
+        m_vNumberOfDetectiveInputField.interactable = !_bValue;
+
+        m_vNumberOfMafiaInputField.text = "";
+        m_vNumberOfDetectiveInputField.text = "";
+    }
+
 
     // 방의 이름과 최대 인원수를 정해야만 방을 만들 수 있슴
     public void CheckValidCreateRoom()
     {
-        if (m_vRoomNameInputField.text != "" && m_vMaxPlayerInputField.text != "")
+        if (m_vRoomNameInputField.text != "" && m_vMaxPlayerInputField.text != "" && (m_vAutoRoleToggle.isOn || m_vNumberOfMafiaInputField.text != ""))
         {
             m_vCreateButton.interactable = true;
         }

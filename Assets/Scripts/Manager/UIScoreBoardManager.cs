@@ -143,4 +143,10 @@ public class UIScoreBoardManager : Singleton<UIScoreBoardManager>
             SetScoreBoardItemParent(_dicScoreBoardItem.Key, _dicScoreBoardItem.Value.a_ePlayerState);
         }
     }
+
+    public void MasterClientSwitchedProcess(int _iMasterActorNumber)
+    {
+        if (m_dicScoreBoardItems.ContainsKey(_iMasterActorNumber))
+            m_dicScoreBoardItems[_iMasterActorNumber].SetHostIcon(true);
+    }
 }

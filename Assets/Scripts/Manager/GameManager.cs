@@ -35,6 +35,8 @@ public class GameManager : Singleton<GameManager>
     double m_dPropertyBonusTimeForKill;      // 사람 한명 죽을때마다 추가시간
     double m_dPropertyTimeForCooling;   // 게임 끝나고 기다리는 시간
 
+    bool m_bPropertyIsAutoRole; // 역할이 자동배정 상태인지 확인
+
     int m_iPropertyNumberOfMafia;       // 마피아 수
     int m_iPropertyNumberOfDetective;   // 탐정 수
     /***************************/
@@ -44,6 +46,7 @@ public class GameManager : Singleton<GameManager>
     public PhotonView m_vPhotonView;
 
     Hashtable m_htCustomValue;
+    //Hashtable m_htNumberOfRole;
 
     private bool m_bIsRoleSet;
 
@@ -51,11 +54,11 @@ public class GameManager : Singleton<GameManager>
     {
         m_eGameState = E_GAMESTATE.Wait;
         m_dPropertyTimeForPrepare = 5f;
-        m_dPropertyTimeForPlay = 300;
+        m_dPropertyTimeForPlay = 30;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
-        m_iPropertyNumberOfMafia = 1;
-        m_iPropertyNumberOfDetective = 1;
+        m_iPropertyNumberOfMafia = -1;
+        m_iPropertyNumberOfDetective = -1;
 
         m_dicPlayerRoles = new Dictionary<int, E_PlayerRole>();
 
@@ -78,6 +81,11 @@ public class GameManager : Singleton<GameManager>
             m_dStartTime = (double)m_htCustomValue["StartTime"];
             m_dEndTime = (double)m_htCustomValue["EndTime"];
         }
+
+        // TODO: 마피아수, 탐정수 custom property로 받기
+        m_bPropertyIsAutoRole = (bool)PhotonNetwork.CurrentRoom.CustomProperties["IsAutoRole"];
+        m_iPropertyNumberOfMafia = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfMafia"];
+        m_iPropertyNumberOfDetective = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfDetective"];
 
         UIGameManager.I.SetGameState();
     }
@@ -109,6 +117,10 @@ public class GameManager : Singleton<GameManager>
     private void InitVariable()
     {
         m_bIsRoleSet = false;
+        m_bPropertyIsAutoRole = (bool)PhotonNetwork.CurrentRoom.CustomProperties["IsAutoRole"];
+        m_iPropertyNumberOfMafia = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfMafia"];
+        m_iPropertyNumberOfDetective = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfDetective"];
+
         MapManager.I.InitVariable();
         UIGameManager.I.InitVariable();
         UISearchManager.I.SetSearchPanelActive(false);
@@ -203,7 +215,9 @@ public class GameManager : Singleton<GameManager>
 
     void UpdateWaitProcess()
     {
-        if (PhotonNetwork.CurrentRoom.PlayerCount >= (m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective))
+        // 역할 자동 할당이면 플레이어가 2명이상일때 시작하고, 역할이 수동이면 해당 역할 수 만큼의 플레이어가 다 차야 시작
+        if ((PhotonNetwork.CurrentRoom.PlayerCount >= 2 && m_bPropertyIsAutoRole) ||
+            (!m_bPropertyIsAutoRole && (PhotonNetwork.CurrentRoom.PlayerCount >= (m_iPropertyNumberOfMafia + Mathf.Max(1, m_iPropertyNumberOfDetective)))))
         {
             if (PhotonNetwork.IsMasterClient)
             {
@@ -241,13 +255,6 @@ public class GameManager : Singleton<GameManager>
     {
         m_dicPlayerRoles.Clear();
 
-        //Player[] vSortedPlayers = PhotonNetwork.PlayerList;
-
-        //for (int i = 0; i < vSortedPlayers.Length; i++)   // 전부 시민으로 초기화
-        //{
-        //    m_dicPlayerRoles.Add(vSortedPlayers[i].ActorNumber, _ePlayerRoleToInit);
-        //}
-
         foreach(KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
         {
             m_dicPlayerRoles.Add(_kvPair.Key, _ePlayerRoleToInit);
@@ -265,6 +272,24 @@ public class GameManager : Singleton<GameManager>
 
         m_dicPlayerRoles.Clear();
         Player[] vSortedPlayers = PhotonNetwork.PlayerList;
+
+        // Auto Role 이 활성되면 현재 인원수에 따라 마피아와 탐정수가 자동으로 할당된다. (인원 4명당 마피아 1명 추가, 인원 8명당 탐정 1명 추가)
+        m_bPropertyIsAutoRole = (bool)PhotonNetwork.CurrentRoom.CustomProperties["IsAutoRole"];
+        if (m_bPropertyIsAutoRole)
+        {
+            m_iPropertyNumberOfMafia = Mathf.Max(1, vSortedPlayers.Length / 4);
+            m_iPropertyNumberOfDetective = vSortedPlayers.Length / 8;
+
+            m_htCustomValue["NumberOfMafia"] = m_iPropertyNumberOfMafia;
+            m_htCustomValue["NumberOfDetective"] = m_iPropertyNumberOfDetective;
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(m_htCustomValue);
+        }
+        else
+        {
+            m_iPropertyNumberOfMafia = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfMafia"];
+            m_iPropertyNumberOfDetective = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfDetective"];
+        }
 
         for (int i = 0; i < vSortedPlayers.Length; i ++)   // 전부 시민으로 초기화
         {
@@ -325,7 +350,23 @@ public class GameManager : Singleton<GameManager>
         {
             vPlayerController.a_ePlayerRole = m_dicPlayerRoles[iLocalPlayerActorNumber];
         }
+    }
 
+    public void SetRoleCustomProperty(bool _bIsAutoRole, int _iNumberOfMafia, int _iNumberOfDetective)
+    {
+        m_htCustomValue["IsAutoRole"] = _bIsAutoRole;
+        m_htCustomValue["NumberOfMafia"] = _iNumberOfMafia;
+        m_htCustomValue["NumberOfDetective"] = _iNumberOfDetective;
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(m_htCustomValue);
+
+        // 게임이 대기나 준비 상태일 경우 변경사항을 바로 적용한다.
+        if (m_eGameState == E_GAMESTATE.Wait || m_eGameState == E_GAMESTATE.Prepare)
+        {
+            m_bPropertyIsAutoRole = _bIsAutoRole;
+            m_iPropertyNumberOfMafia = _iNumberOfMafia;
+            m_iPropertyNumberOfDetective = _iNumberOfDetective;
+        }
     }
 
     public E_PlayerRole GetPlayerRole(int iActorNumber)  // 특정 유저의 역할 받기
@@ -579,5 +620,13 @@ public class GameManager : Singleton<GameManager>
 
         vPlayerDeadController.NotifyDead(_iPlayerActorNumber);
 
+    }
+
+    // 새 마스터 클라이언트로 바뀌었을때 해당 마스터 클라이언트에서 호출하는 함수
+    public void MasterClientSwitchedProcess()
+    {
+        m_bPropertyIsAutoRole = (bool)PhotonNetwork.CurrentRoom.CustomProperties["IsAutoRole"];
+        m_iPropertyNumberOfMafia = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfMafia"];
+        m_iPropertyNumberOfDetective = (int)PhotonNetwork.CurrentRoom.CustomProperties["NumberOfDetective"];
     }
 }

@@ -150,7 +150,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
 
         m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
-        m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName);
+        m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName, m_vPhotonView.Owner.IsMasterClient);
 
         if (m_vPhotonView.IsMine)
         {
