@@ -29,6 +29,8 @@ public class CharacterUIController : MonoBehaviour
     GameObject m_vCanvasBody;
     [SerializeField] PhotonView m_vPhotonView;
 
+    private int m_iLayerBlockAll;
+
     void Start()
     {
         if (!m_vPhotonView.IsMine)
@@ -36,6 +38,8 @@ public class CharacterUIController : MonoBehaviour
             if (GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).a_ePlayerState == E_PlayerState.Alive)
                 m_vCanvasBody.SetActive(false);
         }
+
+        m_iLayerBlockAll = 1 << LayerMask.NameToLayer("BlockAll");
     }
 
     public void SetUIData(string _sNickName, E_PlayerRole _ePlayerRole, int _iHealth)
@@ -105,11 +109,38 @@ public class CharacterUIController : MonoBehaviour
         }
     }
 
-    private void OnMouseEnter()
+    //private void OnMouseEnter()
+    //{
+    //    if (!m_vPhotonView.IsMine)
+    //    {
+    //        //RaycastHit2D hit = Physics2D.Raycast(transform.position, GameManager.I.GetPlayerController().transform.position - transform.position, 10f, 1 << LayerMask.NameToLayer("BlockAll"));
+    //        //if (hit.transform.gameObject == null)
+    //        //{
+    //        //    m_vCanvasBody.SetActive(true);
+    //        //}
+
+    //        m_vCanvasBody.SetActive(true);
+    //    }
+    //}
+
+    // 다른 플레이어에게 마우스를 가져다대면 해당 플레이어의 이름과 체력이 표시된다.
+    private void OnMouseOver()
     {
-        if (!m_vPhotonView.IsMine)
+        // 로컬 플레이어가 죽은상태면 어차피 모든 이름이 표시되기 때문에 살아있을때만 OnMouseOver를 받는다
+        if (!m_vPhotonView.IsMine && GameManager.I.GetPlayerController(PhotonNetwork.LocalPlayer.ActorNumber).a_ePlayerState == E_PlayerState.Alive)
         {
-            m_vCanvasBody.SetActive(true);
+            // 로컬 플레이어와 타겟 플레이어 사이에 벽(layer가 BlockAll로 되어있는 오브젝트)이 있으면 시야가 가려져있으므로 표시하지 않는다.
+            Vector3 vLocalPlayerPosition = GameManager.I.GetPlayerController().transform.position;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, vLocalPlayerPosition - transform.position, Vector2.Distance(vLocalPlayerPosition, transform.position), m_iLayerBlockAll);
+
+            if (hit.transform != null)
+            {
+                m_vCanvasBody.SetActive(false);
+            }
+            else
+            {
+                m_vCanvasBody.SetActive(true);
+            }
         }
     }
 

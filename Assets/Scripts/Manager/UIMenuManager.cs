@@ -126,6 +126,9 @@ public class UIMenuManager : Singleton<UIMenuManager>
     {
         if(PhotonNetwork.IsMasterClient)
         {
+            if (m_vNumberOfDetectiveInputField.text == "")
+                m_vNumberOfDetectiveInputField.text = "0";
+
             GameManager.I.SetRoleCustomProperty(m_vAutoRoleToggle.isOn, int.Parse(m_vNumberOfMafiaInputField.text), int.Parse(m_vNumberOfDetectiveInputField.text));
             ChatManager.I.SendChat(E_ChatType.System, "The host has changed the settings for the game. This will be applied in the next round.");
         }

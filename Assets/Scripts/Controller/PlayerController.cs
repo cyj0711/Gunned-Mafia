@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     public PhotonView a_vPhotonView { get { return m_vPhotonView; } }
 
     [SerializeField] GameObject m_vCharacterObject;
+    [SerializeField] Collider2D m_vCharacterMoveCollider;
 
     CharacterAnimationController m_vCharacterAnimationController;
 
@@ -63,6 +64,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         m_vCharacterAnimationController.SetGhost(bIsDead);
         m_vCharacterObject.GetComponent<Collider2D>().enabled = !bIsDead;
+        m_vCharacterMoveCollider.enabled = !bIsDead;
         m_vCharacterUIClickCollider.enabled = !bIsDead;
         m_vWeaponController.enabled = !bIsDead;
 
@@ -156,6 +158,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         {
             // 2D 카메라
             CameraManager.I.SetCinemachineCameraFollowAt(transform);
+            LightManager.I.SetPlayerLightPosition(transform);
         }
 
     }
@@ -181,10 +184,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
                 a_ePlayerState = E_PlayerState.Spectator;
                 GameManager.I.DisplayGhosts();
                 GameManager.I.PlayerNameColorUpdate();
+                LightManager.I.DeadPlayerLight();
             }
             else
             {
                 a_ePlayerState = E_PlayerState.Alive;
+                LightManager.I.AlivePlayerLight();
             }
 
             //m_vPhotonView.RPC(nameof(InitScoreBoardRPC), RpcTarget.AllBuffered);
@@ -248,6 +253,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
             MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, _iShooterActorNumber, _iWeaponID, PhotonNetwork.Time, fKillerDistance);
 
             // UIScoreBoardManager.I.UpdateAllPlayerScoreBoard();
+            LightManager.I.DeadPlayerLight();
             GameManager.I.PlayerNameColorUpdate();
             GameManager.I.DisplayGhosts();
             GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);

@@ -231,6 +231,7 @@ GameObject:
   - component: {fileID: 1359341775859407717}
   - component: {fileID: 1359341775859407719}
   - component: {fileID: 6888472427408253902}
+  - component: {fileID: 7606921436466280602}
   m_Layer: 0
   m_Name: Player Dummy
   m_TagString: Player
@@ -292,6 +293,21 @@ MonoBehaviour:
   m_vCharacterObject: {fileID: 7798866993823549336}
   m_vCharacterUIClickCollider: {fileID: 7378585772382976552}
   m_vHealthText: {fileID: 8641471647691005056}
+--- !u!114 &7606921436466280602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359341775859407726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10c4a46d28c43b846819365e5b53aae0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_vNickNameText: {fileID: 1359341775690753772}
+  m_vHealthText: {fileID: 8641471647691005056}
+  m_vCanvasBody: {fileID: 1359341777276765964}
 --- !u!1 &1359341777276765964
 GameObject:
   m_ObjectHideFlags: 0

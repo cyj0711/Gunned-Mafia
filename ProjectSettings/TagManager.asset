@@ -20,11 +20,11 @@ TagManager:
   - Player
   - Bullet
   - Weapon
-  - Blockable
+  - BlockAll
   - MouseEvent
   - DeadBody
-  - 
-  - 
+  - PlayerMove
+  - BlockPlayer
   - 
   - 
   - 

@@ -28,7 +28,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     public void Spawn()
     {
-        PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(-0.5f, 1f), Random.Range(-1f, 0f), 0), Quaternion.identity);
+        PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(0f, 3f), Random.Range(2f, 5f), 0), Quaternion.identity);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -76,9 +76,12 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     public void LeaveGame()
     {
         PhotonNetwork.LeaveRoom();
-
-        SceneManager.LoadScene("LogIn");
+        SceneManager.LoadScene("Login");
     }
+
+    //public override void OnLeftRoom()
+    //{
+    //}
 
     // TODO: 마스터가 나가서 새 마스터가 생기면 할일(메뉴의 Room Setting 버튼 활성화 라거나)
     public override void OnMasterClientSwitched(Player newMasterClient)

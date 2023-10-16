@@ -40,7 +40,11 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
     void Start()
     {
         //m_dicRoomData.Clear();
+
         PhotonNetwork.JoinLobby();
+
+        m_vNickNameInputField.text = PhotonNetwork.LocalPlayer.NickName;
+
         // m_vMaxPlayerInputField.onEndEdit.AddListener(CheckValidMaxPlayer);
     }
 
@@ -105,6 +109,12 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
             return;
         }
 
+        if (m_vNumberOfDetectiveInputField.text=="")
+        {
+            m_vNumberOfDetectiveInputField.text = "0";
+            m_iNumberOfDetective = 0;
+        }
+
         RoomOptions roomOption = new RoomOptions();
         roomOption.MaxPlayers = byte.Parse(m_vMaxPlayerInputField.text);
         roomOption.IsOpen = true; //방이 열려있는지 닫혀있는지 설정
@@ -112,6 +122,8 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
         roomOption.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "IsAutoRole", m_vAutoRoleToggle.isOn }, { "NumberOfMafia", m_iNumberOfMafia }, { "NumberOfDetective", m_iNumberOfDetective } };
 
         PhotonNetwork.CreateRoom(m_vRoomNameInputField.text, roomOption, null);
+
+        m_vCreateButton.interactable = false;
     }
 
     public override void OnJoinedRoom()

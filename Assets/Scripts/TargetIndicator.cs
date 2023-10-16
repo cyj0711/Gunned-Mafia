@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// source by https://www.youtube.com/watch?v=265lCMTNMQI (Unity 2D Target Indicator Without Canvas: On-screen & Off-screen Pointers by https://www.youtube.com/@codewithk)
+
 public class TargetIndicator : MonoBehaviour
 {
     private Vector3 m_vTargetPosition;

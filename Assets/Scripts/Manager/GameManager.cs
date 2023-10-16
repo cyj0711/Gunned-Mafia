@@ -54,7 +54,7 @@ public class GameManager : Singleton<GameManager>
     {
         m_eGameState = E_GAMESTATE.Wait;
         m_dPropertyTimeForPrepare = 5f;
-        m_dPropertyTimeForPlay = 30;
+        m_dPropertyTimeForPlay = 300;
         m_dPropertyBonusTimeForKill = 30f;
         m_dPropertyTimeForCooling = 5f;
         m_iPropertyNumberOfMafia = -1;
@@ -215,6 +215,8 @@ public class GameManager : Singleton<GameManager>
 
     void UpdateWaitProcess()
     {
+        // if (PhotonNetwork.CurrentRoom == null) return;
+
         // 역할 자동 할당이면 플레이어가 2명이상일때 시작하고, 역할이 수동이면 해당 역할 수 만큼의 플레이어가 다 차야 시작
         if ((PhotonNetwork.CurrentRoom.PlayerCount >= 2 && m_bPropertyIsAutoRole) ||
             (!m_bPropertyIsAutoRole && (PhotonNetwork.CurrentRoom.PlayerCount >= (m_iPropertyNumberOfMafia + Mathf.Max(1, m_iPropertyNumberOfDetective)))))
@@ -233,7 +235,7 @@ public class GameManager : Singleton<GameManager>
         m_dProcessTimer = PhotonNetwork.Time - m_dStartTime;
 
         // prepare 도중 플레이어가 나가서 인원이 부족해지면 다시 wait 단계로 돌아감
-        if(PhotonNetwork.CurrentRoom.PlayerCount < (m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective))
+        if (!m_bPropertyIsAutoRole && PhotonNetwork.CurrentRoom.PlayerCount < (m_iPropertyNumberOfMafia + m_iPropertyNumberOfDetective))
         {
             SetGameState(PhotonNetwork.Time, m_dPropertyTimeForCooling, E_GAMESTATE.Wait);
         }
@@ -467,6 +469,7 @@ public class GameManager : Singleton<GameManager>
             GetPlayerController().a_vWeaponController.InitWeaponController();
             UISearchManager.I.RemoveDicPlayerLocationPingAll();
             ChatManager.I.ToggleTeamChat(false);
+            LightManager.I.AlivePlayerLight();
 
             InitVariable();
             InitPlayerRole(E_PlayerRole.None);
@@ -483,7 +486,7 @@ public class GameManager : Singleton<GameManager>
     {
         foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)
         {
-            _kvPair.Value.TeleportPlayer(UnityEngine.Random.Range(-0.5f, 1f), UnityEngine.Random.Range(-1f, 0f));
+            _kvPair.Value.TeleportPlayer(UnityEngine.Random.Range(0f, 3f), UnityEngine.Random.Range(2f, 5f));
             _kvPair.Value.a_ePlayerState = E_PlayerState.Alive;
             _kvPair.Value.a_ePlayerRole = E_PlayerRole.None;
             _kvPair.Value.a_iCurrentHealth = 100;

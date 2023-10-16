@@ -46,5 +46,5 @@ Material:
     - Color_E37BA639: {r: 0.032455012, g: 0, b: 0.9811321, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _PlayerColor: {r: 0.9914521, g: 1, b: 0, a: 0}
+    - _PlayerColor: {r: 0.99215686, g: 1, b: 0, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}

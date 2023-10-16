@@ -30,7 +30,7 @@ public class BulletController : MonoBehaviourPunCallbacks
 
     private void OnTriggerEnter2D(Collider2D col)   // col을 RPC의 매개변수로 줄 수 없다.
     {
-        if (col.gameObject.layer == LayerMask.NameToLayer("Blockable"))
+        if (col.gameObject.layer == LayerMask.NameToLayer("BlockAll"))
         {
             Destroy(gameObject);
         }
