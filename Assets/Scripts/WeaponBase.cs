@@ -82,6 +82,14 @@ public abstract class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     // return weapon's recoil (0f if don't shoot)
     public abstract float Shoot(float _fAngle, int _iShooterActorNumber);
 
+    [PunRPC]
+    public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
+    {
+        GameObject vPooledBullet = ObjectPoolingManager.I.a_vBulletObjectPool.ActivatePoolItem();
+        vPooledBullet.GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID, vPosition, vRotation, ObjectPoolingManager.I.a_vBulletObjectPool);
+        // Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID);
+    }
+
     //[PunRPC]
     //public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
     //{
@@ -111,7 +119,6 @@ public abstract class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
 
     public void DropWeapon(Quaternion _WeaponRoration)
     {
-        //StartCoroutine(ColliderOnCoroutine());
         StartCoroutine(SmoothLerp(0.2f, _WeaponRoration));
     }
 

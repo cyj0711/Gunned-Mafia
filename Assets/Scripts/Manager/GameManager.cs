@@ -218,7 +218,7 @@ public class GameManager : Singleton<GameManager>
         // if (PhotonNetwork.CurrentRoom == null) return;
 
         // 역할 자동 할당이면 플레이어가 2명이상일때 시작하고, 역할이 수동이면 해당 역할 수 만큼의 플레이어가 다 차야 시작
-        if ((PhotonNetwork.CurrentRoom.PlayerCount >= 2 && m_bPropertyIsAutoRole) ||
+        if ((PhotonNetwork.CurrentRoom.PlayerCount >= 1 && m_bPropertyIsAutoRole) ||
             (!m_bPropertyIsAutoRole && (PhotonNetwork.CurrentRoom.PlayerCount >= (m_iPropertyNumberOfMafia + Mathf.Max(1, m_iPropertyNumberOfDetective)))))
         {
             if (PhotonNetwork.IsMasterClient)

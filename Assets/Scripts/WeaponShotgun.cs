@@ -24,7 +24,7 @@ public class WeaponShotgun : WeaponBase
 
             for (int i = 0; i < 10; i++)
             {
-                m_vPhotonView.RPC(nameof(ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, _fAngle + UnityEngine.Random.Range(-15f, 15f)), _iShooterActorNumber, m_vWeaponData.a_iWeaponId);
+                m_vPhotonView.RPC(nameof(base.ShootRPC), RpcTarget.All, m_vMuzzlePosition.position, Quaternion.Euler(0f, 0f, _fAngle + UnityEngine.Random.Range(-15f, 15f)), _iShooterActorNumber, m_vWeaponData.a_iWeaponId);
             }
 
             m_iCurrentAmmo -= 1;
@@ -34,12 +34,6 @@ public class WeaponShotgun : WeaponBase
         }
 
         return 0f;
-    }
-
-    [PunRPC]
-    public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
-    {
-        Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID);
     }
 
     public override void Reload(WeaponController _vLocalPlayerWeaponController)

@@ -12,9 +12,11 @@ public class BulletController : MonoBehaviourPunCallbacks
     int m_iShooterActorNumber = -1;
     WeaponData m_vWeaponData;
 
+    private ObjectPoolingController m_vObjectPool;
+
     void Start()
     {
-        Destroy(gameObject, 3.5f);
+        // Destroy(gameObject, 3.5f);
     }
 
     void Update()
@@ -22,17 +24,22 @@ public class BulletController : MonoBehaviourPunCallbacks
         transform.Translate(Vector3.right * m_fBulletSpeed * Time.deltaTime);
     }
 
-    public void SetBulletData(int _iShooterActorNumber, int _iWeaponID)
+    public void SetBulletData(int _iShooterActorNumber, int _iWeaponID, Vector3 _vPosition, Quaternion _vRotation, ObjectPoolingController _vObjectPool)
     {
+        transform.position = _vPosition;
+        transform.rotation = _vRotation;
+
         m_iShooterActorNumber = _iShooterActorNumber;
         m_vWeaponData = DataManager.I.GetWeaponDataWithID(_iWeaponID);
+
+        m_vObjectPool = _vObjectPool;
     }
 
     private void OnTriggerEnter2D(Collider2D col)   // col을 RPC의 매개변수로 줄 수 없다.
     {
         if (col.gameObject.layer == LayerMask.NameToLayer("BlockAll"))
         {
-            Destroy(gameObject);
+            m_vObjectPool.DeactiveatePoolItem(gameObject);
         }
 
         if (col.gameObject.layer == LayerMask.NameToLayer("Player"))    // 느린쪽(즉 맞는사람)에 맞춰서 충돌을 판정해 좀더 유저들이 쾌적한 싸움을 경험하게 한다.
@@ -46,11 +53,8 @@ public class BulletController : MonoBehaviourPunCallbacks
                     PlayerController vTargetPlayer = col.GetComponentInParent<PlayerController>();
                     vTargetPlayer.Hit(m_vWeaponData.a_iDamage, m_iShooterActorNumber, m_vWeaponData.a_iWeaponId);
                 }
-                Destroy(gameObject);
+                m_vObjectPool.DeactiveatePoolItem(gameObject);
             }
         }
     }
-
-    [PunRPC]
-    void DestroyRPC() => Destroy(gameObject);
 }
