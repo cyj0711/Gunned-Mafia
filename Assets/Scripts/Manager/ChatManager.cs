@@ -150,7 +150,7 @@ public class ChatManager : Singleton<ChatManager>
                 else
                 {
                     m_vChatText.text += "\r\n" + "<b><color=#" + (GameManager.I.GetPlayerRole(_iSenderActorNumber) == E_PlayerRole.Detective ? ColorUtility.ToHtmlStringRGB(UIColor.TextBlue) : ColorUtility.ToHtmlStringRGB(UIColor.TextGreen)) + ">"
-                        + GameManager.I.GetPlayerNickName(_iSenderActorNumber) + _iSenderActorNumber + "</color></b>" + ": " + _strChatMessage;
+                        + GameManager.I.GetPlayerNickName(_iSenderActorNumber) + "</color></b>" + ": " + _strChatMessage;
                 }
                 break;
             case E_ChatType.Game:

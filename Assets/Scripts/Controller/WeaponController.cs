@@ -14,6 +14,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     private Dictionary<E_EquipType, WeaponBase> m_dicWeaponInventory = new Dictionary<E_EquipType, WeaponBase>();
 
     private WeaponBase m_vCurrentWeapon;
+    public WeaponBase a_vCurrentWeapon { get => m_vCurrentWeapon; }
 
     private bool m_bSeeingRight = true;
     private bool m_bIsShooting = false; public bool a_bIsShooting { get => m_bIsShooting; }

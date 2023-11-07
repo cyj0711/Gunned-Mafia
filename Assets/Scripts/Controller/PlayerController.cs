@@ -217,23 +217,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void Update()
     {
-        if (m_vPhotonView.IsMine)
-        {
-            if (!ChatManager.I.a_vInputField.isFocused)
-            {
-                UpdateWalkingProcess();
-                UpdateWeaponAimProcess();
-                UpdateWeaponShotProcess();
-                UpdateKeyboardInputProcess();
-            }
-        }
+        //if (m_vPhotonView.IsMine)
+        //{
+        //    if (!ChatManager.I.a_vInputField.isFocused)
+        //    {
+        //        UpdateWalkingProcess();
+        //        UpdateWeaponAimProcess();
+        //        UpdateWeaponShotProcess();
+        //        UpdateKeyboardInputProcess();
+        //    }
+        //}
 
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
         // IsMine이 아닌 것들은 부드럽게 위치 동기화
-        else if ((transform.position - m_vCurrentPosition).sqrMagnitude >= 1) // 너무 멀리 떨어져있으면 바로 순간이동
-            transform.position = m_vCurrentPosition;
-        else
-            transform.position = Vector3.Lerp(transform.position, m_vCurrentPosition, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
+        if (!m_vPhotonView.IsMine)
+        {
+            if ((transform.position - m_vCurrentPosition).sqrMagnitude >= 1) // 너무 멀리 떨어져있으면 바로 순간이동
+                transform.position = m_vCurrentPosition;
+            else
+                transform.position = Vector3.Lerp(transform.position, m_vCurrentPosition, Time.deltaTime * 10); // 적당히 떨어져있으면 부드럽게 이동
+        }
     }
 
     public void Hit(int _idamage, int _iShooterActorNumber, int _iWeaponID)
@@ -268,11 +271,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     }
 
 
-    void WeaponRotation(float _fAngle)
+    public void WeaponRotation(float _fAngle)
     {
         m_vWeaponController.gameObject.transform.rotation = Quaternion.AngleAxis(_fAngle, Vector3.forward);
     }
 
+    /*
     void UpdateWeaponShotProcess()
     {
         // 총 발사
@@ -335,18 +339,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void UpdateWalkingProcess()
     {
-        // transform을 이동하면 벽에 부딪히면 떨리는 현상이 있으므로 velocity로 움직인다.
         float axisX = Input.GetAxisRaw("Horizontal");
         float axisY = Input.GetAxisRaw("Vertical");
-        m_vRigidBody.velocity = new Vector2(axisX, axisY);
 
-        if (axisX != 0 || axisY != 0)
+        if (axisX != 0f || axisY != 0f)
+            SetWalkingInput(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+    }
+    */
+
+    public void SetWalkingInput(float _fAxisX, float _fAxisY)
+    {
+        // transform을 이동하면 벽에 부딪히면 떨리는 현상이 있으므로 velocity로 움직인다.
+        m_vRigidBody.velocity = new Vector2(_fAxisX, _fAxisY).normalized;
+
+        if (_fAxisX != 0 || _fAxisY != 0)
         {
             m_vCharacterAnimationController.SetWalk(true);
         }
         else m_vCharacterAnimationController.SetWalk(false);
     }
 
+    /*
     void UpdateWeaponAimProcess()
     {
         m_vTargetPosition = transform.position;
@@ -357,6 +370,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         WeaponRotation(fAngle);
     }
+    */
 
     public void TeleportPlayer(float _fPositionX, float _fPositionY)
     {
@@ -370,7 +384,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     }
 
     // angle을 통해 유저가 오른쪽을 보는지 왼쪽을 보는지 확인
-    void SetDirection(float angle)
+    public void SetDirection(float angle)
     {
         angle = Mathf.Abs(angle);   // angle의 절대값이 90이하면 오른쪽, 이상이면 왼쪽을 보는것
         if (angle < 90)
@@ -435,29 +449,4 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         info.Sender.TagObject = gameObject;
     }
 
-    // Player Discoonected
-    private void OnDestroy()
-    {
-        //if (!NetworkManager.I.a_bActiveState || m_vPhotonView == null || m_vPhotonView.IsMine)
-        //    return;
-
-        //GameManager.I?.RemovePlayerController(m_vPhotonView.OwnerActorNr);
-        //UIScoreBoardManager.I?.RemoveScoreBoardItem(m_vPhotonView.OwnerActorNr);
-
-        //if (PhotonNetwork.IsMasterClient)
-        //{
-        //    ChatManager.I.SendChat(E_ChatType.System, GameManager.I.GetPlayerNickName(m_vPhotonView.OwnerActorNr) + " left the game.");
-        //    // 살아있는 플레이어가 나가면 해당 플레이어의 시체를 소환한다.
-        //    if (!MapManager.I.a_dicPlayerDead.ContainsKey(m_vPhotonView.OwnerActorNr) && m_ePlayerState == E_PlayerState.Alive)
-        //    {
-        //        // 시스템상의 자살이나 게임종료로 인한 사망은 ShooterActorNumber, WeaponID, killerDistance 를 전부 0으로 표시한다.
-        //        MapManager.I.SpawnPlayerDeadBody(transform.position, m_vPhotonView.Owner.ActorNumber, 0, 0, PhotonNetwork.Time, 0f);
-        //        // a_ePlayerState = E_PlayerState.Missing;
-        //        GameManager.I.CheckGameOver(m_vPhotonView.OwnerActorNr);
-        //    }
-        //}
-        //if (m_vWeaponController != null)
-        //    m_vWeaponController.DropAllWeaponsOnLeft();
-
-    }
 }
