@@ -16,9 +16,10 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
 
     [SerializeField] TMP_InputField m_vRoomNameInputField;
     [SerializeField] TMP_InputField m_vMaxPlayerInputField;
-    [SerializeField] TMP_InputField m_vRoomPasswordInputField;
+    [SerializeField] TMP_InputField m_vCreateRoomPasswordInputField;
     [SerializeField] TMP_InputField m_vNumberOfMafiaInputField;
     [SerializeField] TMP_InputField m_vNumberOfDetectiveInputField;
+    [SerializeField] TMP_InputField m_vJoinRoomPasswordInputField;
 
     [SerializeField] Toggle m_vAutoRoleToggle;
 
@@ -29,9 +30,13 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
     [SerializeField] GameObject m_vRoomEntityPrefab;
     [SerializeField] Transform m_vRoomListContent;
 
-    [SerializeField] GameObject m_vNickNameInvalidMessageObject;
+    [SerializeField] GameObject m_vWarningMessageObject;
+    [SerializeField] TMP_Text m_vWarningText;
+    [SerializeField] GameObject m_vInputPasswordPanelObject;
 
     [SerializeField] GameObject m_vNoRoomTextObject;
+
+    RoomData m_vRoomDataToJoin;
 
     int m_iMaxPlayer = -1;
     int m_iNumberOfMafia = -1;
@@ -105,7 +110,7 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
     {
         if (m_vNickNameInputField.text == "")
         {
-            SetActiveNickNameInvalidMessage(true);
+            SetActiveWarningMessage(true, "Please Enter Your NicknameFirst!!!");
             return;
         }
 
@@ -119,7 +124,8 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
         roomOption.MaxPlayers = byte.Parse(m_vMaxPlayerInputField.text);
         roomOption.IsOpen = true; //방이 열려있는지 닫혀있는지 설정
         roomOption.IsVisible = true; //비공개 방 여부
-        roomOption.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "IsAutoRole", m_vAutoRoleToggle.isOn }, { "NumberOfMafia", m_iNumberOfMafia }, { "NumberOfDetective", m_iNumberOfDetective } };
+        roomOption.CustomRoomPropertiesForLobby = new string[] { "Password" };
+        roomOption.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { {"Password", m_vCreateRoomPasswordInputField.text },{ "IsAutoRole", m_vAutoRoleToggle.isOn }, { "NumberOfMafia", m_iNumberOfMafia }, { "NumberOfDetective", m_iNumberOfDetective } };
 
         PhotonNetwork.CreateRoom(m_vRoomNameInputField.text, roomOption, null);
 
@@ -209,9 +215,35 @@ public class LobbyManager : SingletonPunCallbacks<LobbyManager>
         }
     }
 
-    // 닉네임을 설정하지 않을 경우 닉네임 설정 경고창 활성화
-    public void SetActiveNickNameInvalidMessage(bool _bIsActive)
+    // 참가하고자 하는 방이 비밀번호가 있을 경우 비밀번호 입력 창 활성화
+    public void SetActiveInputPasswordPanel(RoomData _vRoomData)
     {
-        m_vNickNameInvalidMessageObject.SetActive(_bIsActive);
+        m_vRoomDataToJoin = _vRoomData;
+        m_vInputPasswordPanelObject.SetActive(true);
+    }
+
+    public void CheckRoomPassword()
+    {
+        if (m_vJoinRoomPasswordInputField.text == (string)m_vRoomDataToJoin.a_vRoomInfo.CustomProperties["Password"])
+        {
+            m_vRoomDataToJoin.JoinRoom();
+        }
+        else
+        {
+            SetActiveWarningMessage(true, "The password is wrong!!");
+        }
+    }
+
+    // 닉네임을 설정하지 않을 경우 닉네임 설정 경고창 활성화
+    public void SetActiveWarningMessage(bool _bIsActive, string _strMessage ="")
+    {
+        m_vWarningText.text = _strMessage;
+        m_vWarningMessageObject.SetActive(_bIsActive);
+    }
+
+    // ui 창 닫기
+    public void CloseUIWindow(GameObject _vWindowToClose)
+    {
+        _vWindowToClose.SetActive(false);
     }
 }

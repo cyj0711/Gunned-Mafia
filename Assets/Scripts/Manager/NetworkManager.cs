@@ -28,7 +28,9 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     public void Spawn()
     {
-        PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(0f, 3f), Random.Range(2f, 5f), 0), Quaternion.identity);
+        //PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(0f, 3f), Random.Range(2f, 5f), 0), Quaternion.identity);
+
+        PhotonNetwork.Instantiate("Player", new Vector3(0.033f, 3.153f,0), Quaternion.identity);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)

@@ -16,14 +16,28 @@ public class RoomData : MonoBehaviour
         m_vRoomInfoText.text = $"{m_vRoomInfo.Name} ({m_vRoomInfo.PlayerCount}/{m_vRoomInfo.MaxPlayers})";
     }
 
-    public void JoinRoom()
+    public void OnClickJoinRoom()
     {
         if(LobbyManager.I.a_vNickNameInputField.text=="")
         {
-            LobbyManager.I.SetActiveNickNameInvalidMessage(true);
+            LobbyManager.I.SetActiveWarningMessage(true, "Please Enter Your NicknameFirst!!!");
             return;
         }
 
+        if (m_vRoomInfo == null) return;
+
+        if ((string)m_vRoomInfo.CustomProperties["Password"] == "")
+        {
+            JoinRoom();
+        }
+        else
+        {
+            LobbyManager.I.SetActiveInputPasswordPanel(this);
+        }
+    }
+
+    public void JoinRoom()
+    {
         if (m_vRoomInfo == null) return;
 
         PhotonNetwork.JoinRoom(m_vRoomInfo.Name);

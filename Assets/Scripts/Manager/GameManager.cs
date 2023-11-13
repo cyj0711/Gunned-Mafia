@@ -248,7 +248,9 @@ public class GameManager : Singleton<GameManager>
                 SetPlayerRole();
                 //m_vPhotonView.RPC(nameof(SetGameStateRPC), RpcTarget.AllBuffered, PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
 
-                SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
+                // m_bIsRoleSet이 false라면 모종의 문제(역할 세팅 도중 플레이어 수가 부족해지는 등)로 게임 진행이 불가한 상황이므로 prepare 상태를 지속함
+                if (m_bIsRoleSet)
+                    SetGameState(PhotonNetwork.Time, m_dPropertyTimeForPlay, E_GAMESTATE.Play);
             }
         }
     }
@@ -274,6 +276,12 @@ public class GameManager : Singleton<GameManager>
 
         m_dicPlayerRoles.Clear();
         Player[] vSortedPlayers = PhotonNetwork.PlayerList;
+
+        // 만약 역할 지정 도중 플레이어 수가 부족해지면 무한루프를 막기위해 m_bIsRoleSet = false 인 상태로 함수를 종료
+        if (vSortedPlayers.Length==1 || vSortedPlayers.Length< m_iPropertyNumberOfMafia+Math.Max(1, m_iPropertyNumberOfDetective))
+        {
+            return;
+        }
 
         // Auto Role 이 활성되면 현재 인원수에 따라 마피아와 탐정수가 자동으로 할당된다. (인원 4명당 마피아 1명 추가, 인원 8명당 탐정 1명 추가)
         m_bPropertyIsAutoRole = (bool)PhotonNetwork.CurrentRoom.CustomProperties["IsAutoRole"];
@@ -546,9 +554,10 @@ public class GameManager : Singleton<GameManager>
             return;
         }
 
-        if (vWeaponBase.a_iOwnerPlayerActorNumber == -1)
+        if (vWeaponBase.a_iOwnerPlayerActorNumber == -1 && !GetPlayerController(_iPlayerActorNumber).a_vWeaponController.a_dicWeaponInventory.ContainsKey(vWeaponBase.a_vWeaponData.a_eEquipType))
         {
             vWeaponBase.a_iOwnerPlayerActorNumber = _iPlayerActorNumber;
+            GetPlayerController(_iPlayerActorNumber).a_vWeaponController.a_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eEquipType, vWeaponBase);
             m_vPhotonView.RPC(nameof(ReturnCanPlayerPickUpWeaponRPC), PhotonNetwork.CurrentRoom.GetPlayer(_iPlayerActorNumber), _iWeaponViewID, _iPlayerActorNumber, true);
         }
         else

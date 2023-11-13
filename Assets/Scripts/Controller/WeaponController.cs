@@ -12,6 +12,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     private PhotonView m_vPhotonView;
 
     private Dictionary<E_EquipType, WeaponBase> m_dicWeaponInventory = new Dictionary<E_EquipType, WeaponBase>();
+    public Dictionary<E_EquipType, WeaponBase> a_dicWeaponInventory { get => m_dicWeaponInventory; }
 
     private WeaponBase m_vCurrentWeapon;
     public WeaponBase a_vCurrentWeapon { get => m_vCurrentWeapon; }
@@ -494,7 +495,8 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
         vWeaponBase.gameObject.SetActive(false);
 
-        m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eEquipType, vWeaponBase);
+        //m_dicWeaponInventory.Add(vWeaponBase.a_vWeaponData.a_eEquipType, vWeaponBase);
+        m_dicWeaponInventory[vWeaponBase.a_vWeaponData.a_eEquipType] =  vWeaponBase;
     }
 
     public void PlayerDeadProcess()
