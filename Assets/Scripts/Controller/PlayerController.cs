@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     [SerializeField] GameObject m_vCharacterObject;
     [SerializeField] Collider2D m_vCharacterMoveCollider;
 
-    CharacterAnimationController m_vCharacterAnimationController;
+    [SerializeField] CharacterAnimationController m_vCharacterAnimationController;
 
     [SerializeField] WeaponController m_vWeaponController;
     public WeaponController a_vWeaponController { get { return m_vWeaponController; } }
@@ -149,7 +149,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     {
         GameManager.I.AddPlayerController(m_vPhotonView.OwnerActorNr, this);
 
-        m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
+        //m_vCharacterAnimationController = m_vCharacterObject.GetComponent<CharacterAnimationController>();
 
         m_vScoreBoardItemController = Instantiate(m_vScoreBoardItemPrefab).GetComponent<ScoreBoardItemController>();
         m_vScoreBoardItemController.InitData(m_vPhotonView.OwnerActorNr, m_vPhotonView.Owner.NickName, m_vPhotonView.Owner.IsMasterClient);
@@ -401,7 +401,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     public void SetCharacterSprite(bool _bIsEnabled)
     {
-        m_vCharacterObject.GetComponent<SpriteRenderer>().enabled = _bIsEnabled;
+        //m_vCharacterObject.GetComponent<SpriteRenderer>().enabled = _bIsEnabled;
+        m_vCharacterAnimationController.SetCharacterSprite(_bIsEnabled);
         // m_vCharacterUIController.SetCanvasBodyActive(_bIsEnabled);
     }
 

@@ -201,6 +201,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    // 유령 상태의 플레이어를 볼 수 있게 한다.
     public void DisplayGhosts()
     {
         foreach (KeyValuePair<int, PlayerController> _kvPair in m_dicPlayerController)

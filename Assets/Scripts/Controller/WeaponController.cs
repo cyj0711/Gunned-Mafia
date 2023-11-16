@@ -79,6 +79,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     public void InitWeaponController()
     {
+        UIGameManager.I.SetAmmoActive(false);
         ToggleAim(false);
         m_vPhotonView.RPC(nameof(InitWeaponControllerRPC),RpcTarget.AllBuffered);
         a_iCurrentWeaponViewID = -1;
