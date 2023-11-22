@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "714909436925",
+    "project_id": "gunmong-us",
+    "storage_bucket": "gunmong-us.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714909436925:android:63a504bfd4424c0b8d6794",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.GunmongUs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714909436925-iac8s7t8itdkoidf3lv0mf2m6pd840dt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.DefaultCompany.GunmongUs",
+            "certificate_hash": "7190321f0212ccddca83c9fe8945990903f2ecd7"
+          }
+        },
+        {
+          "client_id": "714909436925-4mun8uc60j66ptjb77gv6cbl5q7sae1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8-XLx9dq4zwnkGjABxFiq-Rp9ayAmFr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714909436925-4mun8uc60j66ptjb77gv6cbl5q7sae1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
