@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "714909436925-eeb8o9oijutepp65ivtilo5j847799p2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.DefaultCompany.GunmongUs",
+            "certificate_hash": "f5e377d5b297df0e5f099ef1bb1c388b1f96bd6a"
+          }
+        },
+        {
           "client_id": "714909436925-iac8s7t8itdkoidf3lv0mf2m6pd840dt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

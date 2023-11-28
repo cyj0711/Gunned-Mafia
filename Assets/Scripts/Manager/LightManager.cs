@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
+
 
 public class LightManager : Singleton<LightManager>
 {
-    [SerializeField] Light2D m_vGlobalLight;
-    [SerializeField] Light2D m_vPlayerLight;
+    [SerializeField] UnityEngine.Rendering.Universal.Light2D m_vGlobalLight;
+    [SerializeField] UnityEngine.Rendering.Universal.Light2D m_vPlayerLight;
 
     void Start()
     {

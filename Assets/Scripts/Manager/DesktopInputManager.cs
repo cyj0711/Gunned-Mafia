@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class DesktopInputManager : Singleton<DesktopInputManager>
 {
     private PlayerController m_vLocalPlayer;
+    private int iLayerTouchable;
 
     void Start()
     {
@@ -12,6 +14,7 @@ public class DesktopInputManager : Singleton<DesktopInputManager>
             gameObject.SetActive(false);
 
         m_vLocalPlayer = GameManager.I.GetPlayerController();
+        iLayerTouchable = 1 << LayerMask.NameToLayer("Touchable");
     }
 
     void Update()
@@ -30,6 +33,19 @@ public class DesktopInputManager : Singleton<DesktopInputManager>
         // 총 발사
         if (Input.GetMouseButton(0))
         {
+            //Debug.Log(Input.mousePosition);
+
+            // 클릭한곳에 버튼 등 상호작용 오브젝트가 있으면 총을 쏘지않고 해당 상호작용을 진행함
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
+            if (hit.collider != null)
+            {
+                return;
+            }
+            //if (EventSystem.current.IsPointerOverGameObject())
+            //{
+            //    return;
+            //}
+
             m_vLocalPlayer.a_vWeaponController.Shoot();
 
         }

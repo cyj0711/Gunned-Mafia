@@ -38,8 +38,10 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
 
     void Start()
     {
+        // 모바일 구동이 아닐 시
         if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android)
             gameObject.SetActive(false);
+        // 모바일 구동 시
         else
         {
             m_vMobilePanelObject.SetActive(true);
@@ -84,8 +86,9 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                     RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
                     if (hit.collider != null)
                     {
-                        return;
+                        continue;
                     }
+                    // Debug.Log(hit.collider);
 
                     if (vTouchPosition.x < Screen.width / 2) // Left Touch begin
                     {
@@ -120,7 +123,15 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                 }
                 else if (eTouchPhase == TouchPhase.Moved || eTouchPhase == TouchPhase.Stationary)
                 {
-                    if (iTouchID == m_iLeftID) // left touching
+                    // 터치한곳에 상호작용 오브젝트가 있으면 조이스틱을 생성하지않고 해당 상호작용을 진행함
+                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
+                    if (hit.collider != null)
+                    {
+                        continue;
+                    }
+                    // Debug.Log(hit.collider);
+
+                    if (iTouchID == m_iLeftID)          // left touching
                     {
                         Vector2 vLeverPos = vTouchPosition - vLeftTouchDownPosition;
 
@@ -133,7 +144,7 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
 
                         m_vLocalPlayer.SetWalkingInput(vLeverPos.x, vLeverPos.y);
                     }
-                    else                    // right touching
+                    else if (iTouchID == m_iRightID)    // right touching
                     {
                         Vector2 vLeverPos = vTouchPosition - vRightTouchDownPosition;
 
@@ -159,7 +170,7 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                 }
                 else if (eTouchPhase == TouchPhase.Ended || eTouchPhase == TouchPhase.Canceled)
                 {
-                    if (iTouchID == m_iLeftID) // left touch end
+                    if (iTouchID == m_iLeftID)          // left touch end
                     {
                         m_iLeftID = -1;
 
@@ -168,7 +179,7 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
 
                         m_vLocalPlayer.SetWalkingInput(0f, 0f);
                     }
-                    else                    // right touch end
+                    else if (iTouchID == m_iRightID)    // right touch end
                     {
                         m_iRightID = -1;
 
