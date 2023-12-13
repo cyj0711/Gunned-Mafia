@@ -10,6 +10,7 @@ public class DesktopInputManager : Singleton<DesktopInputManager>
 
     void Start()
     {
+        // 모바일 구동시 DesktopInputManager 비활성화.
         if (Application.platform != RuntimePlatform.WindowsEditor && Application.platform != RuntimePlatform.WindowsPlayer)
             gameObject.SetActive(false);
 
@@ -71,20 +72,20 @@ public class DesktopInputManager : Singleton<DesktopInputManager>
 
         else if (Input.GetKeyDown(KeyCode.Alpha1))   // 주무기
         {
-            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(1);
+            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Primary);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))  // 보조무기
         {
-            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(2);
+            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Secondary);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))  // 근접무기
-        {
-            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(3);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))  // 투척무기
-        {
-            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(4);
-        }
+        //else if (Input.GetKeyDown(KeyCode.Alpha3))  // 근접무기
+        //{
+        //    m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Melee);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.Alpha4))  // 투척무기
+        //{
+        //    m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Grenade);
+        //}
 
         else if (Input.GetKeyDown(KeyCode.G))    // 무기 버리기
         {

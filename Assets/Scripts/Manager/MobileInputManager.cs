@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -11,23 +12,20 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
     [SerializeField] RectTransform m_vLeftLever;
 
     [SerializeField] RectTransform m_vRightJoystick;
+    public RectTransform a_vRightJoystick { get => m_vRightJoystick; }
     [SerializeField] RectTransform m_vRightLever;
+    public RectTransform a_vRightLever { get => m_vRightLever; }
 
     [SerializeField] RectTransform m_vChatPanelTransform;
 
-    RectTransform m_vCurrentJoystick;
-    RectTransform m_vCurrentLever;
-
-    private bool m_bIsLeftTouched = false;
-    private bool m_bIsRightTouched = false;
+    [SerializeField] Image m_vFireButtonImage;
+    [SerializeField] Image m_vAimLockButtonImage;
 
     private int m_iLeftID = -1;
     private int m_iRightID = -1;
 
     private float m_fLeverMovementLimit;
-
-    private Vector2 vMouseDownPosition;
-    private Vector2 vMouseMovePosition;
+    public float a_fLeverMovementLimit { get => m_fLeverMovementLimit; }
 
     private Vector2 vLeftTouchDownPosition;
     private Vector2 vRightTouchDownPosition;
@@ -35,6 +33,14 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
     private int iLayerTouchable;
 
     private PlayerController m_vLocalPlayer;
+
+    private bool m_bIsFireMode = false;
+    private bool m_bIsAimLockMode = false;
+    public bool a_bIsAimLockMode { get => m_bIsAimLockMode; }
+    private float m_fLeverMoveDistance;
+    public float a_fLeverMoveDistance { get => m_fLeverMoveDistance; }
+    private Vector3 m_vAimVector;   // 조준 상태를 고정할때 사용하기위해 RightLever vector 대신 사용한다.
+    public Vector3 a_vAimVector{ get => m_vAimVector; }
 
     void Start()
     {
@@ -48,10 +54,11 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
             m_vChatPanelTransform.anchorMin = new Vector2(0f, 1f);
             m_vChatPanelTransform.anchorMax = new Vector2(0f, 1f);
             m_vChatPanelTransform.anchoredPosition = new Vector3(m_vChatPanelTransform.anchoredPosition.x, -100f, 0f);
+            ChatManager.I.SetChatUIForMobile();
         }
 
-        m_fLeverMovementLimit = (m_vLeftJoystick.rect.width - m_vLeftLever.GetComponent<RectTransform>().rect.width) / 2;
-        iLayerTouchable = 1 << LayerMask.NameToLayer("Touchable");
+        m_fLeverMovementLimit = (m_vLeftJoystick.rect.width - m_vLeftLever.rect.width) / 2;
+        iLayerTouchable = LayerMask.GetMask("Touchable","MouseEvent");
 
         m_vLocalPlayer = GameManager.I.GetPlayerController();
     }
@@ -59,8 +66,7 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
     void Update()
     {
         if (m_vLocalPlayer == null) return;
-        //OnMultiTouch();
-        //MouseTouch();
+
         MoblieTouch();
     }
 
@@ -80,13 +86,29 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                 Vector2 vTouchPosition = touch.position;
                 TouchPhase eTouchPhase = touch.phase;
 
-                if (eTouchPhase == TouchPhase.Began)
+                if (eTouchPhase == TouchPhase.Began)    // { 조이스틱 터치 시작 }
                 {
                     // 터치한곳에 상호작용 오브젝트가 있으면 조이스틱을 생성하지않고 해당 상호작용을 진행함
-                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
+                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(vTouchPosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
                     if (hit.collider != null)
                     {
-                        continue;
+                        if (hit.collider.CompareTag("Player"))
+                        {
+                            CharacterUIController vUIController = hit.collider.GetComponentInParent<CharacterUIController>();
+                            if (vUIController != null)
+                            {
+                                // 플레이어 시야에 없는 플레이어는 눌러도 ui가 안뜨고 레버를 생성함
+                                if (!vUIController.CheckIsPlayerOutOfSight())
+                                {
+                                    vUIController.SetCharacterUIMobile();
+                                    continue;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                     // Debug.Log(hit.collider);
 
@@ -118,18 +140,16 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                             m_vRightJoystick.gameObject.SetActive(true);
 
                             vRightTouchDownPosition = vTouchPosition;
+
+                            m_vLocalPlayer.a_vWeaponController.ToggleAim(true);
                         }
                     }
                 }
-                else if (eTouchPhase == TouchPhase.Moved || eTouchPhase == TouchPhase.Stationary)
+                else if (eTouchPhase == TouchPhase.Moved || eTouchPhase == TouchPhase.Stationary) // { 조이스틱 터치 유지 및 이동 }
                 {
                     // 터치한곳에 상호작용 오브젝트가 있으면 조이스틱을 생성하지않고 해당 상호작용을 진행함
-                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
-                    if (hit.collider != null)
-                    {
-                        continue;
-                    }
-                    // Debug.Log(hit.collider);
+                    RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(vTouchPosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
+                    if (hit.collider != null) continue;
 
                     if (iTouchID == m_iLeftID)          // left touching
                     {
@@ -154,21 +174,27 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                         }
 
                         m_vRightLever.localPosition = vLeverPos;
+                        if(vLeverPos!=Vector2.zero)
+                            m_vAimVector = vLeverPos;
 
-                        // 레버를 움직였을때 총을 발사함
-                        if(m_vRightLever.localPosition!=Vector3.zero)
+                        // 레버를 움직였을때 총을 조준함
+                        if (m_vRightLever.localPosition!=Vector3.zero)
                         {
-                            Vector3 m_vTargetPosition = Vector3.zero;
-                            Vector3 vMousePosition = m_vRightLever.localPosition;
-                            float fAngle = Mathf.Atan2(vMousePosition.y - m_vTargetPosition.y, vMousePosition.x - m_vTargetPosition.x) * Mathf.Rad2Deg;
+                            //Vector3 vTargetPosition = Vector3.zero;
+                            //Vector3 vLeverPosition = m_vRightLever.localPosition;
+                            // float fAngle = Mathf.Atan2(vLeverPosition.y - vTargetPosition.y, vLeverPosition.x - vTargetPosition.x) * Mathf.Rad2Deg;
+                            float fAngle = Mathf.Atan2(m_vRightLever.localPosition.y, m_vRightLever.localPosition.x) * Mathf.Rad2Deg;
 
                             m_vLocalPlayer.SetDirection(fAngle);
                             m_vLocalPlayer.WeaponRotation(fAngle);
-                            m_vLocalPlayer.a_vWeaponController.Shoot();
+
+                            // 발사 토글이 활성화 된 상태에만 총을 쏨.
+                            if(m_bIsFireMode)
+                                m_vLocalPlayer.a_vWeaponController.Shoot();
                         }
                     }
                 }
-                else if (eTouchPhase == TouchPhase.Ended || eTouchPhase == TouchPhase.Canceled)
+                else if (eTouchPhase == TouchPhase.Ended || eTouchPhase == TouchPhase.Canceled) //  { 조이스틱 끝 }
                 {
                     if (iTouchID == m_iLeftID)          // left touch end
                     {
@@ -187,6 +213,15 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
                         m_vRightJoystick.gameObject.SetActive(false);
 
                         m_vLocalPlayer.a_vWeaponController.StopShooting();
+
+                        Debug.Log("Aim Lock EndTouch : " + m_bIsAimLockMode);
+                        // 조준 고정 상태가 아닐때만 조준을 해제한다.
+                        if (!m_bIsAimLockMode)
+                        {
+                            m_vAimVector = Vector3.zero;
+                            m_vLocalPlayer.a_vWeaponController.ToggleAim(false);
+                            Debug.Log("End TOuch exe");
+                        }
                     }
                 }
             }
@@ -197,171 +232,63 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
     {
         m_vLocalPlayer.a_vWeaponController.Reload();
     }
+
     public void OnTouchDrop()
     {
         m_vLocalPlayer.a_vWeaponController.DropWeapon();
     }
+
     public void OnTouchSwitch()
     {
-        if(m_vLocalPlayer.a_vWeaponController.a_vCurrentWeapon.a_vWeaponData.a_eEquipType==E_EquipType.Primary)
-
-            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(2);
-        else
-
-            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(1);
+        // 현재 들고있는 무기가 없다면 인벤토리에 가진 무기중 하나로 바꾼다(주무기 우선)
+        if (m_vLocalPlayer.a_vWeaponController.a_vCurrentWeapon == null)
+        {
+            if (m_vLocalPlayer.a_vWeaponController.CheckCanEquipWeaponType(E_EquipType.Primary))
+                m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Primary);
+            else if (m_vLocalPlayer.a_vWeaponController.CheckCanEquipWeaponType(E_EquipType.Secondary))
+                m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Secondary);
+        }
+        else if (m_vLocalPlayer.a_vWeaponController.a_vCurrentWeapon.a_vWeaponData.a_eEquipType == E_EquipType.Primary)
+            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Secondary);
+        else if(m_vLocalPlayer.a_vWeaponController.a_vCurrentWeapon.a_vWeaponData.a_eEquipType == E_EquipType.Secondary)
+            m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Primary);
     }
 
-    private void MouseTouch()
+    public void OnTouchFire()
     {
-        // 조이스틱 on
-        if (Input.GetMouseButtonDown(0))
+        m_bIsFireMode = !m_bIsFireMode;
+
+        m_vFireButtonImage.color = new Color(1f, (m_bIsFireMode ? 0.6f : 1f), (m_bIsFireMode ? 0f : 1f));
+    }
+
+    public void onTouchAimLock()
+    {
+        m_bIsAimLockMode = !m_bIsAimLockMode;
+
+        m_vAimLockButtonImage.color = new Color(1f, (m_bIsAimLockMode ? 0.6f : 1f), (m_bIsAimLockMode ? 0f : 1f));
+
+        Debug.Log("Aim Lock : " + m_bIsAimLockMode);
+
+        if(m_bIsAimLockMode)
         {
-            // 터치한곳에 상호작용 오브젝트가 있으면 조이스틱을 생성하지않고 해당 상호작용을 진행함
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, iLayerTouchable);
-            if (hit.collider != null)
-            {
-                return;
-            }
+            m_fLeverMoveDistance = m_vRightLever.localPosition.magnitude;
+            Debug.Log("Aim Lock true exe");
 
-            Vector3 vMoustPos = Input.mousePosition;
-            vMouseDownPosition = Input.mousePosition;
-
-            if (vMoustPos.x < Screen.width / 2) // Left Touch
-            {
-                if (!m_bIsLeftTouched)
-                {
-                    m_bIsLeftTouched = true;
-
-                    Vector3 vJoystickPos = Camera.main.ScreenToWorldPoint(vMoustPos);
-                    vJoystickPos.z = 0f;
-
-                    m_vLeftJoystick.transform.position = vJoystickPos;
-                    m_vLeftJoystick.gameObject.SetActive(true);
-
-                    m_vCurrentJoystick = m_vLeftJoystick;
-                    m_vCurrentLever = m_vLeftLever;
-                }
-                else
-                {
-
-                }
-            }
-            else    // right touch
-            {
-                if (!m_bIsRightTouched)
-                {
-                    m_bIsRightTouched = true;
-
-                    Vector3 vJoystickPos = Camera.main.ScreenToWorldPoint(vMoustPos);
-                    vJoystickPos.z = 0f;
-
-                    m_vRightJoystick.transform.position = vJoystickPos;
-                    m_vRightJoystick.gameObject.SetActive(true);
-
-                    m_vCurrentJoystick = m_vRightJoystick;
-                    m_vCurrentLever = m_vRightLever;
-                }
-                else
-                {
-
-                }
-            }
         }
-        // 조이스틱 레버 이동
-        else if (Input.GetMouseButton(0))
+        else
         {
-            vMouseMovePosition = Input.mousePosition;
+            // 조준 고정을 해제할때 오른쪽 레버도 사용하지 않는 상태이면(조준중이지 않으면) 조준을 해제함
+            if(m_iRightID==-1)
+                m_vLocalPlayer.a_vWeaponController.ToggleAim(false);
+            Debug.Log("Aim Lock false exe");
 
-            Vector2 vJoystickPos = vMouseMovePosition - vMouseDownPosition;
-
-            //Debug.Log("Mouse: "+ vMoustPos.ToString() + " / Stick: " + m_vCurrentJoystick.anchoredPosition.ToString() + " / " + Vector3.Distance(vMoustPos, m_vCurrentJoystick.anchoredPosition).ToString());
-            if (Vector3.Distance(vMouseMovePosition, vMouseDownPosition) > m_fLeverMovementLimit)
-            {
-                vJoystickPos = (vMouseMovePosition - vMouseDownPosition).normalized * m_fLeverMovementLimit;
-            }
-
-            m_vCurrentLever.localPosition = vJoystickPos;
-        }
-        // 조이스틱 off
-        else if (Input.GetMouseButtonUp(0))
-        {
-            m_bIsLeftTouched = false;
-            m_bIsRightTouched = false;
-
-            m_vCurrentLever.localPosition = Vector3.zero;
-            m_vCurrentJoystick.gameObject.SetActive(false);
-
-            m_vCurrentJoystick = null;
-            m_vCurrentLever = null;
         }
 
 
     }
 
-    //private void OnMultiTouch()
-    //{
-    //    if(Input.touchCount>0)
-    //    {
-    //        for(int i=0;i<Input.touchCount;i++)
-    //        {
-    //            Touch touch = Input.GetTouch(i);
-    //            int index = touch.fingerId;
-    //            Vector2 position = touch.position;
-    //            TouchPhase phase = touch.phase;
-
-    //            if (phase == TouchPhase.Began)
-    //            {
-    //                if(touch.position.x<Screen.width/2) // Left Touch
-    //                {
-    //                    if(!m_bIsLeftTouched)
-    //                    {
-    //                        m_bIsLeftTouched = true;
-
-    //                        m_vLeftJoystick.gameObject.SetActive(true);
-    //                    }
-    //                    else
-    //                    {
-
-    //                    }
-    //                }
-    //                else   // Right Touch
-    //                {
-
-    //                }
-    //            }
-    //            else if (phase == TouchPhase.Moved)
-    //            {
-
-    //            }
-    //            else if (phase == TouchPhase.Stationary)
-    //            {
-
-    //            }
-    //            else if (phase == TouchPhase.Ended)
-    //            {
-
-    //            }
-    //            else if(phase==TouchPhase.Canceled)
-    //            {
-
-    //            }
-    //        }
-    //    }
-    //}
-
-    //public void OnBeginDrag(PointerEventData eventData)
-    //{
-    //    throw new System.NotImplementedException();
-    //}
-
-    //public void OnDrag(PointerEventData eventData)
-    //{
-    //    throw new System.NotImplementedException();
-    //}
-
-    //public void OnEndDrag(PointerEventData eventData)
-    //{
-    //    throw new System.NotImplementedException();
-    //}
-
+    public void OnTouchScoreboard()
+    {
+        UIScoreBoardManager.I.ShowScoreBoard();
+    }
 }

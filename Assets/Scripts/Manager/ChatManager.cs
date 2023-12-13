@@ -34,6 +34,18 @@ public class ChatManager : Singleton<ChatManager>
         SendChat(E_ChatType.System, PhotonNetwork.LocalPlayer.NickName + " joined the game.");
     }
 
+    public void SetChatUIForMobile()
+    {
+        m_vInputField.interactable = true;
+        //m_vInputField.Select();
+
+        m_vChatScrollViewImage.color = new Color(0.2f, 0.2f, 0.2f, 0.6f);
+        m_vScrollRect.verticalScrollbar = m_vScrollBar;
+
+        m_vTargetToChatButton.gameObject.SetActive(true);
+    }
+
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return))
@@ -41,15 +53,30 @@ public class ChatManager : Singleton<ChatManager>
             m_vInputField.interactable = true;
             m_vInputField.Select();
         }
-        else if(Input.GetKeyDown(KeyCode.Tab))
+        else if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if(m_vInputField.isFocused)
+            if (m_vInputField.isFocused)
             {
                 ToggleTeamChat();
             }
         }
 
         DisplayChatPanel();
+    }
+#endif
+
+    public void InputReturn()
+    {
+        m_vInputField.interactable = true;
+        m_vInputField.Select();
+    }
+
+    public void InputTab()
+    {
+        if (m_vInputField.isFocused)
+        {
+            ToggleTeamChat();
+        }
     }
 
     // 채팅 치는 도중에는 채팅 패널을 활성화한다.
@@ -80,8 +107,9 @@ public class ChatManager : Singleton<ChatManager>
         m_bIsFocusedPast = m_vInputField.isFocused;
     }
 
+
     // Tab을 누르면 전체채팅과 팀채팅을 바꾼다
-    private void ToggleTeamChat()
+    public void ToggleTeamChat()
     {
         // 팀채팅은 살아있는 마피아 플레이어만 사용할 수 있다.
         if ((GameManager.I.GetPlayerRole() != E_PlayerRole.Mafia) || (GameManager.I.GetPlayerController().a_ePlayerState != E_PlayerState.Alive))

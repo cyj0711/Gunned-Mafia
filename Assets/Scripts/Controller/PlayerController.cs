@@ -217,17 +217,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
     void Update()
     {
-        //if (m_vPhotonView.IsMine)
-        //{
-        //    if (!ChatManager.I.a_vInputField.isFocused)
-        //    {
-        //        UpdateWalkingProcess();
-        //        UpdateWeaponAimProcess();
-        //        UpdateWeaponShotProcess();
-        //        UpdateKeyboardInputProcess();
-        //    }
-        //}
-
         /* 위치 동기화는 transformView Component를 안 쓰고 OnPhotonSerializeView와 이 코드를 쓰면 빠르고 버그도 없어서 좋다 */
         // IsMine이 아닌 것들은 부드럽게 위치 동기화
         if (!m_vPhotonView.IsMine)
@@ -276,77 +265,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         m_vWeaponController.gameObject.transform.rotation = Quaternion.AngleAxis(_fAngle, Vector3.forward);
     }
 
-    /*
-    void UpdateWeaponShotProcess()
-    {
-        // 총 발사
-        if (Input.GetMouseButton(0))
-        {
-            m_vWeaponController.Shoot();
-
-        }
-        // 발사 중지
-        else if (Input.GetMouseButtonUp(0))
-        {
-            m_vWeaponController.StopShooting();
-        }
-
-        // 무기 조준
-        if (Input.GetMouseButtonDown(1))
-        {
-            m_vWeaponController.ToggleAim();
-        }
-    }
-
-    void UpdateKeyboardInputProcess()
-    {
-        if (Input.GetKeyDown(KeyCode.R)) // 장전
-        {
-            m_vWeaponController.Reload();
-        }
-
-        else if (Input.GetKeyDown(KeyCode.Alpha1))   // 주무기
-        {
-            m_vWeaponController.ChangeCurrentWeapon(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))  // 보조무기
-        {
-            m_vWeaponController.ChangeCurrentWeapon(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))  // 근접무기
-        {
-            m_vWeaponController.ChangeCurrentWeapon(3);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))  // 투척무기
-        {
-            m_vWeaponController.ChangeCurrentWeapon(4);
-        }
-
-        else if (Input.GetKeyDown(KeyCode.G))    // 무기 버리기
-        {
-            m_vWeaponController.DropWeapon();
-        }
-
-        else if (Input.GetKeyDown(KeyCode.Tab))  // 점수창 열기
-        {
-            UIScoreBoardManager.I.ShowScoreBoard(true);
-        }
-        else if (Input.GetKeyUp(KeyCode.Tab))   // 점수창 닫기
-        {
-            UIScoreBoardManager.I.ShowScoreBoard(false);
-        }
-    }
-
-    void UpdateWalkingProcess()
-    {
-        float axisX = Input.GetAxisRaw("Horizontal");
-        float axisY = Input.GetAxisRaw("Vertical");
-
-        if (axisX != 0f || axisY != 0f)
-            SetWalkingInput(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-    }
-    */
-
     public void SetWalkingInput(float _fAxisX, float _fAxisY)
     {
         // transform을 이동하면 벽에 부딪히면 떨리는 현상이 있으므로 velocity로 움직인다.
@@ -358,19 +276,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
         }
         else m_vCharacterAnimationController.SetWalk(false);
     }
-
-    /*
-    void UpdateWeaponAimProcess()
-    {
-        m_vTargetPosition = transform.position;
-        Vector2 vMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float fAngle = Mathf.Atan2(vMousePosition.y - m_vTargetPosition.y, vMousePosition.x - m_vTargetPosition.x) * Mathf.Rad2Deg;
-
-        SetDirection(fAngle);
-
-        WeaponRotation(fAngle);
-    }
-    */
 
     public void TeleportPlayer(float _fPositionX, float _fPositionY)
     {
@@ -394,7 +299,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
 
         if (m_bSeeingRight != m_bLastSeeingRight)
         {
-            m_vPhotonView.RPC(nameof(ChangeDirectionRPC), RpcTarget.AllBuffered, m_bSeeingRight);
+            m_vPhotonView.RPC(nameof(ChangeDirectionRPC), RpcTarget.All, m_bSeeingRight);
         }
         m_bLastSeeingRight = m_bSeeingRight;
     }
@@ -410,7 +315,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable, IPunI
     void ChangeDirectionRPC(bool isSeeingRight)
     {
         Vector3 scale = new Vector3(m_vCharacterObject.transform.localScale.x, m_vCharacterObject.transform.localScale.y, m_vCharacterObject.transform.localScale.z);
-        scale.x *= -1;
+
+        if (isSeeingRight)
+        {
+            scale.x = scale.x > 0f ? -scale.x : scale.x;
+        }
+        else
+        {
+            scale.x = scale.x > 0f ? scale.x : -scale.x;
+        }
+
         m_vCharacterObject.transform.localScale = scale;
         m_vWeaponController.SetDirection(isSeeingRight);
     }

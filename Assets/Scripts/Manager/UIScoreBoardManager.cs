@@ -29,6 +29,11 @@ public class UIScoreBoardManager : Singleton<UIScoreBoardManager>
         m_vScoreBoardPanelObject.SetActive(bActive);
     }
 
+    public void ShowScoreBoard()
+    {
+        m_vScoreBoardPanelObject.SetActive(!m_vScoreBoardPanelObject.activeSelf);
+    }
+
     public void CreateScoreBoardItem(int _iActorNumber, ScoreBoardItemController _vScoreBoardItem)
     {
         if (!m_dicScoreBoardItems.ContainsKey(_iActorNumber))

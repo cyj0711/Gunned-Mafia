@@ -29,7 +29,7 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     [SerializeField] Image m_vReloadUIImage;
     public Image a_vReloadUIImage { get => m_vReloadUIImage; }
-    //private Vector3 m_vLastMousePosition;
+    //private Vector3 vLastMousePosition;
 
     //*************** Synchronization Properties *******************
     [SerializeField] int m_iCurrentWeaponViewID;   // 아무것도 안들었을땐 -1 로 설정해주자.
@@ -99,7 +99,9 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
     {
         if (m_vCurrentWeapon != null)
         {
-            if ((m_vCurrentWeapon.a_vWeaponData.a_bAutoFire || !m_bIsShooting) && !m_bIsReloading)
+            // 모바일 기기는 autoFire 무기가 아니더라도 autoFire를 지원한다 (사격 보정)
+            if ((Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android
+                || m_vCurrentWeapon.a_vWeaponData.a_bAutoFire || !m_bIsShooting) && !m_bIsReloading)
             {
                 // 총기 발사 및 반동
                 float fWeaponRecoil = m_vCurrentWeapon.Shoot(transform.rotation.eulerAngles.z + Random.Range(-m_fCurrentRecoil, m_fCurrentRecoil), PhotonNetwork.LocalPlayer.ActorNumber);
@@ -144,14 +146,19 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         if (m_vCurrentWeapon == null || m_bIsReloading) return;
 
         m_bIsAiming = _bIsAiming;
-
+        Debug.Log("Is Aiming : " + m_bIsAiming);
         // 조준
         if (m_bIsAiming)
         {
             if (m_coToggleAim == null)
             {
-                if(m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor>0)
-                    m_coToggleAim = StartCoroutine(AimCoroutine());
+                if (m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor > 0)
+                {
+                    if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
+                        m_coToggleAim = StartCoroutine(AimCoroutine());
+                    else if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android)
+                        m_coToggleAim = StartCoroutine(AimCoroutineMobile());
+                }
             }
         }
         // 조준 해제
@@ -169,15 +176,15 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
 
     private IEnumerator AimCoroutine()
     {
-        Vector3 m_vLastMousePosition = Input.mousePosition;
+        Vector3 vLastMousePosition = Input.mousePosition;
         bool bIsClickedFrame = true;    // AimCoroutine 이 호출된 바로 그 프레임인지 확인(우클릭 누르자마자 바로 조준하는 용도)
 
         while (m_bIsAiming)
         {
             Vector3 vCurrentMousePosition = Input.mousePosition;
 
-            // if (Vector3.Distance(m_vLastMousePosition, vCurrentMousePosition) > 0.2f 의  0.2f 는 보정값임.
-            if (Vector3.Distance(m_vLastMousePosition, vCurrentMousePosition) > 0.2f || bIsClickedFrame)
+            // if (Vector3.Distance(vLastMousePosition, vCurrentMousePosition) > 0.2f 의  0.2f 는 보정값임.
+            if (Vector3.Distance(vLastMousePosition, vCurrentMousePosition) > 0.2f || bIsClickedFrame)
             {
                 Vector3 vAimPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,
             Input.mousePosition.y, -Camera.main.transform.position.z)) - transform.parent.transform.position;
@@ -191,8 +198,26 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
                 CameraManager.I.SetCameraFollowerPosition(vAimPosition);
 
             }
-            m_vLastMousePosition = vCurrentMousePosition;
+            vLastMousePosition = vCurrentMousePosition;
             bIsClickedFrame = false;
+
+            yield return null;
+        }
+    }
+
+    // 모바일 전용 AimCoroutine 함수
+    private IEnumerator AimCoroutineMobile()
+    {
+        while (m_bIsAiming)
+        {
+            // 조준을 잠금한 상태면 조준 비율이 잠금 당시의 조준 길이의 비율로 고정된다.
+            float fLeverMoveRate = (MobileInputManager.I.a_bIsAimLockMode ?
+                MobileInputManager.I.a_fLeverMoveDistance : MobileInputManager.I.a_vRightLever.localPosition.magnitude)
+                / MobileInputManager.I.a_fLeverMovementLimit;
+
+            // CameraManager.I.SetCameraFollowerPosition(MobileInputManager.I.a_vRightLever.localPosition.normalized * fLeverMoveRate * m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor);
+            CameraManager.I.SetCameraFollowerPosition(MobileInputManager.I.a_vAimVector.normalized * fLeverMoveRate * m_vCurrentWeapon.a_vWeaponData.a_fZoomFactor);
+
 
             yield return null;
         }
@@ -417,8 +442,59 @@ public class WeaponController : MonoBehaviourPunCallbacks , IPunObservable
         }
     }
 
+    public void ChangeCurrentWeapon(E_EquipType _eInputEquipType)
+    {
+        // 교체하려는 무기가 현재 들고있으면 무시함
+        if (m_vCurrentWeapon != null && _eInputEquipType == m_vCurrentWeapon.a_vWeaponData.a_eEquipType)
+            return;
+        // 교체하려는 무기가 없는 무기면 무시함
+        if (!CheckCanEquipWeaponType(_eInputEquipType))
+            return;
+
+        StopShooting();
+        ToggleAim(false);
+        m_bIsReloading = false;
+        m_fCurrentRecoil = 0f;
+
+        switch (_eInputEquipType)
+        {
+            case E_EquipType.Primary:
+                if (CheckCanEquipWeaponType(E_EquipType.Primary))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Primary].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmoUI();
+                    UIGameManager.I.SetAmmoActive(true);
+                }
+                break;
+            case E_EquipType.Secondary:
+                if (CheckCanEquipWeaponType(E_EquipType.Secondary))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Secondary].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmoUI();
+                    UIGameManager.I.SetAmmoActive(true);
+                }
+                break;
+            case E_EquipType.Melee:
+                if (CheckCanEquipWeaponType(E_EquipType.Melee))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Melee].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmoUI();
+                    UIGameManager.I.SetAmmoActive(true);
+                }
+                break;
+            case E_EquipType.Grenade:
+                if (CheckCanEquipWeaponType(E_EquipType.Grenade))
+                {
+                    a_iCurrentWeaponViewID = m_dicWeaponInventory[E_EquipType.Grenade].gameObject.GetComponent<PhotonView>().ViewID;
+                    m_vCurrentWeapon.SetAmmoUI();
+                    UIGameManager.I.SetAmmoActive(true);
+                }
+                break;
+        }
+    }
+
     // 들고자 하는 무기가 들 수 있는 상태인지 확인
-    private bool CheckCanEquipWeaponType(E_EquipType eWeaponType)
+    public bool CheckCanEquipWeaponType(E_EquipType eWeaponType)
     {
         if (m_vCurrentWeapon != null)
         {

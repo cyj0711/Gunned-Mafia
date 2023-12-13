@@ -3,237 +3,57 @@
     "m_SelectedPackage": {
         "deviceId": "2ccc8761fd1d7ece",
         "name": "com.DefaultCompany.GunmongUs",
-        "processId": 11009,
+        "processId": 5399,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.android.settings",
-            "processId": 9645,
+            "name": "com.DefaultCompany.GunmongUs",
+            "processId": 25302,
             "exited": true
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
             "name": "com.DefaultCompany.GunmongUs",
-            "processId": 10167,
+            "processId": 27690,
             "exited": true
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
             "name": "com.DefaultCompany.GunmongUs",
-            "processId": 13347,
+            "processId": 29836,
             "exited": true
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
             "name": "com.DefaultCompany.GunmongUs",
-            "processId": 17547,
+            "processId": 31872,
             "exited": true
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.sec.android.app.launcher",
-            "processId": 2387,
+            "name": "com.DefaultCompany.GunmongUs",
+            "processId": 1295,
             "exited": false
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
             "name": "com.DefaultCompany.GunmongUs",
-            "processId": 19931,
+            "processId": 3358,
             "exited": false
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
             "name": "com.DefaultCompany.GunmongUs",
-            "processId": 20821,
+            "processId": 4353,
             "exited": false
         },
         {
             "deviceId": "2ccc8761fd1d7ece",
             "name": "com.DefaultCompany.GunmongUs",
-            "processId": 21385,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 22279,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 23311,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 25140,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 26067,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 26697,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 27703,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 28250,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 29383,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 31584,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 32096,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 32342,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 532,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 3006,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 4176,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 4951,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 7098,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 7912,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 8781,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 9196,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 3951,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 5121,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 5623,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 9234,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 29253,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 30530,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 32062,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 4094,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 4747,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 6537,
-            "exited": false
-        },
-        {
-            "deviceId": "2ccc8761fd1d7ece",
-            "name": "com.DefaultCompany.GunmongUs",
-            "processId": 11009,
+            "processId": 5399,
             "exited": false
         }
     ],

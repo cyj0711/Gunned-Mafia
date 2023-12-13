@@ -54,7 +54,10 @@ public class LogInManager : SingletonPunCallbacks<LogInManager>
         if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android)
             SceneManager.LoadScene("Lobby");
         else
-            ConnectGoogle();
+        {
+            SceneManager.LoadScene("Lobby");    // TODO: 블루스택 구동용 코드이므로 실제 빌드에선 반드시 지우고 ConnectGoogle(); 를 활성화해야함
+            // ConnectGoogle();
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause)
