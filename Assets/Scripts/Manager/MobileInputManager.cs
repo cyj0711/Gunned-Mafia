@@ -261,7 +261,7 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
         m_vFireButtonImage.color = new Color(1f, (m_bIsFireMode ? 0.6f : 1f), (m_bIsFireMode ? 0f : 1f));
     }
 
-    public void onTouchAimLock()
+    public void OnTouchAimLock()
     {
         m_bIsAimLockMode = !m_bIsAimLockMode;
 
@@ -283,8 +283,11 @@ public class MobileInputManager : Singleton<MobileInputManager>//, IBeginDragHan
             Debug.Log("Aim Lock false exe");
 
         }
+    }
 
-
+    public void OnTouchSearch()
+    {
+        UISearchManager.I.SearchBody();
     }
 
     public void OnTouchScoreboard()

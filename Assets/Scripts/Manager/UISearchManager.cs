@@ -20,6 +20,14 @@ public class UISearchManager : Singleton<UISearchManager>
     private Dictionary<int, LocationPingController> m_dicPlayerLocationPing = new Dictionary<int, LocationPingController>();    // 플레이어(죽었으면 시체)의 위치를 표시하는 핑들을 저장. 탐정 ui 용도.
     public IReadOnlyDictionary<int, LocationPingController> a_dicPlayerLocationPing => m_dicPlayerLocationPing;
 
+    public void SearchBody()
+    {
+        PlayerDeadController vBodyToSearch = MapManager.I.a_vNearestBody;
+
+        if (vBodyToSearch != null)
+            vBodyToSearch.SearchBody();
+    }
+
     public void SetSearchPanelActive(bool _bIsActive)
     {
         m_vSearchPanelObject.SetActive(_bIsActive);

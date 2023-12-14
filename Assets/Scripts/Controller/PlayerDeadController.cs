@@ -25,7 +25,7 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
     int m_iRemainTimeDNA;           // 범인의 DNA가 남아있는 시간 (초 단위)
 
     /* 두 bool형 모두 충족해야 시체조사 가능 */
-    bool m_bIsCollisionEntered;     // 플레이어의 시체 근접 여부
+    bool m_bIsCollisionEntered;     // 플레이어의 시체 근접 여부   // 현재 사용하지 않는 변수. MapManager의 m_dicNearBody 로 대체됨.
     bool m_bIsMouseEntered;         // 마우스의 시체 근접 여부
 
     bool m_bIsSearchEnable;         // 시체 조사 가능 여부
@@ -49,22 +49,22 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
         m_iFirstWitnessActorNumber = -1;
     }
 
-    private void Update()
-    {
-        if (m_bIsSearchEnable)
-        {
-            if (Input.GetKeyUp(KeyCode.E))
-            {
-                if (m_iFirstWitnessActorNumber == -1)   // 최초 발견자인지 확인(알림 띄우는 용도)
-                {
-                    GameManager.I.CheckIsPlayerFirstWitness(m_iVictimActorNumber, PhotonNetwork.LocalPlayer.ActorNumber);   // 최초 발견자가 맞다면 PlayerDeadController.cs의 NotifyDead 함수 호출
-                }
+    //private void Update()
+    //{
+    //    if (m_bIsSearchEnable)
+    //    {
+    //        if (Input.GetKeyUp(KeyCode.E))
+    //        {
+    //            if (m_iFirstWitnessActorNumber == -1)   // 최초 발견자인지 확인(알림 띄우는 용도)
+    //            {
+    //                GameManager.I.CheckIsPlayerFirstWitness(m_iVictimActorNumber, PhotonNetwork.LocalPlayer.ActorNumber);   // 최초 발견자가 맞다면 PlayerDeadController.cs의 NotifyDead 함수 호출
+    //            }
 
-                UISearchManager.I.SetSearchText(m_iVictimActorNumber, m_iKillerActorNumber, m_strVictimNickName, m_ePlayerRole, m_iWeaponID, (int)(PhotonNetwork.Time - m_dDeadTime), Mathf.Max(m_iRemainTimeDNA - (int)(PhotonNetwork.Time - m_dDeadTime), 0));
-                UISearchManager.I.SetSearchPanelActive(true);
-            }
-        }
-    }
+    //            UISearchManager.I.SetSearchText(m_iVictimActorNumber, m_iKillerActorNumber, m_strVictimNickName, m_ePlayerRole, m_iWeaponID, (int)(PhotonNetwork.Time - m_dDeadTime), Mathf.Max(m_iRemainTimeDNA - (int)(PhotonNetwork.Time - m_dDeadTime), 0));
+    //            UISearchManager.I.SetSearchPanelActive(true);
+    //        }
+    //    }
+    //}
 
     public void InitData(int _iVictimActorNumber, E_PlayerRole _ePlayerRole, int _iKillerActorNumber, int _iWeaponID, double _dDeadTime, float _fKillerDistance, string _strVictimNickName)
     {
@@ -91,37 +91,37 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
         return Mathf.Max((int)((120 / fRoundedDistance) - (fRoundedDistance * fRoundedDistance)), 0);
     }
 
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
     // 시체에 가까이가서 마우스를 가져다 대면 조사가 가능하다.
     private void OnMouseEnter()
     {
         m_bIsMouseEntered = true;
 
-        if (m_bIsCollisionEntered == true)
-            ActivateSearch(true);
+        if (MapManager.I.GetNearBody(m_iVictimActorNumber) == this)
+            MapManager.I.SetNearestBody(m_iVictimActorNumber);
     }
 
     private void OnMouseExit()
     {
         m_bIsMouseEntered = false;
-        ActivateSearch(false);
+
+        if (MapManager.I.GetNearBody(m_iVictimActorNumber) == this)
+            MapManager.I.SetNearestBody(-1);
     }
+#endif
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         PlayerController vPlayerController = collision.GetComponentInParent<PlayerController>();
 
-        if (vPlayerController == null)
-        {
-            //Debug.LogError("Body " + m_iVictimActorNumber + " is touched, but " + collision + "is null");
-            return;
-        }
+        if (vPlayerController == null) return;
 
         if (vPlayerController.a_vPhotonView.IsMine)
         {
-            m_bIsCollisionEntered = true;
+            MapManager.I.AddDictionaryNearBody(m_iVictimActorNumber, this);
 
             if (m_bIsMouseEntered == true)
-                ActivateSearch(true);
+                MapManager.I.SetNearestBody(m_iVictimActorNumber);
         }
 
     }
@@ -130,24 +130,30 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
     {
         PlayerController vPlayerController = collision.GetComponentInParent<PlayerController>();
 
-        if (vPlayerController == null)
-        {
-            //Debug.LogError("Body " + m_iVictimActorNumber + " is touched, but " + collision + "is null");
-            return;
-        }
+        if (vPlayerController == null) return;
 
         if (vPlayerController.a_vPhotonView.IsMine)
         {
-            m_bIsCollisionEntered = false;
-            ActivateSearch(false);
+            MapManager.I.RemoveDictionaryNearBody(m_iVictimActorNumber);
         }
 
     }
 
-    private void ActivateSearch(bool _bIsEnable)
+    public void ActivateSearch(bool _bIsEnable)
     {
         m_vCanvasBody.SetActive(_bIsEnable);
         m_bIsSearchEnable = _bIsEnable;
+    }
+
+    public void SearchBody()
+    {
+        if (m_iFirstWitnessActorNumber == -1)   // 최초 발견자인지 확인(알림 띄우는 용도)
+        {
+            GameManager.I.CheckIsPlayerFirstWitness(m_iVictimActorNumber, PhotonNetwork.LocalPlayer.ActorNumber);   // 최초 발견자가 맞다면 PlayerDeadController.cs의 NotifyDead 함수 호출
+        }
+
+        UISearchManager.I.SetSearchText(m_iVictimActorNumber, m_iKillerActorNumber, m_strVictimNickName, m_ePlayerRole, m_iWeaponID, (int)(PhotonNetwork.Time - m_dDeadTime), Mathf.Max(m_iRemainTimeDNA - (int)(PhotonNetwork.Time - m_dDeadTime), 0));
+        UISearchManager.I.SetSearchPanelActive(true);
     }
 
     public void NotifyDead(int _iFirstWitness)
@@ -156,7 +162,7 @@ public class PlayerDeadController : MonoBehaviour, IPunInstantiateMagicCallback
 
         m_vPhotonView.RPC(nameof(SetBodyNameRPC), RpcTarget.AllBuffered, _iFirstWitness);
 
-        PlayerController vPlayerController = GameManager.I.GetPlayerController(a_iVictimActorNumber);
+        PlayerController vPlayerController = GameManager.I.GetPlayerController(m_iVictimActorNumber);
         if (vPlayerController == null)
             return;
 

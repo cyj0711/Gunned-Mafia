@@ -86,7 +86,8 @@ public abstract class WeaponBase : MonoBehaviour, IPunInstantiateMagicCallback
     public void ShootRPC(Vector3 vPosition, Quaternion vRotation, int iShooterActorNumber, int iWeaponID)
     {
         GameObject vPooledBullet = ObjectPoolingManager.I.a_vBulletObjectPool.ActivatePoolItem();
-        vPooledBullet.GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID, vPosition, vRotation, ObjectPoolingManager.I.a_vBulletObjectPool);
+        if (vPooledBullet != null)
+            vPooledBullet.GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID, vPosition, vRotation, ObjectPoolingManager.I.a_vBulletObjectPool);
         // Instantiate(m_vBulletObject, vPosition, vRotation).GetComponent<BulletController>().SetBulletData(iShooterActorNumber, iWeaponID);
     }
 

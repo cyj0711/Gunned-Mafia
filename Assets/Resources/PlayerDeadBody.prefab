@@ -308,7 +308,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 201
+  m_SortingOrder: 219
   m_TargetDisplay: 0
 --- !u!114 &8356245941367237446
 MonoBehaviour:
@@ -332,7 +332,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &6651597320220245985
 MonoBehaviour:
   m_ObjectHideFlags: 0

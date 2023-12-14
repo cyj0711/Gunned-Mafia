@@ -86,7 +86,10 @@ public class DesktopInputManager : Singleton<DesktopInputManager>
         //{
         //    m_vLocalPlayer.a_vWeaponController.ChangeCurrentWeapon(E_EquipType.Grenade);
         //}
-
+        else if (Input.GetKeyUp(KeyCode.E))
+        {
+            UISearchManager.I.SearchBody();
+        }
         else if (Input.GetKeyDown(KeyCode.G))    // 무기 버리기
         {
             m_vLocalPlayer.a_vWeaponController.DropWeapon();

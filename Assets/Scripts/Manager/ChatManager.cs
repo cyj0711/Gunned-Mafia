@@ -25,6 +25,7 @@ public class ChatManager : Singleton<ChatManager>
     [SerializeField] private Image m_vInputFieldImage;
     [SerializeField] private TMP_Text m_vTargetToChatText;
     [SerializeField] private Button m_vTargetToChatButton;
+    [SerializeField] private Collider2D m_vChatPanelCollider;
 
     private bool m_bIsFocusedPast = false; // 이전 프레임에서 inputField가 포커스를 가졌는지 여부를 저장하는 변수
     private bool m_bIsTeamChat = false;
@@ -43,6 +44,11 @@ public class ChatManager : Singleton<ChatManager>
         m_vScrollRect.verticalScrollbar = m_vScrollBar;
 
         m_vTargetToChatButton.gameObject.SetActive(true);
+    }
+
+    public void SetChatUIForDesktop()
+    {
+        m_vChatPanelCollider.enabled = false;
     }
 
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN

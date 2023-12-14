@@ -21,7 +21,11 @@ public class MapManager : Singleton<MapManager>
     private bool m_bIsWeaponSpawned = false;
 
     private List<WeaponBase> m_listSpawnedWeaponBase = new List<WeaponBase>();
-    private List<GameObject> m_listSpawnedBodyObject = new List<GameObject>();
+
+    private Dictionary<int, PlayerDeadController> m_dicNearBody = new Dictionary<int, PlayerDeadController>();  // 로컬 플레이어와 가까이 있는(조사 가능한) 시체
+    private PlayerDeadController m_vNearestBody = null;
+    public PlayerDeadController a_vNearestBody { get => m_vNearestBody; }
+    private Coroutine m_coFindNearestBody = null;
 
     public void InitVariable()
     {
@@ -130,6 +134,112 @@ public class MapManager : Singleton<MapManager>
     {
         if (!m_dicPlayerDead.ContainsKey(_iVictimActorNumber))
             m_dicPlayerDead.Add(_iVictimActorNumber, vPlayerDead);
+    }
+
+    // 시체와 로컬 플레이어가 충돌(trigger)하면 해당 시체를 dicCloseBody에 추가한다.
+    public void AddDictionaryNearBody(int _iVictimActorNumber, PlayerDeadController vPlayerDead)
+    {
+        if (!m_dicNearBody.ContainsKey(_iVictimActorNumber))
+            m_dicNearBody.Add(_iVictimActorNumber, vPlayerDead);
+
+        // 거리를 통해 가장 가까운 시체를 찾는건 모바일 기기에서만 동작한다(pc에서는 마우스를 올린 곳이 가장 가까운 시체로 처리)
+        if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android)
+        {
+            // 가장 가까운 시체가 없으면 해당 시체를 가장 가까운 시체로 지정한다.
+            if (m_vNearestBody == null)
+            {
+                SetNearestBody(vPlayerDead.a_iVictimActorNumber);
+            }
+            // 가장 가까운 시체가 있다면,  그중 가장 가까운 시체를 찾도록 coroutine을 돌린다.
+            else
+            {
+                if (m_coFindNearestBody == null)
+                    m_coFindNearestBody = StartCoroutine(FindNearestBodyCoroutine());
+            }
+        }
+    }
+
+    // 시체와 로컬 플레이어가 충돌(trigger)에서 벗어나면 dicCloseBody에 해당 시체를 지운다.
+    public void RemoveDictionaryNearBody(int _iVictimActorNumber)
+    {
+        if (m_dicNearBody.ContainsKey(_iVictimActorNumber))
+            m_dicNearBody.Remove(_iVictimActorNumber);
+
+        if (m_vNearestBody != null && _iVictimActorNumber == m_vNearestBody.a_iVictimActorNumber)
+            SetNearestBody(-1);
+
+        // 거리를 통해 가장 가까운 시체를 찾는건 모바일 기기에서만 동작한다(pc에서는 마우스를 올린 곳이 가장 가까운 시체로 처리)
+        if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android)
+        {
+            // 인접한 시체가 없으면 가장 가까운 시체를 찾는 코루틴을 종료한다.
+            if (m_dicNearBody.Count <= 1)
+            {
+                StopCoroutine(FindNearestBodyCoroutine());
+                m_coFindNearestBody = null;
+
+                // 가까운 시체가 아무것도 없으면 가장 가까운 시체를 null로 하고, 하나만 있으면 해당 시체를 가장 가까운 시체로 한다.
+                if (m_dicNearBody.Count == 0)
+                    SetNearestBody(-1);
+                else
+                {
+                    foreach(KeyValuePair<int, PlayerDeadController> _kvPair in m_dicNearBody)
+                    {
+                        SetNearestBody(_kvPair.Key);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public PlayerDeadController GetNearBody(int _iVictimActorNumber)
+    {
+        if (m_dicNearBody.ContainsKey(_iVictimActorNumber))
+            return m_dicNearBody[_iVictimActorNumber];
+        else
+            return null;
+    }
+
+    // 가장 가까운 시체 세팅 (시체 조사 가능 ui 포함)
+    public void SetNearestBody(int _iVictimActorNumber)
+    {
+        // 가장 가까운 시체를 설정하기전 그 이전의 가장 가까운 시체의 ui창을 비활성화한다.
+        if (m_vNearestBody != null)
+        {
+            m_vNearestBody.ActivateSearch(false);
+        }
+
+        if (_iVictimActorNumber == -1)
+        {
+            m_vNearestBody = null;
+            return;
+        }
+
+        if (m_dicNearBody.ContainsKey(_iVictimActorNumber))
+        {
+            m_vNearestBody = m_dicNearBody[_iVictimActorNumber];
+            m_vNearestBody.ActivateSearch(true);
+        }
+    }
+
+    private IEnumerator FindNearestBodyCoroutine()
+    {
+        while(m_vNearestBody!=null)
+        {
+            foreach(KeyValuePair<int, PlayerDeadController> _kvPair in m_dicNearBody)
+            {
+                if (m_vNearestBody != _kvPair.Value)
+                {
+                    if (Vector3.Distance(_kvPair.Value.transform.position, GameManager.I.GetPlayerController().transform.position)
+                        < Vector3.Distance(m_vNearestBody.transform.position, GameManager.I.GetPlayerController().transform.position))
+                    {
+                        SetNearestBody(_kvPair.Key);
+                    }
+                }
+            }
+
+            yield return null;
+        }
     }
 
     //[PunRPC]
